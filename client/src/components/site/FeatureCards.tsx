@@ -320,11 +320,13 @@ export function FeatureCards() {
               key={f.id}
               feature={f}
               onOpen={() => setOpenId(f.id)}
-              className={
+              className={cn(
                 i === 0 || i === 3 ? "md:col-span-2" :
                 i === 4 ? "lg:col-span-2" :
-                ""
-              }
+                "",
+                "min-h-[420px]",
+                "h-full"
+              )}
             />
           ))}
         </div>
@@ -359,7 +361,7 @@ function FeatureCard({
       onBlur={() => setActive(false)}
       onClick={onOpen}
       className={cn(
-        "group relative flex h-[420px] w-full flex-col overflow-hidden rounded border border-quicx-line bg-quicx-bg-2 text-left",
+        "group relative flex w-full flex-col overflow-hidden rounded border border-quicx-line bg-quicx-bg-2 text-left",
         "transition-all duration-500 ease-out",
         "hover:border-white/15 hover:bg-quicx-bg-3",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-quicx-orange/60 focus-visible:ring-offset-2 focus-visible:ring-offset-quicx-bg",
@@ -518,7 +520,7 @@ function ModalBody({ feature }: { feature: Feature }) {
 
       {/* Visual showcase */}
       <div
-        className="relative mt-12 h-[420px] overflow-hidden rounded border border-quicx-line bg-quicx-bg-2"
+        className="relative mt-12 overflow-hidden rounded border border-quicx-line bg-quicx-bg-2"
         style={{
           background: `radial-gradient(ellipse 70% 60% at 50% 0%, ${feature.tint.radial}, var(--quicx-bg-2) 70%)`,
         }}

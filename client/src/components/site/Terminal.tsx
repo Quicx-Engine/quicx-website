@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils";
 export type TerminalLine =
   | { kind: "input"; text: string }
   | { kind: "output"; text: string; className?: string }
-  | { kind: "blank" };
+  | { kind: "blank" }
+  | { kind: "clear" };
 
 type Props = {
   lines: TerminalLine[];
@@ -32,7 +33,7 @@ export function Terminal({
   outputDelay = 220,
   lineDelay = 55,
   className,
-  prompt = "~",
+  prompt = "anastassow@Dimitars-MacBook-Pro ~ %",
 }: Props) {
   const [visible, setVisible] = useState<TerminalLine[]>([]);
   const [typingIndex, setTypingIndex] = useState(0);
@@ -84,6 +85,14 @@ export function Terminal({
           }
         };
         typeChar();
+      } else if (line.kind === "clear") {
+        timers.current.push(
+          setTimeout(() => {
+            setVisible([]);
+            cursor += 1;
+            playNext();
+          }, 300)
+        );
       } else {
         timers.current.push(
           setTimeout(() => {
@@ -109,6 +118,15 @@ export function Terminal({
   const isTypingNow =
     active && typingText.length > 0 && typingIndex === visible.length;
 
+  // Pre-calculate final lines to reserve exact height
+  const lastClearIdx = (() => {
+    for (let i = lines.length - 1; i >= 0; i--) {
+      if (lines[i].kind === "clear") return i;
+    }
+    return -1;
+  })();
+  const finalLines = lastClearIdx >= 0 ? lines.slice(lastClearIdx + 1) : lines;
+
   return (
     <div
       className={cn(
@@ -129,48 +147,75 @@ export function Terminal({
       {/* Body */}
       <div
         ref={scrollRef}
-        className="terminal-scroll flex-1 overflow-y-auto px-4 py-3"
+        className="terminal-scroll relative flex-1 overflow-y-auto px-4 py-3"
       >
-        {visible.map((line, idx) => {
-          if (line.kind === "input") {
+        {/* Invisible final state to set exact height container */}
+        <div className="pointer-events-none invisible" aria-hidden="true">
+          {finalLines.map((line, idx) => {
+            if (line.kind === "input") {
+              return (
+                <div key={`inv-${idx}`} className="text-quicx-text">
+                  <span className="text-quicx-dim">{prompt}</span>{" "}
+                  <span>{line.text}</span>
+                </div>
+              );
+            }
+            if (line.kind === "blank") {
+              return <div key={`inv-${idx}`}>&nbsp;</div>;
+            }
+            if (line.kind === "clear") return null;
             return (
-              <div key={idx} className="text-quicx-text">
-                <span className="text-quicx-orange-bright">❯</span>{" "}
-                <span className="text-quicx-dim">{prompt}</span>{" "}
-                <span>{line.text}</span>
+              <div
+                key={`inv-${idx}`}
+                className={cn("whitespace-pre text-quicx-muted", line.className)}
+              >
+                {line.text}
               </div>
             );
-          }
-          if (line.kind === "blank") {
-            return <div key={idx}>&nbsp;</div>;
-          }
-          return (
-            <div
-              key={idx}
-              className={cn("whitespace-pre text-quicx-muted", line.className)}
-            >
-              {line.text}
+          })}
+        </div>
+
+        {/* Absolute positioned typing state */}
+        <div className="absolute inset-0 px-4 py-3">
+          {visible.map((line, idx) => {
+            if (line.kind === "input") {
+              return (
+                <div key={idx} className="text-quicx-text">
+                  <span className="text-quicx-dim">{prompt}</span>{" "}
+                  <span>{line.text}</span>
+                </div>
+              );
+            }
+            if (line.kind === "blank") {
+              return <div key={idx}>&nbsp;</div>;
+            }
+            if (line.kind === "clear") return null;
+            return (
+              <div
+                key={idx}
+                className={cn("whitespace-pre text-quicx-muted", line.className)}
+              >
+                {line.text}
+              </div>
+            );
+          })}
+
+          {isTypingNow && (
+            <div className="text-quicx-text">
+              <span className="text-quicx-dim">{prompt}</span>{" "}
+              <span>{typingText}</span>
+              <span className="caret-blink ml-0.5 inline-block h-[1em] w-[7px] translate-y-[2px] bg-quicx-orange-bright align-middle" />
             </div>
-          );
-        })}
+          )}
 
-        {isTypingNow && (
-          <div className="text-quicx-text">
-            <span className="text-quicx-orange-bright">❯</span>{" "}
-            <span className="text-quicx-dim">{prompt}</span>{" "}
-            <span>{typingText}</span>
-            <span className="caret-blink ml-0.5 inline-block h-[1em] w-[7px] translate-y-[2px] bg-quicx-orange-bright align-middle" />
-          </div>
-        )}
-
-        {/* Trailing caret when idle but not done */}
-        {active && !isTypingNow && visible.length < lines.length && (
-          <div className="text-quicx-text">
-            <span className="text-quicx-orange-bright">❯</span>{" "}
-            <span className="text-quicx-dim">{prompt}</span>{" "}
-            <span className="caret-blink ml-0.5 inline-block h-[1em] w-[7px] translate-y-[2px] bg-quicx-orange-bright align-middle" />
-          </div>
-        )}
+          {/* Trailing caret when idle but not done */}
+          {active && !isTypingNow && visible.length < lines.length && (
+            <div className="text-quicx-text">
+              <span className="text-quicx-dim">{prompt}</span>{" "}
+              <span className="caret-blink ml-0.5 inline-block h-[1em] w-[7px] translate-y-[2px] bg-quicx-orange-bright align-middle" />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
