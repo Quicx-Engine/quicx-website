@@ -22,7 +22,7 @@ export function FootprintVisual({ active }: { active: boolean }) {
   }, [active]);
 
   return (
-    <div className="grid h-full grid-cols-1 gap-3 p-4 sm:grid-cols-[1fr_1.1fr]">
+    <div className="flex h-full flex-col gap-4 p-5">
       {/* Binary download */}
       <div className="flex flex-col overflow-hidden rounded-lg border border-white/10 bg-[#061219] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
         <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-3 py-2">
@@ -62,7 +62,7 @@ export function FootprintVisual({ active }: { active: boolean }) {
         </div>
         <div className="flex flex-1 flex-col justify-center gap-2 px-4 py-3 font-[family-name:var(--font-jetbrains-mono)] text-[11px]">
           {/* Memory ceiling chart */}
-          <div className="flex items-end gap-1 h-24">
+          <div className="flex items-end gap-1 h-20">
             {Array.from({ length: 24 }).map((_, i) => {
               const h =
                 20 + Math.sin(i * 0.6 + used * 0.05) * 12 + (used % 30);
@@ -70,11 +70,12 @@ export function FootprintVisual({ active }: { active: boolean }) {
               return (
                 <div
                   key={i}
-                  className="flex-1 rounded-sm bg-quicx-orange/70"
+                  className="flex-1 rounded-sm bg-quicx-orange shadow-[0_0_8px_rgba(255,87,0,0.4)]"
                   style={{
-                    height: `${clamped}%`,
+                    height: active ? `${clamped}%` : "0%",
                     opacity: 0.45 + (i / 24) * 0.55,
                     transition: "height 500ms ease-out",
+                    transitionDelay: `${i * 20}ms`
                   }}
                 />
               );

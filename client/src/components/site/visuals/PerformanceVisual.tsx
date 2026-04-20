@@ -93,10 +93,11 @@ export function PerformanceVisual({ active }: { active: boolean }) {
               return (
                 <div
                   key={i}
-                  className="flex-1 rounded-sm bg-gradient-to-t from-quicx-orange/60 to-quicx-orange-bright"
+                  className="flex-1 rounded-sm bg-gradient-to-t from-quicx-orange/60 to-quicx-orange-bright shadow-[0_0_8px_rgba(255,87,0,0.3)]"
                   style={{
-                    height: `${h}%`,
+                    height: active ? `${h}%` : "5%",
                     transition: "height 700ms cubic-bezier(.2,.8,.2,1)",
+                    transitionDelay: `${i * 20}ms`
                   }}
                 />
               );

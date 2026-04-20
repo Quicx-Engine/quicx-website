@@ -57,8 +57,8 @@ export function ProtocolVisual({ active }: { active: boolean }) {
             <div
               key={frame.name}
               className={cn(
-                "flex items-center gap-3 rounded px-1.5 py-1 transition-all",
-                i === idx ? "bg-white/[0.04]" : "opacity-70"
+                "flex items-center gap-3 rounded px-2 py-1.5 transition-all duration-300",
+                active && i === idx ? "bg-quicx-orange/10 scale-[1.02] border border-quicx-orange/20 shadow-[0_0_12px_rgba(255,87,0,0.15)]" : "border border-transparent opacity-60"
               )}
             >
               <span

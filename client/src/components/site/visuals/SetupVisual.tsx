@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 const steps = [
   { label: "Install binary", cmd: "curl -fsSL quicx.io/install | sh", time: "0:45" },
-  { label: "Write config", cmd: "quicx init > quicx.toml", time: "1:20" },
+  { label: "Write config", cmd: "quicx init > quicx.conf", time: "1:20" },
   { label: "Start daemon", cmd: "quicx start", time: "1:35" },
   { label: "Add client", cmd: "mvn add dev.quicx:quicx-client", time: "3:20" },
   { label: "Submit task", cmd: "Quicx.submit(task).await();", time: "5:00" },
@@ -55,11 +55,11 @@ export function SetupVisual({ active }: { active: boolean }) {
                 <li key={s.label} className="flex items-start gap-3">
                   <div
                     className={cn(
-                      "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border transition-all",
+                      "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border transition-all duration-300",
                       completed
-                        ? "border-quicx-orange/60 bg-quicx-orange/15 text-quicx-orange-bright"
-                        : "border-white/10 text-quicx-dim",
-                      current && "shadow-[0_0_0_3px_rgba(255,87,0,0.15)]"
+                        ? "border-quicx-orange/60 bg-quicx-orange/15 text-quicx-orange-bright shadow-[0_0_8px_rgba(255,87,0,0.3)] scale-[1.05]"
+                        : "border-white/10 text-quicx-dim scale-95",
+                      current && "shadow-[0_0_0_3px_rgba(255,87,0,0.2)]"
                     )}
                   >
                     {completed ? (

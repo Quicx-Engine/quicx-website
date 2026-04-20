@@ -172,12 +172,12 @@ const features: Feature[] = [
   },
   {
     id: "configurability",
-    title: "One TOML file. Zero guesswork.",
+    title: "One .conf file. Zero guesswork.",
     modalTitle: "Configure memory exactly the way you want it",
     shortSummary:
       "Declare a pool size and a size-class mix. PMAD lays out memory exactly as you asked — no guesswork, no fragmentation.",
     description:
-      "Quicx is built on PMAD, a custom deterministic slab allocator. You declare your memory ceiling and your size-class distribution in a single TOML file; PMAD carves up the pool at startup and hands out slots in O(1), every time.",
+      "Quicx is built on PMAD, a custom deterministic slab allocator. You declare your memory ceiling and your size-class distribution in a single .conf file; PMAD carves up the pool at startup and hands out slots in O(1), every time.",
     bullets: [
       "Fixed pool_size cap, enforced from process start",
       "Tunable size classes (e.g. 32B, 64B, 128B, 256B, 512B, 1024B)",
@@ -197,7 +197,7 @@ const features: Feature[] = [
       },
       {
         title: "Tunable per workload",
-        body: "Different configs for different services, all in a single TOML.",
+        body: "Different configs for different services, all in a single .conf file.",
       },
     ],
   },

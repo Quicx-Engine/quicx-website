@@ -50,29 +50,33 @@ export function ConfigVisual({ active }: { active: boolean }) {
   }, [active]);
 
   return (
-    <div className="grid h-full grid-cols-1 gap-3 p-4 sm:grid-cols-2">
+    <div className="flex h-full flex-col gap-4 p-5">
       {/* Config file */}
       <div className="relative flex flex-col overflow-hidden rounded-lg border border-white/10 bg-[#061219] font-[family-name:var(--font-jetbrains-mono)] text-[11.5px] leading-relaxed shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
         <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-3 py-2">
           <span className="text-[10px] tracking-wide text-quicx-dim">
-            quicx.toml
+            quicx.conf
           </span>
-          <span className="text-[10px] text-quicx-dim">TOML</span>
+          <span className="text-[10px] text-quicx-dim">CONF</span>
         </div>
         <div className="flex-1 space-y-3 overflow-hidden px-4 py-3">
           {sections.map((section) => (
             <div key={section.title}>
-              <div className="text-quicx-orange-bright">{section.title}</div>
-              {section.lines.map((l, i) => (
-                <div key={i} className="flex flex-wrap gap-x-2">
-                  <span className="text-quicx-text">{l.k}</span>
-                  <span className="text-quicx-dim">=</span>
-                  <span className="text-[#9ecbff]">{l.v}</span>
-                  {l.comment && (
-                    <span className="text-quicx-dim">{l.comment}</span>
-                  )}
-                </div>
-              ))}
+              <div className="text-[#cba6f7] font-semibold mb-2">{section.title}</div>
+              <div className="space-y-1.5">
+                {section.lines.map((l, i) => (
+                  <div key={i} className="flex flex-col">
+                    {l.comment && (
+                      <span className="text-[#6c7086] italic mb-0.5">{l.comment}</span>
+                    )}
+                    <div className="flex flex-wrap gap-x-2">
+                      <span className="text-[#89b4fa]">{l.k}</span>
+                      <span className="text-white/30">=</span>
+                      <span className="text-[#a6e3a1]">{l.v}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
@@ -95,12 +99,12 @@ export function ConfigVisual({ active }: { active: boolean }) {
               <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-white/[0.04]">
                 <div
                   className={cn(
-                    "h-full rounded-full transition-all duration-500 ease-out",
+                    "h-full rounded-full transition-all duration-1000 ease-out",
                     highlight === i
-                      ? "bg-quicx-orange"
+                      ? "bg-quicx-orange shadow-[0_0_8px_rgba(255,87,0,0.5)]"
                       : "bg-quicx-orange/40"
                   )}
-                  style={{ width: `${c.pct * 3}%` }}
+                  style={{ width: active ? `${c.pct * 3}%` : "0%", transitionDelay: `${i * 100}ms` }}
                 />
               </div>
               <span
