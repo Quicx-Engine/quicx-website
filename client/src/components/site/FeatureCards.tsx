@@ -314,12 +314,17 @@ export function FeatureCards() {
         </div>
 
         {/* Cards grid */}
-        <div className="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((f) => (
+        <div className="mt-16 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {features.map((f, i) => (
             <FeatureCard
               key={f.id}
               feature={f}
               onOpen={() => setOpenId(f.id)}
+              className={
+                i === 0 || i === 3 ? "md:col-span-2" :
+                i === 4 ? "lg:col-span-2" :
+                ""
+              }
             />
           ))}
         </div>
@@ -337,9 +342,11 @@ export function FeatureCards() {
 function FeatureCard({
   feature,
   onOpen,
+  className,
 }: {
   feature: Feature;
   onOpen: () => void;
+  className?: string;
 }) {
   const [active, setActive] = useState(false);
 
@@ -355,7 +362,8 @@ function FeatureCard({
         "group relative flex h-[420px] w-full flex-col overflow-hidden rounded-2xl border border-quicx-line bg-quicx-bg-2 text-left",
         "transition-all duration-500 ease-out",
         "hover:border-white/15 hover:bg-quicx-bg-3",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-quicx-orange/60 focus-visible:ring-offset-2 focus-visible:ring-offset-quicx-bg"
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-quicx-orange/60 focus-visible:ring-offset-2 focus-visible:ring-offset-quicx-bg",
+        className
       )}
     >
       {/* Card tint — subtle radial glow in top-right */}
