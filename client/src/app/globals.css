@@ -1,0 +1,215 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* -----------------------------------------------------------------------------
+ * Quicx design tokens
+ * ---------------------------------------------------------------------------*/
+:root {
+  /* Brand */
+  --quicx-orange: #ff5700;
+  --quicx-orange-bright: #ff7a33;
+  --quicx-orange-deep: #c94401;
+
+  /* Surface */
+  --quicx-bg: #0b1920;
+  --quicx-bg-2: #0f1f28;
+  --quicx-bg-3: #142530;
+  --quicx-line: rgba(255, 255, 255, 0.08);
+  --quicx-line-strong: rgba(255, 255, 255, 0.14);
+
+  /* Text */
+  --quicx-text: #f4f6fb;
+  --quicx-muted: #9aa3b2;
+  --quicx-dim: #6a7487;
+
+  /* shadcn base (dark-first, with neutral palette) */
+  --background: var(--quicx-bg);
+  --foreground: var(--quicx-text);
+  --card: #0f1f28;
+  --card-foreground: var(--quicx-text);
+  --popover: #0f1f28;
+  --popover-foreground: var(--quicx-text);
+  --primary: var(--quicx-orange);
+  --primary-foreground: #ffffff;
+  --secondary: #1a2338;
+  --secondary-foreground: var(--quicx-text);
+  --muted: #1a2338;
+  --muted-foreground: var(--quicx-muted);
+  --accent: #1a2338;
+  --accent-foreground: var(--quicx-text);
+  --destructive: #ef4444;
+  --border: var(--quicx-line);
+  --input: var(--quicx-line);
+  --ring: rgba(255, 87, 0, 0.4);
+
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-quicx-orange: var(--quicx-orange);
+  --color-quicx-orange-bright: var(--quicx-orange-bright);
+  --color-quicx-orange-deep: var(--quicx-orange-deep);
+  --color-quicx-bg: var(--quicx-bg);
+  --color-quicx-bg-2: var(--quicx-bg-2);
+  --color-quicx-bg-3: var(--quicx-bg-3);
+  --color-quicx-line: var(--quicx-line);
+  --color-quicx-line-strong: var(--quicx-line-strong);
+  --color-quicx-text: var(--quicx-text);
+  --color-quicx-muted: var(--quicx-muted);
+  --color-quicx-dim: var(--quicx-dim);
+
+  --font-display: var(--font-anton);
+  --font-sans: var(--font-archivo);
+  --font-action: var(--font-barlow-condensed);
+  --font-mono: var(--font-jetbrains-mono);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(255, 87, 0, 0.35);
+  color: #fff;
+}
+
+/* -----------------------------------------------------------------------------
+ * Display type – hero
+ * ---------------------------------------------------------------------------*/
+.hero-display {
+  font-family: var(--font-anton), Impact, "Arial Narrow Bold", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.005em;
+  line-height: 0.88;
+  transform: scaleY(1.12);
+  transform-origin: center top;
+  text-transform: uppercase;
+}
+
+/* -----------------------------------------------------------------------------
+ * Grid & glow utilities
+ * ---------------------------------------------------------------------------*/
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.bg-dots {
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.08) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+}
+
+.radial-hero-glow {
+  background:
+    radial-gradient(
+      ellipse 60% 50% at 50% 0%,
+      rgba(255, 87, 0, 0.12),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 80% 60% at 50% 100%,
+      rgba(255, 87, 0, 0.05),
+      transparent 60%
+    );
+}
+
+/* -----------------------------------------------------------------------------
+ * Marquee
+ * ---------------------------------------------------------------------------*/
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+/* -----------------------------------------------------------------------------
+ * Architecture diagram flow animation
+ * ---------------------------------------------------------------------------*/
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+.path-flow {
+  stroke-dasharray: 6 6;
+  animation: dash-flow 1.2s linear infinite;
+}
+
+/* Caret blink */
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.caret-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Scrollbar styling for terminal */
+.terminal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.terminal-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+
+.terminal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
