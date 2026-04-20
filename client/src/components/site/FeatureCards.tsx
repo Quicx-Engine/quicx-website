@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,26 @@ import { PerformanceVisual } from "./visuals/PerformanceVisual";
 import { ProtocolVisual } from "./visuals/ProtocolVisual";
 import { SetupVisual } from "./visuals/SetupVisual";
 
-const statusOutput: TerminalLine[] = [
+const initialUsageSequence: TerminalLine[] = [
+  { kind: "input", text: "quicx" },
+  { kind: "output", text: "quicx v1.0.0 — lightweight task queue daemon" },
+  { kind: "blank" },
+  { kind: "output", text: "usage:" },
+  { kind: "output", text: "  quicx start --config FILE" },
+  { kind: "output", text: "  quicx stop" },
+  { kind: "output", text: "  quicx status" },
+  { kind: "output", text: "  quicx version" },
+];
+
+const usageSequence: TerminalLine[] = [
+  { kind: "input", text: "clear" },
+  { kind: "clear" },
+  ...initialUsageSequence,
+];
+
+const statusSequence: TerminalLine[] = [
+  { kind: "input", text: "clear" },
+  { kind: "clear" },
   { kind: "input", text: "quicx status" },
   { kind: "blank" },
   { kind: "output", text: "  quicx v1.0.0", className: "text-quicx-text" },
@@ -40,6 +59,31 @@ const statusOutput: TerminalLine[] = [
   { kind: "output", text: "     512B  [\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  0 /  238" },
   { kind: "output", text: "    1024B  [\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591]  0 /   80" },
 ];
+
+function TerminalShowcase({ active }: { active: boolean }) {
+  const [hasHovered, setHasHovered] = useState(false);
+
+  useEffect(() => {
+    if (active) setHasHovered(true);
+  }, [active]);
+
+  const currentLines = active
+    ? statusSequence
+    : hasHovered
+    ? usageSequence
+    : initialUsageSequence;
+
+  return (
+    <div className="h-full p-5">
+      <Terminal
+        lines={currentLines}
+        active={true}
+        typeSpeed={22}
+        lineDelay={35}
+      />
+    </div>
+  );
+}
 
 type FeatureTint = {
   /** linear gradient for the soft-light on the card */
@@ -110,16 +154,7 @@ const features: Feature[] = [
       "Live pool_size utilization, versus your configured ceiling",
     ],
     tint: orangeTint,
-    renderVisual: (active) => (
-      <div className="h-full p-5">
-        <Terminal
-          lines={statusOutput}
-          active={active}
-          typeSpeed={22}
-          lineDelay={35}
-        />
-      </div>
-    ),
+    renderVisual: (active) => <TerminalShowcase active={active} />,
     footnotes: [
       {
         title: "Zero-overhead introspection",
@@ -324,7 +359,7 @@ export function FeatureCards() {
                 i === 0 || i === 3 ? "md:col-span-2" :
                 i === 4 ? "lg:col-span-2" :
                 "",
-                "min-h-[420px]",
+                i === 0 ? "min-h-[650px]" : "min-h-[420px]",
                 "h-full"
               )}
             />
@@ -520,7 +555,10 @@ function ModalBody({ feature }: { feature: Feature }) {
 
       {/* Visual showcase */}
       <div
-        className="relative mt-12 overflow-hidden rounded border border-quicx-line bg-quicx-bg-2"
+        className={cn(
+          "relative mt-12 overflow-hidden rounded border border-quicx-line bg-quicx-bg-2",
+          feature.id === "observability" ? "min-h-[650px]" : ""
+        )}
         style={{
           background: `radial-gradient(ellipse 70% 60% at 50% 0%, ${feature.tint.radial}, var(--quicx-bg-2) 70%)`,
         }}

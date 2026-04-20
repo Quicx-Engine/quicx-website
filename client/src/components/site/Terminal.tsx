@@ -36,7 +36,6 @@ export function Terminal({
   prompt = "anastassow@Dimitars-MacBook-Pro ~ %",
 }: Props) {
   const [visible, setVisible] = useState<TerminalLine[]>([]);
-  const [typingIndex, setTypingIndex] = useState(0);
   const [typingText, setTypingText] = useState("");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -48,14 +47,7 @@ export function Terminal({
 
   useEffect(() => {
     clearTimers();
-    if (!active) {
-      const reset = setTimeout(() => {
-        setVisible([]);
-        setTypingIndex(0);
-        setTypingText("");
-      }, 0);
-      return () => clearTimeout(reset);
-    }
+    setTypingText("");
 
     // Sequential playback
     let cursor = 0;
@@ -64,7 +56,6 @@ export function Terminal({
       const line = lines[cursor];
 
       if (line.kind === "input") {
-        setTypingIndex(cursor);
         setTypingText("");
         let i = 0;
         const typeChar = () => {
@@ -107,7 +98,7 @@ export function Terminal({
     playNext();
     return clearTimers;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active]);
+  }, [lines]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -115,8 +106,7 @@ export function Terminal({
     }
   }, [visible, typingText]);
 
-  const isTypingNow =
-    active && typingText.length > 0 && typingIndex === visible.length;
+  const isTypingNow = typingText.length > 0;
 
   // Pre-calculate final lines to reserve exact height
   const lastClearIdx = (() => {
