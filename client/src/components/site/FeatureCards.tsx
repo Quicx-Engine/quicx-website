@@ -359,7 +359,7 @@ function FeatureCard({
       onBlur={() => setActive(false)}
       onClick={onOpen}
       className={cn(
-        "group relative flex h-[420px] w-full flex-col overflow-hidden rounded-xl border border-quicx-line bg-quicx-bg-2 text-left",
+        "group relative flex h-[420px] w-full flex-col overflow-hidden rounded border border-quicx-line bg-quicx-bg-2 text-left",
         "transition-all duration-500 ease-out",
         "hover:border-white/15 hover:bg-quicx-bg-3",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-quicx-orange/60 focus-visible:ring-offset-2 focus-visible:ring-offset-quicx-bg",
@@ -391,7 +391,7 @@ function FeatureCard({
 
         <span
           className={cn(
-            "inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/[0.03] text-white/70",
+            "inline-flex size-9 shrink-0 items-center justify-center rounded border border-white/10 bg-white/[0.03] text-white/70",
             "transition-all duration-300",
             "group-hover:border-quicx-orange/50 group-hover:bg-quicx-orange/10 group-hover:text-quicx-orange-bright"
           )}
@@ -428,7 +428,7 @@ function FeatureModal({
           "top-0 left-0 h-[100dvh] w-[100vw] max-w-none translate-x-0 translate-y-0",
           "gap-0 rounded-none border-0 bg-quicx-bg p-0 shadow-none",
           "sm:top-[50%] sm:left-[50%] sm:h-[min(92vh,900px)] sm:w-[min(92vw,1200px)] sm:max-w-[min(92vw,1200px)]",
-          "sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-xl sm:border sm:border-quicx-line"
+          "sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded sm:border sm:border-quicx-line"
         )}
       >
         {feature && (
@@ -442,7 +442,7 @@ function FeatureModal({
                 type="button"
                 onClick={onClose}
                 aria-label="Close"
-                className="inline-flex size-9 items-center justify-center rounded-md border border-quicx-line bg-white/[0.02] text-quicx-muted transition hover:border-white/20 hover:text-quicx-text"
+                className="inline-flex size-9 items-center justify-center rounded border border-quicx-line bg-white/[0.02] text-quicx-muted transition hover:border-white/20 hover:text-quicx-text"
               >
                 <XIconSmall className="size-4" />
               </button>
@@ -518,7 +518,7 @@ function ModalBody({ feature }: { feature: Feature }) {
 
       {/* Visual showcase */}
       <div
-        className="relative mt-12 h-[420px] overflow-hidden rounded-lg border border-quicx-line bg-quicx-bg-2"
+        className="relative mt-12 h-[420px] overflow-hidden rounded border border-quicx-line bg-quicx-bg-2"
         style={{
           background: `radial-gradient(ellipse 70% 60% at 50% 0%, ${feature.tint.radial}, var(--quicx-bg-2) 70%)`,
         }}
@@ -575,7 +575,7 @@ function MoreToDiscover({
               key={f.id}
               type="button"
               onClick={() => onSwitch(f.id)}
-              className="group relative h-56 overflow-hidden rounded-lg border border-quicx-line bg-quicx-bg-2 text-left transition-all hover:border-white/15 hover:bg-quicx-bg-3"
+              className="group relative h-56 overflow-hidden rounded border border-quicx-line bg-quicx-bg-2 text-left transition-all hover:border-white/15 hover:bg-quicx-bg-3"
             >
               <div
                 className="pointer-events-none absolute inset-0"

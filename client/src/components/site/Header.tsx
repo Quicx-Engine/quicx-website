@@ -46,7 +46,7 @@ export function Header() {
         <Button
           variant="outline"
           size="sm"
-          className="h-9 rounded-md border-quicx-orange/60 bg-transparent px-4 font-[family-name:var(--font-barlow-condensed)] text-[15px] font-semibold uppercase tracking-wide text-quicx-orange hover:border-quicx-orange hover:bg-quicx-orange/10 hover:text-quicx-orange-bright"
+          className="h-9 rounded border-quicx-orange/60 bg-transparent px-4 font-[family-name:var(--font-barlow-condensed)] text-[15px] font-semibold uppercase tracking-wide text-quicx-orange hover:border-quicx-orange hover:bg-quicx-orange/10 hover:text-quicx-orange-bright"
         >
           Try Quicx
         </Button>
