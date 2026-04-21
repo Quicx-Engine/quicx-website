@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
+import { DocsSearch } from "./DocsSearch";
+
 export type DocsNavGroup = {
   label: string;
   items: { id: string; label: string }[];
@@ -52,6 +54,8 @@ export function DocsSidebar({ groups }: { groups: DocsNavGroup[] }) {
           Documentation
         </span>
       </div>
+
+      <DocsSearch groups={groups} />
 
       <ul className="space-y-6 text-[13.5px]">
         {groups.map((g) => (

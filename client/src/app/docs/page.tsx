@@ -313,7 +313,7 @@ less install-quicx.sh
 sh install-quicx.sh`}
       />
 
-      <SubHeading>What the installer does</SubHeading>
+      <SubHeading id="what-installer-does">What the installer does</SubHeading>
 
       <KeyList
         items={[
@@ -375,7 +375,7 @@ sh install-quicx.sh`}
         ]}
       />
 
-      <SubHeading>Verify it worked</SubHeading>
+      <SubHeading id="verify-installation">Verify it worked</SubHeading>
 
       <CodeBlock
         window
@@ -631,7 +631,7 @@ class = 512,12
 class = 1024,8`}
       />
 
-      <SubHeading>[server]</SubHeading>
+      <SubHeading id="server-block">[server]</SubHeading>
 
       <KeyList
         items={[
@@ -650,7 +650,7 @@ class = 1024,8`}
         ]}
       />
 
-      <SubHeading>[allocator]</SubHeading>
+      <SubHeading id="allocator-block">[allocator]</SubHeading>
 
       <Prose>
         <p>
@@ -704,7 +704,7 @@ class = 1024,8`}
         accepts its first connection.
       </Callout>
 
-      <SubHeading>Tuning rules of thumb</SubHeading>
+      <SubHeading id="tuning-rules">Tuning rules of thumb</SubHeading>
 
       <Table
         headers={["Workload", "Recommended shape", "Why"]}
@@ -814,7 +814,7 @@ function ArchitectureSection() {
         ]}
       />
 
-      <SubHeading>Why a single daemon?</SubHeading>
+      <SubHeading id="single-daemon-design">Why a single daemon?</SubHeading>
 
       <Prose>
         <p>
@@ -963,7 +963,7 @@ function PmadSection() {
         ]}
       />
 
-      <SubHeading>Benchmarks</SubHeading>
+      <SubHeading id="pmad-benchmarks">Benchmarks</SubHeading>
 
       <Prose>
         <p>
@@ -990,7 +990,7 @@ function PmadSection() {
         ]}
       />
 
-      <SubHeading>Reference configurations</SubHeading>
+      <SubHeading id="pmad-configurations">Reference configurations</SubHeading>
 
       <Table
         headers={[
@@ -1063,7 +1063,7 @@ function PmadSection() {
         as your first.
       </Callout>
 
-      <SubHeading>Tear-down</SubHeading>
+      <SubHeading id="pmad-teardown">Tear-down</SubHeading>
 
       <Prose>
         <p>
@@ -1092,7 +1092,7 @@ function BinaryProtocolSection() {
         lede="Every frame on the wire is a 6-byte header followed by a variable-length payload. No framing ambiguity, no partial reads, no text encoding — parsing is a couple of pointer reads."
       />
 
-      <SubHeading>Frame header</SubHeading>
+      <SubHeading id="protocol-frame-header">Frame header</SubHeading>
 
       <FrameDiagram />
 
@@ -1117,7 +1117,7 @@ function BinaryProtocolSection() {
         ]}
       />
 
-      <SubHeading>Message types</SubHeading>
+      <SubHeading id="protocol-message-types">Message types</SubHeading>
 
       <OpcodeTable />
 
@@ -1488,7 +1488,7 @@ function JavaClientSection() {
         lede="dev.quicx:quicx-client is a small, dependency-free Java 11+ library. Two classes carry the whole surface area: QuicxClient for producers, QuicxWorker for consumers."
       />
 
-      <SubHeading>Add it to your build</SubHeading>
+      <SubHeading id="java-build-setup">Add it to your build</SubHeading>
 
       <Tabs
         tabs={[
