@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * Stripe-style architecture diagram for Quicx — accurate to the internal
@@ -112,9 +115,32 @@ const MSG = {
 /* ─────────────────── Main diagram ─────────────────── */
 
 function ArchitectureDiagram() {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = svgRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setInView(true);
+            io.disconnect();
+            break;
+          }
+        }
+      },
+      { threshold: 0.2 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div className="relative">
       <svg
+        ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
         className="relative block h-auto w-full"
         role="img"
@@ -166,7 +192,7 @@ function ArchitectureDiagram() {
             text="PMAD SLAB ALLOCATOR"
             color={MSG.DONE}
           />
-          <SlabGrid cx={240} cy={185} />
+          <SlabGrid cx={240} cy={185} inView={inView} />
         </g>
 
         {/* PMAD → daemon: horizontal then down */}
@@ -176,6 +202,8 @@ function ArchitectureDiagram() {
               L 650 290`}
           color={MSG.DONE}
           arrow="DONE"
+          revealIndex={0}
+          inView={inView}
         />
         <EdgeLabel x={540} y={160} text="O(1) alloc / free" color={MSG.DONE} />
 
@@ -207,8 +235,6 @@ function ArchitectureDiagram() {
              3. QUICX DAEMON — center
             ════════════════════════════════════════════════════════ */}
         <g>
-          {/* Halo */}
-          <circle cx={870} cy={600} r={320} fill="url(#center-grad)" />
           {/* Container */}
           <rect
             x={520}
@@ -307,6 +333,8 @@ function ArchitectureDiagram() {
           d={`M 307 470 L 470 470 L 470 600 L 571 600`}
           color={MSG.STATS}
           arrow="STATS"
+          revealIndex={1}
+          inView={inView}
         />
         <EdgeLabel x={388} y={455} text="MSG_STATS" color={MSG.STATS} />
 
@@ -315,6 +343,8 @@ function ArchitectureDiagram() {
           d={`M 307 620 L 571 620`}
           color={MSG.SUBMIT}
           arrow="SUBMIT"
+          revealIndex={2}
+          inView={inView}
         />
         <EdgeLabel x={440} y={605} text="MSG_SUBMIT" color={MSG.SUBMIT} />
 
@@ -323,6 +353,8 @@ function ArchitectureDiagram() {
           d={`M 307 770 L 470 770 L 470 640 L 571 640`}
           color={MSG.SUBMIT}
           arrow="SUBMIT"
+          revealIndex={3}
+          inView={inView}
         />
 
         {/* MSG_OK : Connection Router → Producers (back) */}
@@ -330,6 +362,8 @@ function ArchitectureDiagram() {
           d={`M 571 660 L 450 660 L 450 830 L 307 830`}
           color={MSG.OK}
           arrow="OK"
+          revealIndex={4}
+          inView={inView}
         />
         <EdgeLabel x={385} y={845} text="MSG_OK" color={MSG.OK} />
 
@@ -338,16 +372,22 @@ function ArchitectureDiagram() {
           d={`M 1192 600 L 1270 600 L 1270 470 L 1358 470`}
           color={MSG.TASK}
           arrow="TASK"
+          revealIndex={5}
+          inView={inView}
         />
         <PathEdge
           d={`M 1192 620 L 1358 620`}
           color={MSG.TASK}
           arrow="TASK"
+          revealIndex={6}
+          inView={inView}
         />
         <PathEdge
           d={`M 1192 640 L 1270 640 L 1270 730 L 1358 730`}
           color={MSG.TASK}
           arrow="TASK"
+          revealIndex={7}
+          inView={inView}
         />
         <EdgeLabel x={1275} y={545} text="MSG_TASK" color={MSG.TASK} />
 
@@ -357,6 +397,8 @@ function ArchitectureDiagram() {
           color={MSG.DONE}
           arrow="DONE"
           opacity={0.85}
+          revealIndex={8}
+          inView={inView}
         />
         <EdgeLabel x={1415} y={570} text="MSG_DONE" color={MSG.DONE} />
 
@@ -500,7 +542,13 @@ function Pill({
         strokeOpacity={0.45}
         strokeWidth={1}
       />
-      <circle cx={x - w / 2 + 14} cy={y} r={4} fill={ORANGE} />
+      <circle
+        cx={x - w / 2 + 14}
+        cy={y}
+        r={4}
+        fill={ORANGE}
+        className="node-pulse"
+      />
       <text
         x={x + 6}
         y={y + (small ? 4 : 5)}
@@ -683,7 +731,15 @@ function WorkerTile({
 }
 
 /** 3×2 grid of memory slabs inside the PMAD box. */
-function SlabGrid({ cx, cy }: { cx: number; cy: number }) {
+function SlabGrid({
+  cx,
+  cy,
+  inView,
+}: {
+  cx: number;
+  cy: number;
+  inView?: boolean;
+}) {
   const size = 44;
   const gap = 7;
   const cols = 4;
@@ -694,6 +750,8 @@ function SlabGrid({ cx, cy }: { cx: number; cy: number }) {
   const y0 = cy - gridH / 2;
   // which cells have slab contents (emulates the real allocator's occupied vs free)
   const filled = [true, true, false, true, true, false, true, true];
+  // cells that flip once when the diagram scrolls into view
+  const flipCells = new Set([1, 6]);
 
   return (
     <g>
@@ -718,8 +776,19 @@ function SlabGrid({ cx, cy }: { cx: number; cy: number }) {
               />
             );
           }
+          const flipping = inView && flipCells.has(i);
+          // stagger: first flip at 0.6s, second at 1.1s
+          const flipDelay = i === 1 ? "0.6s" : "1.1s";
           return (
-            <g key={i}>
+            <g
+              key={i}
+              className={flipping ? "slab-flip" : undefined}
+              style={
+                flipping
+                  ? ({ animationDelay: flipDelay } as React.CSSProperties)
+                  : undefined
+              }
+            >
               <rect
                 x={x}
                 y={y}
@@ -816,18 +885,50 @@ function Legend({ x, y }: { x: number; y: number }) {
   );
 }
 
-/** Colored dotted path with arrowhead — used for every message flow. */
+/** Per-message-type flow speeds — varied so the diagram breathes rather than
+ *  ticks metronomically. Faster for hot-path flows (TASK, SUBMIT), slower for
+ *  the infrequent ones (STATS, OK). */
+const FLOW_DURATION: Record<keyof typeof MSG, string> = {
+  SUBMIT: "1.2s",
+  OK: "1.8s",
+  TASK: "1.0s",
+  DONE: "1.6s",
+  STATS: "2.4s",
+};
+
+/** Colored dotted path with arrowhead + animated dash-flow. Every message
+ *  line in the diagram animates along its own direction of travel.
+ *
+ *  When `revealIndex` is provided, the line starts invisible and fades in
+ *  (staggered by index) once the diagram scrolls into view. */
 function PathEdge({
   d,
   color,
   arrow,
   opacity = 1,
+  animated = true,
+  revealIndex,
+  inView,
 }: {
   d: string;
   color: string;
   arrow?: keyof typeof MSG;
   opacity?: number;
+  animated?: boolean;
+  revealIndex?: number;
+  inView?: boolean;
 }) {
+  const duration = arrow ? FLOW_DURATION[arrow] : "1.4s";
+  const reveal = typeof revealIndex === "number";
+  const delay = reveal ? `${(revealIndex as number) * 0.12}s` : "0s";
+  const classes = [
+    animated ? "path-flow" : "",
+    reveal ? "path-reveal" : "",
+    reveal && inView ? "is-visible" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <path
       d={d}
@@ -839,6 +940,17 @@ function PathEdge({
       strokeLinecap="round"
       strokeLinejoin="round"
       markerEnd={arrow ? `url(#arrow-${arrow})` : undefined}
+      className={classes || undefined}
+      style={
+        {
+          ...(animated
+            ? { ["--flow-duration" as string]: duration }
+            : undefined),
+          ...(reveal
+            ? { ["--reveal-delay" as string]: delay }
+            : undefined),
+        } as React.CSSProperties
+      }
     />
   );
 }
