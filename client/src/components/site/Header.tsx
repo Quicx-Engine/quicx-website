@@ -19,19 +19,19 @@ export function Header() {
         <nav className="hidden items-center gap-8 text-[13px] font-medium text-quicx-muted md:flex">
           <a
             className="transition hover:text-quicx-text"
-            href="#features"
+            href="/#features"
           >
             Features
           </a>
           <a
             className="transition hover:text-quicx-text"
-            href="#architecture"
+            href="/#architecture"
           >
             Architecture
           </a>
           <a
             className="transition hover:text-quicx-text"
-            href="#performance"
+            href="/#performance"
           >
             Performance
           </a>
