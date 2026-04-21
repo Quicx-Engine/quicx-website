@@ -1,10 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+
+function buildSparkline(latency: number, isActive: boolean) {
+  const points = Array.from({ length: 40 }, (_, i) => {
+    const y =
+      28 +
+      Math.sin(i * 0.45) * 6 +
+      (isActive ? Math.sin(i + latency * 50) * 4 : 0);
+    return { x: (i / 39) * 100, y };
+  });
+  const path = points
+    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
+    .join(" ");
+  const areaPath = `${path} L 100 60 L 0 60 Z`;
+  return { path, areaPath };
+}
 
 export function PerformanceVisual({ active }: { active: boolean }) {
+  const [mounted, setMounted] = useState(false);
   const [latency, setLatency] = useState(0.181);
   const [throughput, setThroughput] = useState(21000);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!active) return;
@@ -15,15 +35,10 @@ export function PerformanceVisual({ active }: { active: boolean }) {
     return () => clearInterval(id);
   }, [active]);
 
-  // Data points for sparkline
-  const points = Array.from({ length: 40 }, (_, i) => {
-    const y = 28 + Math.sin(i * 0.45) * 6 + (active ? Math.sin(i + latency * 50) * 4 : 0);
-    return { x: (i / 39) * 100, y };
-  });
-  const path = points
-    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
-    .join(" ");
-  const areaPath = `${path} L 100 60 L 0 60 Z`;
+  const { path, areaPath } = useMemo(
+    () => (mounted ? buildSparkline(latency, active) : { path: "", areaPath: "" }),
+    [mounted, latency, active]
+  );
 
   return (
     <div className="grid h-full grid-cols-2 gap-3 p-4">
@@ -78,7 +93,7 @@ export function PerformanceVisual({ active }: { active: boolean }) {
           <div>
             <div className="flex items-baseline gap-1 font-[family-name:var(--font-jetbrains-mono)]">
               <span className="text-3xl font-semibold tabular-nums text-quicx-text">
-                {throughput.toLocaleString()}
+                {new Intl.NumberFormat("en-US").format(throughput)}
               </span>
             </div>
             <div className="mt-1 text-[10.5px] text-quicx-dim">
