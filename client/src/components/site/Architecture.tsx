@@ -331,29 +331,6 @@ function ArchitectureDiagram() {
         <Legend x={W - 300} y={90} />
       </svg>
 
-      {/* Stat strip */}
-      <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-        {[
-          { k: "Binary", v: "~60 KB" },
-          { k: "Latency", v: "0.181 ms" },
-          { k: "Throughput", v: "21,000 /s" },
-          { k: "Protocol", v: "5 opcodes" },
-          { k: "Memory", v: "Bounded" },
-          { k: "Setup", v: "5 minutes" },
-        ].map((s) => (
-          <div
-            key={s.k}
-            className="flex items-center justify-between rounded-xl border border-quicx-line bg-white/[0.015] px-4 py-3"
-          >
-            <span className="font-[family-name:var(--font-barlow-condensed)] text-[11px] uppercase tracking-[0.22em] text-quicx-dim">
-              {s.k}
-            </span>
-            <span className="font-[family-name:var(--font-jetbrains-mono)] text-[13px] text-quicx-text">
-              {s.v}
-            </span>
-          </div>
-        ))}
-      </div>
 
       <div className="mt-10 flex items-center justify-center gap-3 text-[12px] text-quicx-dim">
         <Image
