@@ -273,3 +273,24 @@ body {
 .terminal-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* Protocol opcode log — translate-based shift.
+   The outer list is a fixed-height, overflow:hidden window.
+   The inner list always has the same number of rows; it starts 1 slot
+   above the window and slides down exactly 1 slot — the new row drops
+   into view at top and the oldest slides out through the bottom edge.
+   No row ever changes height, so the card height is perfectly constant. */
+.protocol-log-primed {
+  transform: translateY(var(--log-shift, -36px));
+  transition: none;
+}
+
+.protocol-log-shifting {
+  transform: translateY(0);
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.protocol-log-idle {
+  transform: translateY(0);
+  transition: none;
+}

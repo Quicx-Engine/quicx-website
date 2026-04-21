@@ -70,8 +70,8 @@ function TerminalShowcase({ active }: { active: boolean }) {
   const currentLines = active
     ? statusSequence
     : hasHovered
-    ? usageSequence
-    : initialUsageSequence;
+      ? usageSequence
+      : initialUsageSequence;
 
   return (
     <div className="h-full p-5">
@@ -103,7 +103,7 @@ type Feature = {
   description: string;
   bullets: string[];
   tint: FeatureTint;
-  renderVisual: (active: boolean) => ReactNode;
+  renderVisual: (active: boolean, expanded?: boolean) => ReactNode;
   footnotes: { title: string; body: string }[];
 };
 
@@ -203,12 +203,12 @@ const features: Feature[] = [
   },
   {
     id: "lightweight",
-    title: "60 KB. Bounded memory.",
+    title: "63 KB. Bounded memory.",
     modalTitle: "One binary. One memory budget. No surprises.",
     shortSummary:
-      "A single ~60 KB static binary that never drifts past the memory budget you set. Drop it next to your backend — bounded by design.",
+      "A single ~63 KB static binary that never drifts past the memory budget you set. Drop it next to your backend — bounded by design.",
     description:
-      "Quicx ships as a single ~60 KB static binary. There's no runtime, no JVM, no scheduler to tune. You set a pool_size and that is the memory ceiling — enforced by PMAD, not by hope.",
+      "Quicx ships as a single ~63 KB static binary. There's no runtime, no JVM, no scheduler to tune. You set a pool_size and that is the memory ceiling — enforced by PMAD, not by hope.",
     bullets: [
       "Single static binary, no runtime dependencies",
       "Hard memory ceiling, enforced by the allocator",
@@ -270,15 +270,17 @@ const features: Feature[] = [
     shortSummary:
       "Quicx speaks its own compact binary protocol — opcodes, lengths, and payloads moving at line rate. No JSON, no bloat.",
     description:
-      "The Quicx protocol is a fixed-layout binary wire format with a small, versioned opcode surface. Producers, daemon, and workers all speak it directly — frames are read in-place without parsing overhead.",
+      "The Quicx protocol is a fixed-layout binary wire format: a 6-byte header — version (1B), type (1B), length (4B) — followed by a payload sized exactly to the PMAD slot that holds it. Producers, daemon, and workers all speak it directly.",
     bullets: [
-      "Fixed-layout frame: type, version, length, corr_id, payload",
-      "Five opcodes cover the entire protocol surface",
-      "Zero-copy reads — frames consumed straight from the buffer",
-      "Versioned from v1, forward-compatible by design",
+      "6-byte header: version (1B), type (1B), length (4B)",
+      "Variable-length payload, sized to the PMAD slot",
+      "Twelve opcodes cover the entire protocol surface",
+      "Versioned from byte 0, forward-compatible by design",
     ],
     tint: blueTint,
-    renderVisual: (active) => <ProtocolVisual active={active} />,
+    renderVisual: (active, expanded) => (
+      <ProtocolVisual active={active} expanded={expanded} />
+    ),
     footnotes: [
       {
         title: "Zero-copy wire",
@@ -396,8 +398,8 @@ export function FeatureCards() {
               onOpen={() => setOpenId(f.id)}
               className={cn(
                 i === 0 || i === 3 ? "md:col-span-2" :
-                i === 4 ? "lg:col-span-2" :
-                "",
+                  i === 4 ? "lg:col-span-2" :
+                    "",
                 i === 0 ? "min-h-[650px]" : "min-h-[420px]",
                 "h-full"
               )}
@@ -603,7 +605,7 @@ function ModalBody({ feature }: { feature: Feature }) {
         }}
       >
         <div className="pointer-events-none absolute inset-0 bg-dots opacity-40" />
-        <div className="relative h-full">{feature.renderVisual(true)}</div>
+        <div className="relative h-full">{feature.renderVisual(true, true)}</div>
       </div>
 
       {/* Footnotes */}

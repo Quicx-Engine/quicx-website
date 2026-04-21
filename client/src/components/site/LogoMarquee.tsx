@@ -13,7 +13,7 @@ const items: Item[] = [
   { kind: "tag", text: "From developers, by developers" },
   { kind: "tag", text: "0.181 ms avg latency" },
   { kind: "nefara" },
-  { kind: "tag", text: "60 KB single binary" },
+  { kind: "tag", text: "63 KB single binary" },
   { kind: "tag", text: "Bounded memory — always" },
 ];
 

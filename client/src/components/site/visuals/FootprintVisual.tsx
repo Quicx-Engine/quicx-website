@@ -36,7 +36,7 @@ export function FootprintVisual({ active }: { active: boolean }) {
             <div className="absolute inset-0 -m-2 animate-pulse rounded-2xl bg-quicx-orange/10 blur-xl" />
             <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl border border-quicx-orange/40 bg-gradient-to-br from-quicx-orange/20 to-transparent font-[family-name:var(--font-jetbrains-mono)] text-xs font-semibold text-quicx-orange-bright">
               <div className="flex flex-col items-center">
-                <span className="text-2xl font-bold leading-none">60</span>
+                <span className="text-2xl font-bold leading-none">63</span>
                 <span className="mt-1 text-[9px] tracking-wider">KB</span>
               </div>
             </div>
