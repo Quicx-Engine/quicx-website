@@ -11,6 +11,7 @@ import {
 import { CodeBlock } from "@/components/site/docs/CodeBlock";
 import { Callout } from "@/components/site/docs/Callout";
 import { Tabs } from "@/components/site/docs/Tabs";
+import type { Metadata } from "next";
 
 /* ─────────────── Sidebar model ─────────────── */
 
@@ -43,6 +44,14 @@ const nav: DocsNavGroup[] = [
 
 /* ─────────────── Page ─────────────── */
 
+export const metadata: Metadata = {
+  title: "Documentation | Quicx",
+  description: "Official documentation for Quicx. Learn how to install, configure, and scale your task queue engine.",
+  alternates: {
+    canonical: "/docs",
+  },
+};
+
 export default function DocsPage() {
   return (
     <>
@@ -58,6 +67,7 @@ export default function DocsPage() {
             <DocsSidebar groups={nav} />
 
             <article className="min-w-0 flex-1 space-y-24">
+              <h1 className="sr-only">Quicx Documentation</h1>
               <InstallationSection />
               <QuickStartSection />
               <ConfigurationSection />

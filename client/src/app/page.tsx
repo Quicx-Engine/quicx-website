@@ -4,6 +4,13 @@ import { FeatureCards } from "@/components/site/FeatureCards";
 import { Architecture } from "@/components/site/Architecture";
 import { LogoMarquee } from "@/components/site/LogoMarquee";
 import { Footer } from "@/components/site/Footer";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+  },
+};
 
 export default function Home() {
   return (

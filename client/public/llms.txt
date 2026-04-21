@@ -1,0 +1,20 @@
+# llms.txt — machine-readable site context
+# https://quicx.dev
+
+Title: Quicx
+Description: Quicx is a lightweight, deterministic task queue engine with a custom PMAD slab allocator and a fast binary protocol. Configure it once. Run it forever.
+Author: Dimitar Anastasov
+Repository: https://github.com/anastassow/Quicx
+Contact: https://www.linkedin.com/in/dimitar-anastasov-339a94310/
+
+# Core Architecture
+- Single-threaded event loop (epoll/kqueue)
+- Custom PMAD slab allocator (deterministic memory, zero fragmentation)
+- Custom binary protocol (6-byte header, push/pop/ack/err)
+- Written in C
+- Java client library available (QuicxClient, QuicxWorker)
+
+# Main Resources
+Home: https://quicx.dev/
+Documentation: https://quicx.dev/docs
+Installer: https://quicx.dev/install.sh
