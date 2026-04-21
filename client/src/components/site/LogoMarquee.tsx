@@ -10,7 +10,7 @@ type Item =
 const items: Item[] = [
   { kind: "tag", text: "Deterministic by design" },
   { kind: "nefara" },
-  { kind: "tag", text: "From developers, by developers" },
+  { kind: "tag", text: "Never Far Away" },
   { kind: "tag", text: "0.181 ms avg latency" },
   { kind: "nefara" },
   { kind: "tag", text: "63 KB single binary" },

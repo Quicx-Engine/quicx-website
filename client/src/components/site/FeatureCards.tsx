@@ -303,10 +303,10 @@ const features: Feature[] = [
     shortSummary:
       "Install the binary, drop in the Java client (quicx-client), and submit your first task — on Linux, macOS, or wherever your backend runs.",
     description:
-      "Quicx was designed to disappear. A one-line install, a default-good quicx.toml, a Maven-published Java client, and a tiny API surface. From nothing to a submitted task in about five minutes.",
+      "Quicx was designed to disappear. A one-line install, a default-good quicx.conf, a Maven-published Java client, and a tiny API surface. From nothing to a submitted task in about five minutes.",
     bullets: [
       "One-line installer — no build toolchain required",
-      "Generate a sensible default quicx.toml with quicx init",
+      "Generate a sensible default quicx.conf with quicx init",
       "Java client (quicx-client) is Maven/Gradle-ready",
       "Submit your first task in under five minutes",
     ],
@@ -430,6 +430,7 @@ function FeatureCard({
 
   return (
     <button
+      id={feature.id}
       type="button"
       onMouseEnter={() => setActive(true)}
       onMouseLeave={() => setActive(false)}
@@ -437,7 +438,7 @@ function FeatureCard({
       onBlur={() => setActive(false)}
       onClick={onOpen}
       className={cn(
-        "group relative flex w-full flex-col overflow-hidden rounded border border-quicx-line bg-quicx-bg-2 text-left",
+        "group relative flex w-full flex-col overflow-hidden rounded border border-quicx-line bg-quicx-bg-2 text-left scroll-mt-24",
         "transition-all duration-500 ease-out",
         "hover:border-white/15 hover:bg-quicx-bg-3",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-quicx-orange/60 focus-visible:ring-offset-2 focus-visible:ring-offset-quicx-bg",
@@ -564,19 +565,23 @@ function ModalBody({ feature }: { feature: Feature }) {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button
-              size="lg"
-              className="h-11 rounded bg-quicx-orange px-5 font-[family-name:var(--font-barlow-condensed)] text-sm font-semibold uppercase tracking-wider text-white hover:bg-quicx-orange-bright"
-            >
-              Start with Quicx
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="h-11 rounded border-white/15 bg-transparent px-5 font-[family-name:var(--font-barlow-condensed)] text-sm font-semibold uppercase tracking-wider text-quicx-text hover:border-white/30 hover:bg-white/[0.04] hover:text-white"
-            >
-              See the Docs
-            </Button>
+            <a href="/docs#quick-start">
+              <Button
+                size="lg"
+                className="h-11 rounded bg-quicx-orange px-5 font-[family-name:var(--font-barlow-condensed)] text-sm font-semibold uppercase tracking-wider text-white hover:bg-quicx-orange-bright"
+              >
+                Start with Quicx
+              </Button>
+            </a>
+            <a href="/docs">
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-11 rounded border-white/15 bg-transparent px-5 font-[family-name:var(--font-barlow-condensed)] text-sm font-semibold uppercase tracking-wider text-quicx-text hover:border-white/30 hover:bg-white/[0.04] hover:text-white"
+              >
+                See the Docs
+              </Button>
+            </a>
           </div>
         </div>
 

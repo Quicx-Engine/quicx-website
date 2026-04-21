@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const steps = [
-  { label: "Install binary", cmd: "curl -fsSL quicx.io/install | sh", time: "0:45" },
+  { label: "Install binary", cmd: "curl -fsSL quicx.dev/install | sh", time: "0:45" },
   { label: "Write config", cmd: "quicx init > quicx.conf", time: "1:20" },
   { label: "Start daemon", cmd: "quicx start", time: "1:35" },
   { label: "Add client", cmd: "mvn add dev.quicx:quicx-client", time: "3:20" },

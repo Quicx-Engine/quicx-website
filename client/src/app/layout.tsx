@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   title: "Quicx — A task queue engine that adapts for you",
   description:
     "Quicx is a lightweight, deterministic task queue engine with a custom PMAD slab allocator and a fast binary protocol. Configure it once. Run it forever.",
-  metadataBase: new URL("https://quicx.io"),
+  metadataBase: new URL("https://quicx.dev"),
   openGraph: {
     title: "Quicx — A task queue engine that adapts for you",
     description:

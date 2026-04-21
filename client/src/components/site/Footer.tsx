@@ -9,10 +9,10 @@ function GithubIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-function XIcon(props: React.SVGProps<SVGSVGElement>) {
+function LinkedInIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden {...props}>
-      <path d="M18.244 2H21.5l-7.51 8.59L22.75 22h-6.86l-5.37-7.02L4.25 22H1l8.07-9.23L1.5 2h7.04l4.86 6.43L18.244 2zm-2.4 18h1.9L7.24 4H5.24l10.6 16z" />
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
     </svg>
   );
 }
@@ -24,23 +24,23 @@ const nav: { title: string; items: { label: string; href: string }[] }[] = [
       { label: "Features", href: "#features" },
       { label: "Architecture", href: "#architecture" },
       { label: "Performance", href: "#performance" },
-      { label: "Changelog", href: "#" },
+      { label: "Changelog", href: "/docs#changelog" },
     ],
   },
   {
     title: "Developers",
     items: [
-      { label: "Documentation", href: "#" },
-      { label: "Quick start", href: "#" },
-      { label: "CLI reference", href: "#" },
-      { label: "Java client", href: "#" },
+      { label: "Documentation", href: "/docs" },
+      { label: "Quick start", href: "/docs#quick-start" },
+      { label: "CLI reference", href: "/docs#cli-reference" },
+      { label: "Java client", href: "/docs#java-client" },
     ],
   },
   {
     title: "Company",
     items: [
-      { label: "About Nefara", href: "#" },
-      { label: "Contact", href: "#" },
+      { label: "About Nefara", href: "https://www.nefara.org" },
+      { label: "Contact", href: "https://www.nefara.org/en#contact" },
       { label: "Security", href: "#" },
       { label: "License", href: "#" },
     ],
@@ -69,13 +69,13 @@ export function Footer() {
             developers.
           </p>
           <div className="mt-6 flex items-center gap-2">
-            <FooterIconLink href="#" label="GitHub">
+            <FooterIconLink href="https://github.com/anastassow" label="GitHub">
               <GithubIcon className="size-4" />
             </FooterIconLink>
-            <FooterIconLink href="#" label="X">
-              <XIcon className="size-[14px]" />
+            <FooterIconLink href="https://www.linkedin.com/in/dimitar-anastasov-339a94310/" label="LinkedIn">
+              <LinkedInIcon className="size-[14px]" />
             </FooterIconLink>
-            <FooterIconLink href="#" label="Documentation">
+            <FooterIconLink href="/docs" label="Documentation">
               <BookOpen className="size-4" />
             </FooterIconLink>
           </div>
@@ -108,7 +108,7 @@ export function Footer() {
         <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-6 px-6 py-10 lg:flex-row lg:px-10">
           <p className="font-[family-name:var(--font-barlow-condensed)] text-sm uppercase tracking-[0.3em] text-quicx-dim">
             <span className="text-quicx-orange-bright">“</span>
-            From developers, by developers
+            Never Far Away
             <span className="text-quicx-orange-bright">”</span>
           </p>
 
@@ -134,8 +134,7 @@ export function Footer() {
       <div className="relative border-t border-quicx-line">
         <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-[12px] text-quicx-dim sm:flex-row lg:px-10">
           <p>
-            © {new Date().getFullYear()} Nefara. Quicx is designed and built by
-            Dimitar Anastasov.
+            © {new Date().getFullYear()} Nefara. All rights reserved.
           </p>
           <div className="flex items-center gap-5">
             <a className="hover:text-quicx-text" href="#">

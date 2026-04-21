@@ -114,7 +114,7 @@ const MSG = {
 
 /* ─────────────────── Main diagram ─────────────────── */
 
-function ArchitectureDiagram() {
+export function ArchitectureDiagram() {
   const svgRef = useRef<SVGSVGElement>(null);
   const [inView, setInView] = useState(false);
 

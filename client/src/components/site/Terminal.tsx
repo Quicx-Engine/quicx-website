@@ -33,7 +33,7 @@ export function Terminal({
   outputDelay = 220,
   lineDelay = 55,
   className,
-  prompt = "anastassow@Dimitars-MacBook-Pro ~ %",
+  prompt = "user@host ~ $",
 }: Props) {
   const [visible, setVisible] = useState<TerminalLine[]>([]);
   const [typingText, setTypingText] = useState("");

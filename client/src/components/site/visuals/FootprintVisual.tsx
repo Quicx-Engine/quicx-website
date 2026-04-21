@@ -42,7 +42,7 @@ export function FootprintVisual({ active }: { active: boolean }) {
             </div>
           </div>
           <div className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-quicx-dim">
-            $ curl -fsSL quicx.io/install | sh
+            $ curl -fsSL quicx.dev/install | sh
           </div>
           <div className="text-[11px] text-quicx-muted">
             One binary. No runtime. No JVM. No surprises.

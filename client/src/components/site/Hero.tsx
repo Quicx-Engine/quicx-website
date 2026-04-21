@@ -36,19 +36,23 @@ export function Hero() {
 
         {/* CTAs */}
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Button
-            size="lg"
-            className="h-12 rounded bg-quicx-orange px-7 font-[family-name:var(--font-barlow-condensed)] text-base font-semibold uppercase tracking-wider text-white shadow-[0_0_0_1px_rgba(255,87,0,0.5),0_10px_30px_-10px_rgba(255,87,0,0.55)] hover:bg-quicx-orange-bright"
-          >
-            Start with Quicx
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="h-12 rounded border-quicx-orange/60 bg-transparent px-7 font-[family-name:var(--font-barlow-condensed)] text-base font-semibold uppercase tracking-wider text-quicx-orange hover:border-quicx-orange hover:bg-quicx-orange/10 hover:text-quicx-orange-bright"
-          >
-            Explore Docs
-          </Button>
+          <a href="/docs#quick-start">
+            <Button
+              size="lg"
+              className="h-12 rounded bg-quicx-orange px-7 font-[family-name:var(--font-barlow-condensed)] text-base font-semibold uppercase tracking-wider text-white shadow-[0_0_0_1px_rgba(255,87,0,0.5),0_10px_30px_-10px_rgba(255,87,0,0.55)] hover:bg-quicx-orange-bright"
+            >
+              Start with Quicx
+            </Button>
+          </a>
+          <a href="/docs">
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-12 rounded border-quicx-orange/60 bg-transparent px-7 font-[family-name:var(--font-barlow-condensed)] text-base font-semibold uppercase tracking-wider text-quicx-orange hover:border-quicx-orange hover:bg-quicx-orange/10 hover:text-quicx-orange-bright"
+            >
+              Explore Docs
+            </Button>
+          </a>
         </div>
       </div>
     </section>
