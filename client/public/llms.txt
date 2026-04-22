@@ -13,7 +13,7 @@ Contact: https://www.linkedin.com/in/dimitar-anastasov-339a94310/
 - Custom binary protocol (6-byte header, push/pop/ack/err)
 - Written in C
 - Java client library available (QuicxClient, QuicxWorker)
-
+    
 # Main Resources
 Home: https://quicx.dev/
 Documentation: https://quicx.dev/docs

@@ -398,8 +398,8 @@ quicx v1.0.0
 
       <Callout variant="tip" title="Offline / airgapped installs">
         Download the release archive directly from{" "}
-        <a href="https://github.com/nefara/quicx/releases">
-          github.com/nefara/quicx/releases
+        <a href="https://github.com/anastassow/Quicx/tree/main/releases">
+          github.com/anastassow/Quicx/tree/main/releases
         </a>
         , copy the binary into your image, and drop the{" "}
         <InlineCode>quicx.conf</InlineCode> from{" "}
