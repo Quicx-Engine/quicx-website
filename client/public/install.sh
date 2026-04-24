@@ -1,6 +1,6 @@
 set -e
 
-REPO="anastassow/Quicx"
+REPO="Quicx-Engine/Quicx-Releases"
 INSTALL_DIR="/usr/local/bin"
 
 VERSION="${QUICX_VERSION:-latest}"
