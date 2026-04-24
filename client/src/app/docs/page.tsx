@@ -906,12 +906,12 @@ function PmadSection() {
         </p>
       </Prose>
 
-      {/* PMAD diagram — drop the PDF export into /public/pmad-architecture.png
+      {/* PMAD diagram — drop the PDF export into /public/pmad-architecture.svg
           (or .svg) and the component will render it inline. Until the asset is
           added, a branded placeholder shows. */}
       <div className="relative overflow-hidden rounded-2xl border border-quicx-line bg-white p-4 sm:p-6">
         <Image
-          src="/pmad-architecture.png"
+          src="/pmad-architecture.svg"
           alt="PMAD — Predictive Memory Allocator architecture overview"
           width={1920}
           height={1760}
