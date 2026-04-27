@@ -6,6 +6,39 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DocsNavGroup } from "./DocsSidebar";
 import { cn } from "@/lib/utils";
 
+const idToSection: Record<string, string> = {
+  "installation": "installation",
+  "what-installer-does": "installation",
+  "verify-installation": "installation",
+  "quick-start": "quick-start",
+  "configuration": "configuration",
+  "server-block": "configuration",
+  "allocator-block": "configuration",
+  "tuning-rules": "configuration",
+  "architecture": "architecture",
+  "single-daemon-design": "architecture",
+  "pmad-allocator": "pmad-allocator",
+  "pmad-benchmarks": "pmad-allocator",
+  "pmad-configurations": "pmad-allocator",
+  "pmad-architecture": "pmad-allocator",
+  "pmad-teardown": "pmad-allocator",
+  "binary-protocol": "binary-protocol",
+  "protocol-frame-header": "binary-protocol",
+  "protocol-message-types": "binary-protocol",
+  "payload-formats": "binary-protocol",
+  "cli-reference": "cli-reference",
+  "quicx-init": "cli-reference",
+  "quicx-start": "cli-reference",
+  "quicx-status": "cli-reference",
+  "quicx-stop": "cli-reference",
+  "java-client": "java-client",
+  "java-build-setup": "java-client",
+  "QuicxClient": "java-client",
+  "QuicxWorker": "java-client",
+  "QuicxException": "java-client",
+  "changelog": "changelog",
+};
+
 // Deep search index mapping directly to IDs on the docs page
 const searchIndex = [
   { id: "installation", label: "Installation", group: "Getting Started", breadcrumbs: "Getting Started → Installation", keywords: "download macos linux binary curl sh releases" },
@@ -57,7 +90,13 @@ function HighlightMatch({ text, query }: { text: string; query: string }) {
   );
 }
 
-export function DocsSearch({ groups }: { groups: DocsNavGroup[] }) {
+export function DocsSearch({
+  groups,
+  onNavigateTo,
+}: {
+  groups: DocsNavGroup[];
+  onNavigateTo?: (sectionId: string, elementId: string) => void;
+}) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -103,7 +142,12 @@ export function DocsSearch({ groups }: { groups: DocsNavGroup[] }) {
 
   const onSelect = (id: string) => {
     setOpen(false);
-    window.location.hash = `#${id}`;
+    if (onNavigateTo) {
+      const sectionId = idToSection[id] ?? id;
+      onNavigateTo(sectionId, id);
+    } else {
+      window.location.hash = `#${id}`;
+    }
   };
 
   useEffect(() => {
@@ -153,7 +197,7 @@ export function DocsSearch({ groups }: { groups: DocsNavGroup[] }) {
         className="mb-6 flex w-full items-center gap-2 rounded-md border border-quicx-line bg-quicx-bg-2 px-3 py-2 text-sm text-quicx-muted shadow-sm transition hover:border-white/20 hover:text-quicx-text focus:outline-none focus:ring-2 focus:ring-quicx-orange/60"
       >
         <Search className="size-4 opacity-70" />
-        <span className="flex-1 text-left">Search documentation...</span>
+        <span className="flex-1 truncate text-left">Search documentation...</span>
         <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-quicx-line bg-quicx-bg px-1.5 font-[family-name:var(--font-jetbrains-mono)] text-[10px] font-medium opacity-100">
           {os === "mac" ? (
             <><span className="text-xs">⌘</span>K</>
@@ -190,7 +234,7 @@ export function DocsSearch({ groups }: { groups: DocsNavGroup[] }) {
               Welcome to Quicx Docs
             </h3>
 
-            <div className="max-h-[380px] overflow-y-auto space-y-2 pb-2" ref={listRef}>
+            <div className="max-h-[520px] overflow-y-auto space-y-2 pb-2" ref={listRef}>
               {filteredItems.length === 0 ? (
                 <div className="py-14 text-center text-sm text-quicx-dim">
                   No results found for <span className="text-quicx-text font-medium">"{query}"</span>
