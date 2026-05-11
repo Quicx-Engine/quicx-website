@@ -192,13 +192,14 @@ export function DocsSearch({
 
   return (
     <>
+      {/* Trigger button — hide ⌘K badge on touch devices (no physical keyboard) */}
       <button
         onClick={() => setOpen(true)}
         className="mb-6 flex w-full items-center gap-2 rounded-md border border-quicx-line bg-quicx-bg-2 px-3 py-2 text-sm text-quicx-muted shadow-sm transition hover:border-white/20 hover:text-quicx-text focus:outline-none focus:ring-2 focus:ring-quicx-orange/60"
       >
         <Search className="size-4 opacity-70" />
         <span className="flex-1 truncate text-left">Search documentation...</span>
-        <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-quicx-line bg-quicx-bg px-1.5 font-[family-name:var(--font-jetbrains-mono)] text-[10px] font-medium opacity-100">
+        <kbd className="pointer-events-none hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border border-quicx-line bg-quicx-bg px-1.5 font-[family-name:var(--font-jetbrains-mono)] text-[10px] font-medium opacity-100">
           {os === "mac" ? (
             <><span className="text-xs">⌘</span>K</>
           ) : (
@@ -208,14 +209,21 @@ export function DocsSearch({
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
+        {/*
+          Mobile: full-bleed (max-w-full, no rounded corners, no side borders),
+          anchored just below the topbar, height capped with dvh so the
+          software keyboard shrinking the viewport is accounted for.
+          sm+: bounded width, rounded corners, full border.
+        */}
         <DialogContent
           showCloseButton={false}
-          className="top-[40%] max-w-3xl gap-0 overflow-hidden border border-quicx-line bg-[#061219] p-0 shadow-2xl sm:rounded-md"
+          className="top-[72px] flex max-h-[calc(100dvh-96px)] max-w-full translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-x-0 border-quicx-line bg-[#061219] p-0 shadow-2xl sm:max-w-2xl sm:rounded-md sm:border-x"
         >
           <DialogTitle className="sr-only">Search Documentation</DialogTitle>
-          
-          <div className="flex items-center gap-3 px-5 py-4">
-            <Search className="size-5 text-quicx-muted" />
+
+          {/* Search input row */}
+          <div className="flex shrink-0 items-center gap-3 px-4 py-3.5 sm:px-5 sm:py-4">
+            <Search className="size-5 shrink-0 text-quicx-muted" />
             <input
               autoFocus
               className="flex-1 bg-transparent text-[16px] text-quicx-text placeholder:text-quicx-dim focus:outline-none"
@@ -224,20 +232,28 @@ export function DocsSearch({
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
             />
-            <kbd className="hidden sm:inline-flex h-7 select-none items-center gap-1 rounded border border-white/10 bg-white/5 px-3 font-[family-name:var(--font-jetbrains-mono)] text-[11px] font-medium text-quicx-dim transition hover:bg-white/10 hover:text-quicx-muted">
+            <kbd className="hidden h-7 select-none items-center gap-1 rounded border border-white/10 bg-white/5 px-3 font-[family-name:var(--font-jetbrains-mono)] text-[11px] font-medium text-quicx-dim transition hover:bg-white/10 hover:text-quicx-muted sm:inline-flex">
               ESC
             </kbd>
           </div>
 
-          <div className="border-t border-quicx-line px-5 py-5">
-            <h3 className="mb-4 text-[14px] font-semibold text-quicx-text">
-              Welcome to Quicx Docs
-            </h3>
+          {/* Results area — grows to fill remaining dialog height */}
+          <div className="flex flex-1 flex-col overflow-hidden border-t border-quicx-line">
+            {/* Heading — hidden on mobile to save vertical space */}
+            <div className="hidden shrink-0 px-5 pb-0 pt-5 sm:block">
+              <h3 className="mb-3 text-[14px] font-semibold text-quicx-text">
+                Welcome to Quicx Docs
+              </h3>
+            </div>
 
-            <div className="max-h-[520px] overflow-y-auto space-y-2 pb-2" ref={listRef}>
+            <div
+              className="flex-1 overflow-y-auto space-y-1.5 px-3 pb-3 pt-3 sm:space-y-2 sm:px-5 sm:pb-5 sm:pt-0"
+              ref={listRef}
+            >
               {filteredItems.length === 0 ? (
-                <div className="py-14 text-center text-sm text-quicx-dim">
-                  No results found for <span className="text-quicx-text font-medium">"{query}"</span>
+                <div className="py-12 text-center text-sm text-quicx-dim sm:py-14">
+                  No results for{" "}
+                  <span className="font-medium text-quicx-text">"{query}"</span>
                 </div>
               ) : (
                 filteredItems.map((item, index) => {
@@ -248,33 +264,37 @@ export function DocsSearch({
                       onMouseEnter={() => setSelectedIndex(index)}
                       onClick={() => onSelect(item.id)}
                       className={cn(
-                        "group flex cursor-pointer items-center gap-4 rounded-md border px-4 py-4 transition-all",
+                        "group flex cursor-pointer items-center gap-3 rounded-md border px-3 py-3 transition-all sm:gap-4 sm:px-4 sm:py-4",
                         isActive
                           ? "border-quicx-line bg-white/[0.04]"
                           : "border-transparent bg-white/[0.02] hover:border-quicx-line/50 hover:bg-white/[0.03]"
                       )}
                     >
-                      <FileText className="size-5 shrink-0 text-quicx-dim" />
-                      
-                      <div className="flex flex-1 flex-col">
-                        <div className="flex items-center gap-1.5 text-[12px] font-medium text-quicx-dim">
-                          {item.breadcrumbs.split('→').map((crumb, idx, arr) => (
+                      <FileText className="size-4 shrink-0 text-quicx-dim sm:size-5" />
+
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <div className="flex items-center gap-1 truncate text-[11px] font-medium text-quicx-dim sm:gap-1.5 sm:text-[12px]">
+                          {item.breadcrumbs.split("→").map((crumb, idx, arr) => (
                             <React.Fragment key={idx}>
-                              <span>{crumb.trim()}</span>
-                              {idx < arr.length - 1 && <span className="text-white/20">→</span>}
+                              <span className="truncate">{crumb.trim()}</span>
+                              {idx < arr.length - 1 && (
+                                <span className="shrink-0 text-white/20">→</span>
+                              )}
                             </React.Fragment>
                           ))}
                         </div>
-                        <div className="mt-0.5 text-[15px] font-medium text-quicx-text">
+                        <div className="mt-0.5 truncate text-[14px] font-medium text-quicx-text sm:text-[15px]">
                           <HighlightMatch text={item.label} query={query} />
                         </div>
                       </div>
 
-                      <ChevronRight 
+                      <ChevronRight
                         className={cn(
-                          "size-5 transition-all duration-200", 
-                          isActive ? "text-quicx-orange-bright translate-x-1" : "text-quicx-dim"
-                        )} 
+                          "size-4 shrink-0 transition-all duration-200 sm:size-5",
+                          isActive
+                            ? "translate-x-0.5 text-quicx-orange-bright"
+                            : "text-quicx-dim"
+                        )}
                       />
                     </div>
                   );

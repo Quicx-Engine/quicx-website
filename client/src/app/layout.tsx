@@ -31,14 +31,34 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Quicx — A task queue engine that adapts for you",
+  title: {
+    default: "Quicx — Deterministic Task Queue Engine",
+    template: "%s | Quicx",
+  },
   description:
-    "Quicx is a lightweight, deterministic task queue engine with a custom PMAD slab allocator and a fast binary protocol. Configure it once. Run it forever.",
+    "Quicx is a lightweight, deterministic task queue daemon built on the PMAD slab allocator. O(1) allocation, zero fragmentation, 63 KB static binary. Configure it once. Run it forever.",
   metadataBase: new URL("https://quicx.dev"),
-  keywords: ["task queue", "message broker", "job queue", "slab allocator", "binary protocol", "event loop", "quicx"],
-  authors: [{ name: "Dimitar Anastasov" }],
+  keywords: [
+    "task queue",
+    "task queue engine",
+    "deterministic task queue",
+    "job queue",
+    "message queue",
+    "message broker",
+    "PMAD allocator",
+    "slab allocator",
+    "binary protocol",
+    "lightweight task queue",
+    "open source task queue",
+    "Java task queue",
+    "quicx",
+    "quicx daemon",
+    "zero GC task queue",
+    "high throughput task queue",
+  ],
+  authors: [{ name: "Dimitar Anastasov", url: "https://www.linkedin.com/in/dimitar-anastasov-339a94310/" }],
   creator: "Dimitar Anastasov",
-  publisher: "Quicx",
+  publisher: "Nefara",
   robots: {
     index: true,
     follow: true,
@@ -51,9 +71,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Quicx — A task queue engine that adapts for you",
+    title: "Quicx — Deterministic Task Queue Engine",
     description:
-      "Configure it once. Run it forever. Watch it breathe. Lightweight by design. No surprises.",
+      "O(1) allocation, zero fragmentation, 63 KB binary. A task queue daemon built on the PMAD slab allocator — no GC pauses, no allocator jitter. Configure it once. Run it forever.",
     type: "website",
     url: "https://quicx.dev",
     siteName: "Quicx",
@@ -61,8 +81,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Quicx — A task queue engine that adapts for you",
-    description: "Lightweight, deterministic task queue engine with a custom PMAD slab allocator and a fast binary protocol.",
+    site: "@quicxdev",
+    creator: "@quicxdev",
+    title: "Quicx — Deterministic Task Queue Engine",
+    description:
+      "O(1) allocation, zero fragmentation, 63 KB binary. A task queue daemon built on the PMAD slab allocator — no GC pauses, no jitter.",
   },
 };
 
@@ -71,24 +94,69 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Structured Data (JSON-LD) for SoftwareApplication
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Quicx",
-    "operatingSystem": "Linux, macOS",
-    "applicationCategory": "DeveloperApplication",
-    "description": "Quicx is a lightweight, deterministic task queue engine with a custom PMAD slab allocator and a fast binary protocol.",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "author": {
-      "@type": "Person",
-      "name": "Dimitar Anastasov",
-      "url": "https://www.linkedin.com/in/dimitar-anastasov-339a94310/"
-    }
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://quicx.dev/#website",
+        "name": "Quicx",
+        "url": "https://quicx.dev",
+        "description": "Deterministic task queue engine with PMAD slab allocator and binary protocol.",
+        "inLanguage": "en-US",
+        "publisher": { "@id": "https://quicx.dev/#organization" },
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://quicx.dev/#organization",
+        "name": "Nefara",
+        "url": "https://www.nefara.org",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://quicx.dev/nefara-logo.svg",
+        },
+        "sameAs": [
+          "https://github.com/anastassow",
+          "https://www.linkedin.com/in/dimitar-anastasov-339a94310/",
+        ],
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://quicx.dev/#software",
+        "name": "Quicx",
+        "url": "https://quicx.dev",
+        "operatingSystem": "Linux, macOS",
+        "applicationCategory": "DeveloperApplication",
+        "applicationSubCategory": "Task Queue, Message Queue",
+        "softwareVersion": "1.0.0",
+        "releaseNotes": "https://quicx.dev/docs",
+        "description":
+          "Quicx is a lightweight, deterministic task queue daemon built on the PMAD slab allocator. It delivers O(1) allocation, zero fragmentation, and a compact binary protocol — no GC pauses, no jitter, one 63 KB static binary.",
+        "featureList": [
+          "O(1) deterministic allocation via PMAD slab allocator",
+          "Zero fragmentation — pre-sized size classes",
+          "19.1 ns allocation latency",
+          "63 KB static binary — no runtime dependencies",
+          "Compact binary protocol with 12 message types",
+          "Java client published to Maven Central",
+          "Real-time CLI observability with quicx status",
+        ],
+        "downloadUrl": "https://quicx.dev/install.sh",
+        "installUrl": "https://quicx.dev/install.sh",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD",
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Dimitar Anastasov",
+          "url": "https://www.linkedin.com/in/dimitar-anastasov-339a94310/",
+        },
+        "publisher": { "@id": "https://quicx.dev/#organization" },
+        "sameAs": ["https://github.com/anastassow/Quicx"],
+      },
+    ],
   };
 
   return (
