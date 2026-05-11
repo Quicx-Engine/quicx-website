@@ -1,9 +1,16 @@
 import Image from "next/image";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Menu } from "lucide-react";
 
-export function DocsTopbar() {
+export function DocsTopbar({ onMenuToggle }: { onMenuToggle: () => void }) {
   return (
-    <header className="fixed inset-x-0 top-0 z-[200] flex h-[52px] items-center gap-5 border-b border-quicx-line bg-quicx-bg/95 px-6 backdrop-blur-xl">
+    <header className="fixed inset-x-0 top-0 z-[200] flex h-[52px] items-center gap-3 border-b border-quicx-line bg-quicx-bg/95 px-4 backdrop-blur-xl sm:gap-5 sm:px-6">
+      <button
+        onClick={onMenuToggle}
+        className="flex size-8 items-center justify-center text-quicx-muted transition hover:text-quicx-text lg:hidden"
+        aria-label="Open navigation"
+      >
+        <Menu className="size-5" />
+      </button>
       <a href="/" className="flex shrink-0 items-center" aria-label="Quicx home">
         <Image
           src="/quicx-logo.svg"
@@ -14,11 +21,11 @@ export function DocsTopbar() {
           className="h-6 w-auto select-none"
         />
       </a>
-      <div className="h-5 w-px bg-quicx-line" />
-      <span className="font-[family-name:var(--font-barlow-condensed)] text-[11px] uppercase tracking-[0.28em] text-quicx-dim">
+      <div className="hidden h-5 w-px bg-quicx-line sm:block" />
+      <span className="hidden font-[family-name:var(--font-barlow-condensed)] text-[11px] uppercase tracking-[0.28em] text-quicx-dim sm:block">
         Documentation
       </span>
-      <div className="ml-auto flex items-center gap-5">
+      <div className="ml-auto flex items-center gap-3 sm:gap-5">
         <a
           href="/"
           className="group flex items-center gap-1.5 font-[family-name:var(--font-barlow-condensed)] text-[11px] uppercase tracking-[0.08em] text-quicx-muted transition hover:text-quicx-text"

@@ -104,6 +104,7 @@ const allItems = nav.flatMap((g) => g.items);
 export function DocsContent() {
   const [activeSectionId, setActiveSectionId] = useState(allItems[0].id);
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const activeItem = allItems.find((i) => i.id === activeSectionId) ?? allItems[0];
 
@@ -135,17 +136,19 @@ export function DocsContent() {
 
   return (
     <div className="min-h-screen bg-quicx-bg">
-      <DocsTopbar />
+      <DocsTopbar onMenuToggle={() => setSidebarOpen(true)} />
 
       <DocsSidebar
         groups={nav}
         activeSectionId={activeSectionId}
         onNavigate={navigate}
         onNavigateTo={navigateTo}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
 
-      <div className="ml-[260px] mt-[52px] flex min-h-[calc(100vh-52px)]">
-        <main className="min-w-0 flex-1 max-w-[820px] px-12 py-14">
+      <div className="mt-[52px] flex min-h-[calc(100vh-52px)] lg:ml-[260px]">
+        <main className="min-w-0 flex-1 max-w-[820px] px-4 py-8 sm:px-8 lg:px-12 lg:py-14">
           {activeSectionId === "installation" && <InstallationSection />}
           {activeSectionId === "quick-start" && <QuickStartSection />}
           {activeSectionId === "configuration" && <ConfigurationSection />}
@@ -321,35 +324,37 @@ function FrameDiagram() {
   ];
 
   return (
-    <div className="overflow-hidden rounded-lg border border-quicx-line bg-[#0a1a22]">
-      <div
-        className="flex"
-        role="img"
-        aria-label="Binary frame layout: version (1 byte), type (1 byte), length (4 bytes), payload (length bytes)"
-      >
-        {fields.map((f) => (
-          <div
-            key={f.label}
-            className="flex flex-col items-center justify-center gap-1 border-r border-quicx-line px-4 py-5 last:border-r-0"
-            style={{ flex: f.flex }}
-          >
-            <span
-              className="font-[family-name:var(--font-jetbrains-mono)] text-[13px] font-semibold"
-              style={{ color: f.color }}
+    <div className="overflow-x-auto">
+      <div className="min-w-[420px] overflow-hidden rounded-lg border border-quicx-line bg-[#0a1a22]">
+        <div
+          className="flex"
+          role="img"
+          aria-label="Binary frame layout: version (1 byte), type (1 byte), length (4 bytes), payload (length bytes)"
+        >
+          {fields.map((f) => (
+            <div
+              key={f.label}
+              className="flex flex-col items-center justify-center gap-1 border-r border-quicx-line px-4 py-5 last:border-r-0"
+              style={{ flex: f.flex }}
             >
-              {f.label}
-            </span>
-            <span className="text-[10.5px] tracking-wider text-quicx-dim">{f.sub}</span>
-          </div>
-        ))}
-      </div>
-      <div className="flex items-center justify-between border-t border-quicx-line bg-white/[0.02] px-4 py-2.5 font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-quicx-dim">
-        <span>
-          total header = <span className="text-quicx-muted">6 bytes fixed</span>
-        </span>
-        <span>
-          total message = <span className="text-quicx-muted">6 + length bytes</span>
-        </span>
+              <span
+                className="font-[family-name:var(--font-jetbrains-mono)] text-[13px] font-semibold"
+                style={{ color: f.color }}
+              >
+                {f.label}
+              </span>
+              <span className="text-[10.5px] tracking-wider text-quicx-dim">{f.sub}</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-quicx-line bg-white/[0.02] px-4 py-2.5 font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-quicx-dim">
+          <span>
+            total header = <span className="text-quicx-muted">6 bytes fixed</span>
+          </span>
+          <span>
+            total message = <span className="text-quicx-muted">6 + length bytes</span>
+          </span>
+        </div>
       </div>
     </div>
   );
