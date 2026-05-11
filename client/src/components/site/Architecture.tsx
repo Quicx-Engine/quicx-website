@@ -24,10 +24,10 @@ export function Architecture() {
   return (
     <section
       id="architecture"
-      className="relative overflow-hidden border-t border-quicx-line bg-[#081419]"
+      className="relative overflow-hidden border-t border-quicx-line bg-[#112a3c]"
     >
-      <div className="pointer-events-none absolute inset-0 bg-dots opacity-60" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(255,87,0,0.07),transparent_60%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-dots opacity-40" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,rgba(255,87,0,0.09),transparent_60%)]" />
 
       <div className="relative mx-auto w-full max-w-7xl px-6 py-24 lg:px-10 lg:py-32">
         <div className="mx-auto max-w-3xl">
