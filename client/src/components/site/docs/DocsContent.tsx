@@ -474,7 +474,7 @@ sh install-quicx.sh`}
         filename="~ $"
         language="sh"
         code={`user@host ~ % quicx version
-quicx v1.0.0
+quicx v1.0.1
 `}
       />
 
@@ -521,7 +521,7 @@ function QuickStartSection() {
             language="sh"
             code={`user@host ~ $ quicx start --config /etc/quicx/quicx.conf
 config loaded: /etc/quicx/quicx.conf
-quicx v1.0.0 starting
+quicx v1.0.1 starting
   port:    16381
   classes: 32 64 128 256 512 1024
 quicx listening on port 16381 [kqueue]
@@ -711,6 +711,13 @@ class = 256,20
 class = 512,12
 class = 1024,8`}
       />
+
+      <Callout variant="note" title="Default configuration">
+        This is the built-in default. When you run{" "}
+        <InlineCode>quicx start</InlineCode> without a{" "}
+        <InlineCode>--config</InlineCode> flag, the daemon uses these exact values — no file
+        needed to get started.
+      </Callout>
 
       <SubHeading id="server-block">[server]</SubHeading>
 
@@ -1269,7 +1276,7 @@ function CliReferenceSection() {
         window
         filename="~ $ quicx"
         language="sh"
-        code={`quicx v1.0.0 — lightweight task queue daemon
+        code={`quicx v1.0.1 — lightweight task queue daemon
 
 usage:
   quicx start --config FILE
@@ -1287,6 +1294,11 @@ usage:
               shell owns the process. Pair with systemd, <InlineCode>tmux</InlineCode>,{" "}
               <InlineCode>launchd</InlineCode> or your container supervisor for lifecycle
               management.
+            </p>
+            <p>
+              <InlineCode>--config</InlineCode> is optional. When omitted, the daemon starts
+              with the built-in default configuration (port <InlineCode>16381</InlineCode>,
+              1 MiB pool, six size classes). Pass a path to override any or all values.
             </p>
           </Prose>
         </CliCommand>
@@ -1322,7 +1334,7 @@ usage:
             language="sh"
             code={`user@host ~ $ quicx status
 
-  quicx v1.0.0
+  quicx v1.0.1
   ─────────────────────────────────────────
   uptime     0h 0m 6s
 
@@ -1604,9 +1616,18 @@ function ChangelogSection() {
 
       <ul className="space-y-6">
         <Release
+          version="v1.0.1"
+          date="2026-05-19"
+          status="Current"
+          highlights={[
+            "quicx start now accepts --config as optional. When omitted, the daemon boots with the built-in default configuration (port 16381, 1 MiB pool, six size classes: 32, 64, 128, 256, 512, 1024 bytes).",
+            "Default config is documented in the Configuration section.",
+          ]}
+        />
+        <Release
           version="v1.0.0"
           date="2026-04-21"
-          status="Current"
+          status="Stable"
           highlights={[
             "First public release.",
             "Binary protocol frozen — 12 message types, 6-byte header, versioned.",

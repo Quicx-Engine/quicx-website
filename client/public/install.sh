@@ -56,7 +56,7 @@ info "Resolving version: $VERSION"
 
 # decide version folder
 if [ "$VERSION" = "latest" ]; then
-  VERSION_DIR="v1.0.0"
+  VERSION_DIR="v1.0.1"
 else
   VERSION_DIR="$VERSION"
 fi

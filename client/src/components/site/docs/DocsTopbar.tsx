@@ -42,7 +42,7 @@ export function DocsTopbar({ onMenuToggle }: { onMenuToggle: () => void }) {
           GitHub
         </a>
         <span className="border border-quicx-orange/30 px-2 py-0.5 font-[family-name:var(--font-jetbrains-mono)] text-[10.5px] text-quicx-orange">
-          v1.0.0
+          v1.0.1
         </span>
       </div>
     </header>
