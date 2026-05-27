@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Search, ChevronRight, FileText } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DocsNavGroup } from "./DocsSidebar";
@@ -91,12 +92,13 @@ function HighlightMatch({ text, query }: { text: string; query: string }) {
 }
 
 export function DocsSearch({
-  groups,
-  onNavigateTo,
+  groups: _groups,
+  onAfterNavigate,
 }: {
   groups: DocsNavGroup[];
-  onNavigateTo?: (sectionId: string, elementId: string) => void;
+  onAfterNavigate?: () => void;
 }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -142,12 +144,11 @@ export function DocsSearch({
 
   const onSelect = (id: string) => {
     setOpen(false);
-    if (onNavigateTo) {
-      const sectionId = idToSection[id] ?? id;
-      onNavigateTo(sectionId, id);
-    } else {
-      window.location.hash = `#${id}`;
-    }
+    const sectionId = idToSection[id] ?? id;
+    const href =
+      sectionId === id ? `/docs/${sectionId}` : `/docs/${sectionId}#${id}`;
+    router.push(href);
+    onAfterNavigate?.();
   };
 
   useEffect(() => {
