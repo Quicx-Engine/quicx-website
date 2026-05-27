@@ -1,4 +1,10 @@
-import { FeatureCardsGrid } from "./FeatureCardsClient";
+import { cn } from "@/lib/utils";
+import { features } from "./featuresData";
+import { FeatureCardChrome } from "./FeatureCardChrome";
+import {
+  FeatureCardsInteractive,
+  FeatureCardSlot,
+} from "./FeatureCardsClient";
 
 export function FeatureCards() {
   return (
@@ -54,8 +60,28 @@ export function FeatureCards() {
           </p>
         </div>
 
-        {/* Cards grid + modal — client interactive */}
-        <FeatureCardsGrid />
+        {/* Cards grid — chrome is server-rendered, slots add interactivity */}
+        <FeatureCardsInteractive>
+          <div className="mt-16 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {features.map((f, i) => (
+              <FeatureCardSlot
+                key={f.id}
+                featureId={f.id}
+                className={cn(
+                  i === 0 || i === 3
+                    ? "md:col-span-2"
+                    : i === 4
+                      ? "lg:col-span-2"
+                      : "",
+                  i === 0 ? "min-h-[650px]" : "min-h-[420px]",
+                  "h-full"
+                )}
+              >
+                <FeatureCardChrome feature={f} />
+              </FeatureCardSlot>
+            ))}
+          </div>
+        </FeatureCardsInteractive>
       </div>
     </section>
   );

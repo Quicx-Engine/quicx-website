@@ -1,6 +1,12 @@
 "use client";
 
-import { ReactNode, useState, useEffect } from "react";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +21,104 @@ import { FootprintVisual } from "./visuals/FootprintVisual";
 import { PerformanceVisual } from "./visuals/PerformanceVisual";
 import { ProtocolVisual } from "./visuals/ProtocolVisual";
 import { SetupVisual } from "./visuals/SetupVisual";
+import { features, type Feature } from "./featuresData";
+
+/* ───────────────── modal context ───────────────── */
+
+const ModalContext = createContext<((id: string | null) => void) | null>(null);
+
+export function FeatureCardsInteractive({ children }: { children: ReactNode }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  const activeFeature = features.find((f) => f.id === openId) ?? null;
+
+  return (
+    <ModalContext.Provider value={setOpenId}>
+      {children}
+      <FeatureModal
+        feature={activeFeature}
+        onClose={() => setOpenId(null)}
+        onSwitch={(id) => setOpenId(id)}
+      />
+    </ModalContext.Provider>
+  );
+}
+
+/* ───────────────── per-card client slot ───────────────── */
+
+export function FeatureCardSlot({
+  featureId,
+  className,
+  children,
+}: {
+  featureId: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  const setOpenId = useContext(ModalContext);
+  const [active, setActive] = useState(false);
+
+  return (
+    <button
+      id={featureId}
+      type="button"
+      onMouseEnter={() => setActive(true)}
+      onMouseLeave={() => setActive(false)}
+      onFocus={() => setActive(true)}
+      onBlur={() => setActive(false)}
+      onClick={() => setOpenId?.(featureId)}
+      className={cn(
+        "group relative flex w-full flex-col overflow-hidden rounded border border-quicx-line bg-quicx-bg-2 text-left scroll-mt-24",
+        "transition-all duration-500 ease-out",
+        "hover:border-white/15 hover:bg-quicx-bg-3",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-quicx-orange/60 focus-visible:ring-offset-2 focus-visible:ring-offset-quicx-bg",
+        className
+      )}
+    >
+      {/* server-rendered chrome (title, expand icon, gradient overlays) */}
+      {children}
+
+      {/* Visual */}
+      <div className="relative flex-1 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-dots opacity-30" />
+        <div className="relative h-full">
+          <VisualFor id={featureId} active={active} />
+        </div>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent to-quicx-bg-2" />
+      </div>
+    </button>
+  );
+}
+
+/* ───────────────── visual dispatch ───────────────── */
+
+function VisualFor({
+  id,
+  active,
+  expanded,
+}: {
+  id: string;
+  active: boolean;
+  expanded?: boolean;
+}) {
+  switch (id) {
+    case "observability":
+      return <TerminalShowcase active={active} />;
+    case "configurability":
+      return <ConfigVisual active={active} />;
+    case "lightweight":
+      return <FootprintVisual active={active} />;
+    case "performance":
+      return <PerformanceVisual active={active} />;
+    case "protocol":
+      return <ProtocolVisual active={active} expanded={expanded} />;
+    case "setup":
+      return <SetupVisual active={active} />;
+    default:
+      return null;
+  }
+}
+
+/* ───────────────── terminal showcase ───────────────── */
 
 const initialUsageSequence: TerminalLine[] = [
   { kind: "input", text: "quicx" },
@@ -85,346 +189,7 @@ function TerminalShowcase({ active }: { active: boolean }) {
   );
 }
 
-type FeatureTint = {
-  glow: string;
-  radial: string;
-  accent: string;
-};
-
-type Feature = {
-  id: string;
-  title: string;
-  modalTitle: string;
-  shortSummary: string;
-  description: string;
-  bullets: string[];
-  tint: FeatureTint;
-  renderVisual: (active: boolean, expanded?: boolean) => ReactNode;
-  footnotes: { title: string; body: string }[];
-};
-
-const orangeTint: FeatureTint = {
-  glow: "from-quicx-orange/25 via-quicx-orange/5 to-transparent",
-  radial: "rgba(255,87,0,0.18)",
-  accent: "#FF7A33",
-};
-const violetTint: FeatureTint = {
-  glow: "from-[#a78bfa]/25 via-[#a78bfa]/5 to-transparent",
-  radial: "rgba(167,139,250,0.18)",
-  accent: "#a78bfa",
-};
-const tealTint: FeatureTint = {
-  glow: "from-[#5eead4]/25 via-[#5eead4]/5 to-transparent",
-  radial: "rgba(94,234,212,0.18)",
-  accent: "#5eead4",
-};
-const amberTint: FeatureTint = {
-  glow: "from-[#fbbf24]/25 via-[#fbbf24]/5 to-transparent",
-  radial: "rgba(251,191,36,0.18)",
-  accent: "#fbbf24",
-};
-const blueTint: FeatureTint = {
-  glow: "from-[#60a5fa]/25 via-[#60a5fa]/5 to-transparent",
-  radial: "rgba(96,165,250,0.18)",
-  accent: "#60a5fa",
-};
-const roseTint: FeatureTint = {
-  glow: "from-[#f472b6]/25 via-[#f472b6]/5 to-transparent",
-  radial: "rgba(244,114,182,0.18)",
-  accent: "#f472b6",
-};
-
-const features: Feature[] = [
-  {
-    id: "observability",
-    title: "Observe the engine in real time",
-    modalTitle: "Observe the engine in real time",
-    shortSummary:
-      "A first-class CLI gives you a deterministic view of every moving part — without touching runtime performance.",
-    description:
-      "The quicx CLI gives you a complete, deterministic view of the engine: PMAD slabs, worker states, queue depth, and task counts — read straight from the daemon over a side-channel that never competes with the hot path.",
-    bullets: [
-      "Per-size-class PMAD usage in real time",
-      "Worker pool state — idle, busy, total",
-      "Tasks submitted, completed, failed",
-      "Live pool_size utilization, versus your configured ceiling",
-    ],
-    tint: orangeTint,
-    renderVisual: (active) => <TerminalShowcase active={active} />,
-    footnotes: [
-      {
-        title: "Zero-overhead introspection",
-        body: "Monitoring runs out-of-band. It never blocks or slows down task processing.",
-      },
-      {
-        title: "Human-readable output",
-        body: "Clean text formatting — no log parsers, no JSON, no dashboards required.",
-      },
-      {
-        title: "Built into the binary",
-        body: "No sidecar, no agent, no separate monitoring stack to deploy.",
-      },
-    ],
-  },
-  {
-    id: "configurability",
-    title: "One .conf file. Zero guesswork.",
-    modalTitle: "Configure memory exactly the way you want it",
-    shortSummary:
-      "Declare a pool size and a size-class mix. PMAD lays out memory exactly as you asked — no guesswork, no fragmentation.",
-    description:
-      "Quicx is built on PMAD, a custom deterministic slab allocator. You declare your memory ceiling and your size-class distribution in a single .conf file; PMAD carves up the pool at startup and hands out slots in O(1), every time.",
-    bullets: [
-      "Fixed pool_size cap, enforced from process start",
-      "Tunable size classes (e.g. 32B, 64B, 128B, 256B, 512B, 1024B)",
-      "Size-class percentages tuned to your payload shape",
-      "O(1) allocation and free — no GC, no fragmentation",
-    ],
-    tint: violetTint,
-    renderVisual: (active) => <ConfigVisual active={active} />,
-    footnotes: [
-      {
-        title: "Deterministic layout",
-        body: "Memory is carved up exactly as configured — same layout every time you boot.",
-      },
-      {
-        title: "No fragmentation",
-        body: "Known payload shapes map to the right size class; no wasted bytes.",
-      },
-      {
-        title: "Tunable per workload",
-        body: "Different configs for different services, all in a single .conf file.",
-      },
-    ],
-  },
-  {
-    id: "lightweight",
-    title: "63 KB. Bounded memory.",
-    modalTitle: "One binary. One memory budget. No surprises.",
-    shortSummary:
-      "A single ~63 KB static binary that never drifts past the memory budget you set. Drop it next to your backend — bounded by design.",
-    description:
-      "Quicx ships as a single ~63 KB static binary. There's no runtime, no JVM, no scheduler to tune. You set a pool_size and that is the memory ceiling — enforced by PMAD, not by hope.",
-    bullets: [
-      "Single static binary, no runtime dependencies",
-      "Hard memory ceiling, enforced by the allocator",
-      "Instant boot — no warmup, no profile-guided jitter",
-      "Safe to co-locate on the same VM as your backend",
-    ],
-    tint: tealTint,
-    renderVisual: (active) => <FootprintVisual active={active} />,
-    footnotes: [
-      {
-        title: "No runtime dependencies",
-        body: "Just a binary. No interpreter, no VM, no package manager.",
-      },
-      {
-        title: "Bounded at all times",
-        body: "Configured ceiling, enforced by the allocator — never swell.",
-      },
-      {
-        title: "Co-locate safely",
-        body: "Runs happily on the same VM as your backend without stealing memory.",
-      },
-    ],
-  },
-  {
-    id: "performance",
-    title: "0.181 ms. 21,000 tasks/s.",
-    modalTitle: "Throughput without tail latency",
-    shortSummary:
-      "0.181 ms average latency, 21,000 tasks per second, sustained on a single node. No GC pauses, no allocator jitter.",
-    description:
-      "Deterministic memory layout means deterministic performance. The same task walks the same code path every time. No GC pauses, no arena resizes — just predictable hundreds-of-microseconds latency.",
-    bullets: [
-      "0.181 ms average end-to-end latency",
-      "21,000 tasks per second, sustained",
-      "No GC pauses or allocator jitter",
-      "Predictable p99 under load",
-    ],
-    tint: amberTint,
-    renderVisual: (active) => <PerformanceVisual active={active} />,
-    footnotes: [
-      {
-        title: "Deterministic hot path",
-        body: "Same allocation path every time. No branching for slow cases.",
-      },
-      {
-        title: "Sustained, not peak",
-        body: "Throughput holds steady — no warmup cliffs, no degradation curve.",
-      },
-      {
-        title: "Written close to the metal",
-        body: "Pure native code. No runtime overhead between your task and the CPU.",
-      },
-    ],
-  },
-  {
-    id: "protocol",
-    title: "Tight binary protocol.",
-    modalTitle: "A binary wire, designed for the hot path",
-    shortSummary:
-      "Quicx speaks its own compact binary protocol — opcodes, lengths, and payloads moving at line rate. No JSON, no bloat.",
-    description:
-      "The Quicx protocol is a fixed-layout binary wire format: a 6-byte header — version (1B), type (1B), length (4B) — followed by a payload sized exactly to the PMAD slot that holds it. Producers, daemon, and workers all speak it directly.",
-    bullets: [
-      "6-byte header: version (1B), type (1B), length (4B)",
-      "Variable-length payload, sized to the PMAD slot",
-      "Twelve opcodes cover the entire protocol surface",
-      "Versioned from byte 0, forward-compatible by design",
-    ],
-    tint: blueTint,
-    renderVisual: (active, expanded) => (
-      <ProtocolVisual active={active} expanded={expanded} />
-    ),
-    footnotes: [
-      {
-        title: "Zero-copy wire",
-        body: "Frames are consumed directly from the network buffer.",
-      },
-      {
-        title: "Minimal opcode surface",
-        body: "Five opcodes — no JSON layer, no accidental polymorphism.",
-      },
-      {
-        title: "Versioned",
-        body: "A version byte in every frame — forward-compatible from day one.",
-      },
-    ],
-  },
-  {
-    id: "setup",
-    title: "Queueing in five minutes.",
-    modalTitle: "From zero to a submitted task in five minutes",
-    shortSummary:
-      "Install the binary, drop in the Java client (quicx-client), and submit your first task — on Linux, macOS, or wherever your backend runs.",
-    description:
-      "Quicx was designed to disappear. A one-line install, a default-good quicx.conf, a Maven-published Java client, and a tiny API surface. From nothing to a submitted task in about five minutes.",
-    bullets: [
-      "One-line installer — no build toolchain required",
-      "Generate a sensible default quicx.conf with quicx init",
-      "Java client (quicx-client) is Maven/Gradle-ready",
-      "Submit your first task in under five minutes",
-    ],
-    tint: roseTint,
-    renderVisual: (active) => <SetupVisual active={active} />,
-    footnotes: [
-      {
-        title: "One-line install",
-        body: "curl | sh, or grab the prebuilt static binary — your call.",
-      },
-      {
-        title: "Batteries-included client",
-        body: "The Java client is published to Maven Central — just add the dep.",
-      },
-      {
-        title: "Sensible defaults",
-        body: "Start with the default config and tune only what you need later.",
-      },
-    ],
-  },
-];
-
-export function FeatureCardsGrid() {
-  const [openId, setOpenId] = useState<string | null>(null);
-  const activeFeature = features.find((f) => f.id === openId) ?? null;
-
-  return (
-    <>
-      <div className="mt-16 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {features.map((f, i) => (
-          <FeatureCard
-            key={f.id}
-            feature={f}
-            onOpen={() => setOpenId(f.id)}
-            className={cn(
-              i === 0 || i === 3 ? "md:col-span-2" :
-                i === 4 ? "lg:col-span-2" :
-                  "",
-              i === 0 ? "min-h-[650px]" : "min-h-[420px]",
-              "h-full"
-            )}
-          />
-        ))}
-      </div>
-
-      <FeatureModal
-        feature={activeFeature}
-        onClose={() => setOpenId(null)}
-        onSwitch={(id) => setOpenId(id)}
-      />
-    </>
-  );
-}
-
-function FeatureCard({
-  feature,
-  onOpen,
-  className,
-}: {
-  feature: Feature;
-  onOpen: () => void;
-  className?: string;
-}) {
-  const [active, setActive] = useState(false);
-
-  return (
-    <button
-      id={feature.id}
-      type="button"
-      onMouseEnter={() => setActive(true)}
-      onMouseLeave={() => setActive(false)}
-      onFocus={() => setActive(true)}
-      onBlur={() => setActive(false)}
-      onClick={onOpen}
-      className={cn(
-        "group relative flex w-full flex-col overflow-hidden rounded border border-quicx-line bg-quicx-bg-2 text-left scroll-mt-24",
-        "transition-all duration-500 ease-out",
-        "hover:border-white/15 hover:bg-quicx-bg-3",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-quicx-orange/60 focus-visible:ring-offset-2 focus-visible:ring-offset-quicx-bg",
-        className
-      )}
-    >
-      <div
-        className="pointer-events-none absolute inset-0 opacity-60 transition-opacity duration-500 group-hover:opacity-100"
-        style={{
-          background: `radial-gradient(ellipse 70% 50% at 85% 0%, ${feature.tint.radial}, transparent 60%)`,
-        }}
-        aria-hidden
-      />
-      <div
-        className={cn(
-          "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent via-[color:var(--tw-grad)]",
-          feature.tint.glow
-        )}
-        style={{ ["--tw-grad" as string]: feature.tint.accent + "55" }}
-        aria-hidden
-      />
-
-      <div className="relative flex items-start justify-between gap-3 p-6">
-        <h3 className="max-w-[14rem] text-[19px] font-semibold leading-snug text-quicx-text">
-          {feature.title}
-        </h3>
-
-        <span
-          className={cn(
-            "inline-flex size-9 shrink-0 items-center justify-center rounded border border-white/10 bg-white/[0.03] text-white/70",
-            "transition-all duration-300",
-            "group-hover:border-quicx-orange/50 group-hover:bg-quicx-orange/10 group-hover:text-quicx-orange-bright"
-          )}
-        >
-          <ExpandIcon className="size-3.5" />
-        </span>
-      </div>
-
-      <div className="relative flex-1 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-dots opacity-30" />
-        <div className="relative h-full">{feature.renderVisual(active)}</div>
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent to-quicx-bg-2" />
-      </div>
-    </button>
-  );
-}
+/* ───────────────── modal ───────────────── */
 
 function FeatureModal({
   feature,
@@ -541,7 +306,9 @@ function ModalBody({ feature }: { feature: Feature }) {
         }}
       >
         <div className="pointer-events-none absolute inset-0 bg-dots opacity-40" />
-        <div className="relative h-full">{feature.renderVisual(true, true)}</div>
+        <div className="relative h-full">
+          <VisualFor id={feature.id} active={true} expanded={true} />
+        </div>
       </div>
 
       <div className="mt-10 grid grid-cols-1 gap-6 border-t border-quicx-line pt-10 sm:grid-cols-3">
@@ -618,6 +385,8 @@ function MoreToDiscover({
     </section>
   );
 }
+
+/* ───────────────── icons ───────────────── */
 
 function ExpandIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
