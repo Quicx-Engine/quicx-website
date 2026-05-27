@@ -4,9 +4,18 @@ import { FeatureCardChrome } from "./FeatureCardChrome";
 import {
   FeatureCardsInteractive,
   FeatureCardSlot,
+  type ModalSlot,
 } from "./FeatureCardsClient";
+import { FeatureModalBody } from "./FeatureModalBody";
 
 export function FeatureCards() {
+  const modalSlots: ModalSlot[] = features.map((f) => ({
+    id: f.id,
+    modalTitle: f.modalTitle,
+    shortSummary: f.shortSummary,
+    body: <FeatureModalBody feature={f} />,
+  }));
+
   return (
     <section
       id="features"
@@ -61,7 +70,7 @@ export function FeatureCards() {
         </div>
 
         {/* Cards grid — chrome is server-rendered, slots add interactivity */}
-        <FeatureCardsInteractive>
+        <FeatureCardsInteractive modalSlots={modalSlots}>
           <div className="mt-16 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {features.map((f, i) => (
               <FeatureCardSlot
