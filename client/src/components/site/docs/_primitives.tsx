@@ -20,9 +20,9 @@ export function SectionHeader({
         <span className="h-px w-8 bg-gradient-to-r from-quicx-orange/70 to-transparent" />
         <span className="text-quicx-orange-bright">{kicker}</span>
       </div>
-      <h2 className="mt-3 font-[family-name:var(--font-archivo)] text-[clamp(1.75rem,3.6vw,2.4rem)] font-semibold leading-[1.1] text-quicx-text">
+      <h1 className="mt-3 font-[family-name:var(--font-archivo)] text-[clamp(1.75rem,3.6vw,2.4rem)] font-semibold leading-[1.1] text-quicx-text">
         {title}
-      </h2>
+      </h1>
       {lede && (
         <p className="mt-4 max-w-3xl text-[15px] leading-relaxed text-quicx-muted">
           {lede}
