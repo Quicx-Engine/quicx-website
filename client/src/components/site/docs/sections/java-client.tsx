@@ -2,7 +2,7 @@ import { CodeBlock } from "@/components/site/docs/CodeBlock";
 import { Callout } from "@/components/site/docs/Callout";
 import { Tabs } from "@/components/site/docs/Tabs";
 import {
-  SectionHeader,
+  SectionHeaderFor,
   Prose,
   InlineCode,
   SubHeading,
@@ -12,13 +12,7 @@ import {
 export function JavaClientSection() {
   return (
     <section className="space-y-8">
-      <SectionHeader
-        num="§ 03.02"
-        kicker="Reference"
-        title="Java Client"
-        id="java-client"
-        lede="dev.quicx:quicx-client is a small, dependency-free Java 11+ library. Two classes carry the whole surface area: QuicxClient for producers, QuicxWorker for consumers."
-      />
+      <SectionHeaderFor slug="java-client" />
 
       <SubHeading id="java-build-setup">Add it to your build</SubHeading>
 

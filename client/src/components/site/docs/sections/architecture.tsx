@@ -1,6 +1,6 @@
 import { ArchitectureDiagram } from "@/components/site/Architecture";
 import {
-  SectionHeader,
+  SectionHeaderFor,
   Prose,
   InlineCode,
   SubHeading,
@@ -10,13 +10,7 @@ import {
 export function ArchitectureSection() {
   return (
     <section className="space-y-8">
-      <SectionHeader
-        num="§ 02.01"
-        kicker="Core Concepts"
-        title="Architecture"
-        id="architecture"
-        lede="One daemon, three role-based endpoints, one allocator. Every moving piece is visible in a single diagram — and intentionally, no piece is optional."
-      />
+      <SectionHeaderFor slug="architecture" />
 
       <div className="relative overflow-hidden rounded-2xl border border-quicx-line bg-[#0a1a22] p-6 sm:p-10">
         <div className="pointer-events-none absolute inset-0 bg-dots opacity-40" />

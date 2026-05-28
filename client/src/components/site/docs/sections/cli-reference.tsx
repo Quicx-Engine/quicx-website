@@ -2,7 +2,7 @@ import React from "react";
 import { Terminal as TerminalIcon } from "lucide-react";
 import { CodeBlock } from "@/components/site/docs/CodeBlock";
 import {
-  SectionHeader,
+  SectionHeaderFor,
   Prose,
   InlineCode,
 } from "@/components/site/docs/_primitives";
@@ -39,13 +39,7 @@ function CliCommand({
 export function CliReferenceSection() {
   return (
     <section className="space-y-8">
-      <SectionHeader
-        num="§ 03.01"
-        kicker="Reference"
-        title="CLI Reference"
-        id="cli-reference"
-        lede="quicx is the single binary that ships with the release. It is self-documenting — running it with no arguments prints the same usage you see below."
-      />
+      <SectionHeaderFor slug="cli-reference" />
 
       <CodeBlock
         window

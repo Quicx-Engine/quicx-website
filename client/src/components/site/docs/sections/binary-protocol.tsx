@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  SectionHeader,
+  SectionHeaderFor,
   InlineCode,
   SubHeading,
   KeyList,
@@ -130,13 +130,7 @@ function Payload({
 export function BinaryProtocolSection() {
   return (
     <section className="space-y-8">
-      <SectionHeader
-        num="§ 02.03"
-        kicker="Core Concepts"
-        title="Binary Protocol"
-        id="binary-protocol"
-        lede="Every frame on the wire is a 6-byte header followed by a variable-length payload. No framing ambiguity, no partial reads, no text encoding — parsing is a couple of pointer reads."
-      />
+      <SectionHeaderFor slug="binary-protocol" />
 
       <SubHeading id="protocol-frame-header">Frame header</SubHeading>
 

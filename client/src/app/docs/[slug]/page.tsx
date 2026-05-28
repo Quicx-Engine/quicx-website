@@ -23,17 +23,17 @@ export async function generateMetadata({
   const url = `https://quicx.dev/docs/${slug}`;
   return {
     title: `${meta.title} - Quicx Docs`,
-    description: meta.description,
+    description: meta.lede,
     alternates: { canonical: url },
     openGraph: {
       title: `${meta.title} - Quicx Docs`,
-      description: meta.description,
+      description: meta.lede,
       url,
       type: "article",
     },
     twitter: {
       title: `${meta.title} - Quicx Docs`,
-      description: meta.description,
+      description: meta.lede,
     },
   };
 }
@@ -67,7 +67,7 @@ export default async function DocsSectionPage({
     "@context": "https://schema.org",
     "@type": "TechArticle",
     "headline": `${meta.title} — Quicx Documentation`,
-    "description": meta.description,
+    "description": meta.lede,
     "url": `https://quicx.dev/docs/${slug}`,
     "inLanguage": "en-US",
     "author": {

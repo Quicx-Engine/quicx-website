@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CodeBlock } from "@/components/site/docs/CodeBlock";
 import { Callout } from "@/components/site/docs/Callout";
 import {
-  SectionHeader,
+  SectionHeaderFor,
   Prose,
   InlineCode,
   SubHeading,
@@ -12,13 +12,7 @@ import {
 export function InstallationSection() {
   return (
     <section className="space-y-8">
-      <SectionHeader
-        num="§ 01.01"
-        kicker="Getting Started"
-        title="Installation"
-        id="installation"
-        lede="Quicx ships as a single static binary. One curl command detects your OS and architecture, verifies the checksum, and drops the daemon into your PATH."
-      />
+      <SectionHeaderFor slug="installation" />
 
       <Prose>
         <p>

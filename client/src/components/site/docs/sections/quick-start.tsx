@@ -3,7 +3,7 @@ import { CodeBlock } from "@/components/site/docs/CodeBlock";
 import { Callout } from "@/components/site/docs/Callout";
 import { Tabs } from "@/components/site/docs/Tabs";
 import {
-  SectionHeader,
+  SectionHeaderFor,
   Prose,
   InlineCode,
 } from "@/components/site/docs/_primitives";
@@ -40,13 +40,7 @@ function Step({
 export function QuickStartSection() {
   return (
     <section className="space-y-8">
-      <SectionHeader
-        num="§ 01.02"
-        kicker="Getting Started"
-        title="Quick Start"
-        id="quick-start"
-        lede="Start the daemon with quicx start, pull the Java client from Maven Central, and submit your first task. End-to-end in under a minute."
-      />
+      <SectionHeaderFor slug="quick-start" />
 
       <ol className="space-y-6">
         <Step index="01" title="Start the daemon">

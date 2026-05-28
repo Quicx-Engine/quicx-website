@@ -1,7 +1,7 @@
 import { Callout } from "@/components/site/docs/Callout";
 import { DocsPageFooterCta } from "@/components/site/docs/DocsPageFooterCta";
 import {
-  SectionHeader,
+  SectionHeaderFor,
   InlineCode,
 } from "@/components/site/docs/_primitives";
 
@@ -45,13 +45,7 @@ export function ChangelogSection() {
   return (
     <>
       <section className="space-y-8">
-        <SectionHeader
-          num="§ 03.03"
-          kicker="Reference"
-          title="Changelog"
-          id="changelog"
-          lede="Quicx follows semver. Breaking protocol changes bump the major version; new message types are additive and bump minor. Patch releases are build-or-docs-only."
-        />
+        <SectionHeaderFor slug="changelog" />
 
         <ul className="space-y-6">
           <Release

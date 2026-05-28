@@ -1,179 +1,220 @@
 import { ImageResponse } from "next/og";
+import {
+  sectionMeta,
+  sectionSlugs,
+} from "@/components/site/docs/sections-meta";
 
-export const runtime = "edge";
-export const alt = "Quicx Documentation — Install, configure and extend Quicx";
+export const alt = "Quicx Documentation";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function Image() {
-  const sections = [
-    "Installation",
-    "Quick Start",
-    "Configuration",
-    "Architecture",
-    "PMAD Allocator",
-    "Binary Protocol",
-    "CLI Reference",
-    "Java Client",
-  ];
+export function generateStaticParams() {
+  return sectionSlugs.map((slug) => ({ slug }));
+}
+
+async function loadGoogleFont(family: string, weight: number) {
+  const url = `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}:wght@${weight}&display=swap`;
+  const css = await (
+    await fetch(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      },
+    })
+  ).text();
+  const match = css.match(
+    /src: url\((https:\/\/[^)]+\.(?:ttf|otf))\) format/
+  );
+  if (!match) throw new Error(`Could not extract font URL for ${family}`);
+  return await (await fetch(match[1])).arrayBuffer();
+}
+
+export default async function Image({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const meta = sectionMeta[slug] ?? sectionMeta["installation"];
+
+  const [archivo400, archivo600, jetbrains500] = await Promise.all([
+    loadGoogleFont("Archivo", 400),
+    loadGoogleFont("Archivo", 600),
+    loadGoogleFont("JetBrains Mono", 500),
+  ]);
+
+  const titleFontSize = meta.title.length > 24 ? 60 : 72;
 
   return new ImageResponse(
     (
       <div
         style={{
-          background: "#060d10",
+          background: "#0b1920",
           width: "100%",
           height: "100%",
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-start",
-          justifyContent: "flex-end",
+          justifyContent: "center",
           padding: "64px",
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Orange radial glow top-right */}
-        <div
-          style={{
-            position: "absolute",
-            top: "-80px",
-            right: "-80px",
-            width: "600px",
-            height: "600px",
-            background:
-              "radial-gradient(circle, rgba(255,87,0,0.18), transparent 65%)",
-          }}
-        />
-        {/* Subtle grid */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            opacity: 0.07,
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)",
-            backgroundSize: "44px 44px",
-          }}
-        />
-        {/* Top accent line */}
+        {/* bg-grid (opacity 0.5) */}
         <div
           style={{
             position: "absolute",
             top: 0,
             left: 0,
-            right: 0,
-            height: "3px",
-            background:
-              "linear-gradient(90deg, transparent, #FF5700 25%, #FF7A33 50%, #FF5700 75%, transparent)",
+            width: "1200px",
+            height: "630px",
+            opacity: 0.5,
+            backgroundImage:
+              "linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+            display: "flex",
           }}
         />
-
-        {/* Section pills — top right */}
+        {/* radial-hero-glow — top ellipse */}
         <div
           style={{
             position: "absolute",
-            top: "52px",
-            right: "64px",
+            top: "0px",
+            left: "0px",
+            width: "1200px",
+            height: "600px",
+            transform: "translateY(-50%)",
+            backgroundImage:
+              "radial-gradient(ellipse at center, rgba(255,87,0,0.12) 0%, transparent 60%)",
             display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-end",
-            gap: "8px",
           }}
-        >
-          {sections.map((s) => (
-            <div
-              key={s}
-              style={{
-                fontSize: "11px",
-                color: "rgba(138,155,168,0.7)",
-                border: "1px solid rgba(255,255,255,0.06)",
-                background: "rgba(255,255,255,0.02)",
-                padding: "5px 12px",
-                borderRadius: "4px",
-                fontFamily: "monospace",
-                letterSpacing: "0.4px",
-              }}
-            >
-              {s}
-            </div>
-          ))}
-        </div>
-
-        {/* Diamond + label */}
+        />
+        {/* radial-hero-glow — bottom ellipse */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: "0",
+            left: "0px",
+            width: "1200px",
+            height: "550px",
+            transform: "translateY(50%)",
+            backgroundImage:
+              "radial-gradient(ellipse at center, rgba(255,87,0,0.05) 0%, transparent 60%)",
+            display: "flex",
+          }}
+        />
+        {/* Top hairline — via-quicx-line-strong */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "1200px",
+            height: "1px",
+            backgroundImage:
+              "linear-gradient(to right, transparent, rgba(255,255,255,0.14), transparent)",
+            display: "flex",
+          }}
+        />
+        {/* Bottom hairline — via-quicx-orange/30 */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            width: "1200px",
+            height: "2px",
+            backgroundImage:
+              "linear-gradient(to right, transparent, rgba(255,87,0,0.3), transparent)",
+            display: "flex",
+          }}
+        />
+        {/* Docs-style kicker: num — gradient line — label */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: "12px",
-            marginBottom: "24px",
+            marginBottom: "28px",
+            fontFamily: "JetBrains Mono, monospace",
+            fontSize: "16px",
+            fontWeight: 500,
+            textTransform: "uppercase",
+            letterSpacing: "4.8px",
           }}
         >
+          <span style={{ color: "#6a7487" }}>{meta.num}</span>
           <div
             style={{
-              width: "9px",
-              height: "9px",
-              background: "#FF5700",
-              transform: "rotate(45deg)",
+              display: "flex",
+              width: "48px",
+              height: "2px",
+              flexShrink: 0,
+              backgroundImage:
+                "linear-gradient(to right, rgba(255,87,0,0.7), transparent)",
             }}
           />
-          <span
-            style={{
-              color: "#FF7A33",
-              fontSize: "13px",
-              letterSpacing: "4px",
-              textTransform: "uppercase",
-              fontFamily: "Arial, sans-serif",
-              fontWeight: 600,
-            }}
-          >
-            Documentation
-          </span>
-        </div>
-
-        {/* Breadcrumb */}
-        <div
-          style={{
-            fontSize: "14px",
-            color: "rgba(138,155,168,0.5)",
-            fontFamily: "monospace",
-            marginBottom: "16px",
-            letterSpacing: "1px",
-          }}
-        >
-          quicx.dev / docs
+          <span style={{ color: "#ff7a33" }}>{meta.kicker}</span>
         </div>
 
         {/* Main headline */}
         <div
           style={{
-            fontSize: "76px",
-            fontWeight: 800,
-            color: "#ffffff",
-            lineHeight: 1.0,
-            letterSpacing: "-2px",
-            fontFamily: "Arial Black, Arial, sans-serif",
+            fontSize: `${titleFontSize}px`,
+            fontWeight: 600,
+            color: "#f4f6fb",
+            lineHeight: 1.1,
+            fontFamily: "Archivo, Arial, sans-serif",
             marginBottom: "20px",
+            maxWidth: "1072px",
           }}
         >
-          Quicx Docs
+          {meta.title}
         </div>
 
-        {/* Description */}
+        {/* Tagline */}
         <div
           style={{
-            fontSize: "24px",
+            fontSize: "28px",
             color: "#8a9ba8",
-            fontFamily: "Arial, sans-serif",
-            maxWidth: "640px",
-            lineHeight: 1.5,
+            fontFamily: "Archivo, Arial, sans-serif",
+            marginBottom: "44px",
+            maxWidth: "1000px",
+            lineHeight: 1.45,
           }}
         >
-          Install, configure and extend Quicx — the PMAD-backed task queue
-          engine with a binary protocol.
+          {meta.lede}
+        </div>
+
+        {/* URL watermark */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: "52px",
+            right: "64px",
+            fontSize: "16px",
+            color: "rgba(138,155,168,0.5)",
+            fontFamily: "Arial, sans-serif",
+            letterSpacing: "2px",
+          }}
+        >
+          {`quicx.dev/docs/${slug}`}
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts: [
+        { name: "Archivo", data: archivo400, weight: 400, style: "normal" },
+        { name: "Archivo", data: archivo600, weight: 600, style: "normal" },
+        {
+          name: "JetBrains Mono",
+          data: jetbrains500,
+          weight: 500,
+          style: "normal",
+        },
+      ],
+    }
   );
 }

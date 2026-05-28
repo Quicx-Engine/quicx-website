@@ -1,4 +1,19 @@
 import React from "react";
+import { sectionMeta } from "@/components/site/docs/sections-meta";
+
+export function SectionHeaderFor({ slug }: { slug: string }) {
+  const m = sectionMeta[slug];
+  if (!m) return null;
+  return (
+    <SectionHeader
+      num={m.num}
+      kicker={m.kicker}
+      title={m.title}
+      id={slug}
+      lede={m.lede}
+    />
+  );
+}
 
 export function SectionHeader({
   num,

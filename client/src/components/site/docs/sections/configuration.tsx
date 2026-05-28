@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CodeBlock } from "@/components/site/docs/CodeBlock";
 import { Callout } from "@/components/site/docs/Callout";
 import {
-  SectionHeader,
+  SectionHeaderFor,
   Prose,
   InlineCode,
   SubHeading,
@@ -13,13 +13,7 @@ import {
 export function ConfigurationSection() {
   return (
     <section className="space-y-8">
-      <SectionHeader
-        num="§ 01.03"
-        kicker="Getting Started"
-        title="Configuration"
-        id="configuration"
-        lede="A Quicx daemon reads its entire runtime shape from a single quicx.conf file. Every number is exact — block counts, pool share, port — and is resolved before a byte of task traffic moves."
-      />
+      <SectionHeaderFor slug="configuration" />
 
       <CodeBlock
         filename="quicx.conf"

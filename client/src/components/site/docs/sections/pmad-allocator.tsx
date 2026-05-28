@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Callout } from "@/components/site/docs/Callout";
 import {
-  SectionHeader,
+  SectionHeaderFor,
   Prose,
   InlineCode,
   SubHeading,
@@ -12,13 +12,7 @@ import {
 export function PmadSection() {
   return (
     <section className="space-y-8">
-      <SectionHeader
-        num="§ 02.02"
-        kicker="Core Concepts"
-        title="PMAD — Predictive Memory Allocator"
-        id="pmad-allocator"
-        lede="A slab allocator written in C that delivers O(1) allocation and deallocation with zero fragmentation and zero system calls at runtime. Every allocation the daemon makes — task envelopes, wire buffers, worker registration slots — comes out of PMAD. Fragmentation is 0 % by design: every block is pre-sized to a declared class, so there is no splitting, no coalescing, and no wasted space."
-      />
+      <SectionHeaderFor slug="pmad-allocator" />
 
       <Prose>
         <p>
