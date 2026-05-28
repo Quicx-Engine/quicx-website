@@ -43,7 +43,7 @@ export function Header() {
           </a>
         </nav>
 
-        <a href="/docs#quick-start">
+        <a href="/docs/quick-start">
           <Button
             variant="outline"
             size="sm"

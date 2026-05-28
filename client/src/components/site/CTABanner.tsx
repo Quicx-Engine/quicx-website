@@ -52,7 +52,7 @@ export function CTABanner() {
 
         {/* CTAs */}
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <a href="/docs#installation">
+          <a href="/docs/installation">
             <button className="inline-flex h-12 items-center gap-2 rounded bg-quicx-orange px-8 font-[family-name:var(--font-barlow-condensed)] text-[15px] font-semibold uppercase tracking-wider text-white shadow-[0_0_0_1px_rgba(255,87,0,0.5),0_10px_30px_-10px_rgba(255,87,0,0.55)] transition hover:bg-quicx-orange-bright">
               Install Quicx
               <ArrowRight className="size-4" />

@@ -24,16 +24,16 @@ const nav: { title: string; items: { label: string; href: string }[] }[] = [
       { label: "Features", href: "#features" },
       { label: "Architecture", href: "#architecture" },
       { label: "Performance", href: "#performance" },
-      { label: "Changelog", href: "/docs#changelog" },
+      { label: "Changelog", href: "/docs/changelog" },
     ],
   },
   {
     title: "Developers",
     items: [
       { label: "Documentation", href: "/docs" },
-      { label: "Quick start", href: "/docs#quick-start" },
-      { label: "CLI reference", href: "/docs#cli-reference" },
-      { label: "Java client", href: "/docs#java-client" },
+      { label: "Quick start", href: "/docs/quick-start" },
+      { label: "CLI reference", href: "/docs/cli-reference" },
+      { label: "Java client", href: "/docs/java-client" },
     ],
   },
   {

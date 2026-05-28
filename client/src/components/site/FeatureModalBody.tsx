@@ -18,7 +18,7 @@ export function FeatureModalBody({ feature }: { feature: Feature }) {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="/docs#quick-start">
+              <a href="/docs/quick-start">
                 <Button
                   size="lg"
                   className="h-11 rounded bg-quicx-orange px-5 font-[family-name:var(--font-barlow-condensed)] text-sm font-semibold uppercase tracking-wider text-white hover:bg-quicx-orange-bright"

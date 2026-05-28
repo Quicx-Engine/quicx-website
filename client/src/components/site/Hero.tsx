@@ -36,7 +36,7 @@ export function Hero() {
 
         {/* CTAs */}
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <a href="/docs#quick-start">
+          <a href="/docs/quick-start">
             <Button
               size="lg"
               className="h-12 rounded bg-quicx-orange px-7 font-[family-name:var(--font-barlow-condensed)] text-base font-semibold uppercase tracking-wider text-white shadow-[0_0_0_1px_rgba(255,87,0,0.5),0_10px_30px_-10px_rgba(255,87,0,0.55)] hover:bg-quicx-orange-bright"
