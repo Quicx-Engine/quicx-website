@@ -24,7 +24,7 @@ export async function generateMetadata({
   return {
     title: `${meta.title} - Quicx Docs`,
     description: meta.description,
-    alternates: { canonical: `/docs/${slug}` },
+    alternates: { canonical: url },
     openGraph: {
       title: `${meta.title} - Quicx Docs`,
       description: meta.description,
