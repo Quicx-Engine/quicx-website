@@ -28,12 +28,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date("2026-05-28"),
       changeFrequency: "weekly",
       priority: 1,
+      images: [`${baseUrl}/opengraph-image`],
     },
     ...docEntryMeta.map(({ slug, lastModified, priority, changeFrequency }) => ({
       url: `${baseUrl}/docs/${slug}`,
       lastModified: new Date(lastModified),
       changeFrequency,
       priority,
+      images: [`${baseUrl}/docs/${slug}/opengraph-image`],
     })),
   ];
 }
