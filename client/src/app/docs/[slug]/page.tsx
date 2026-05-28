@@ -22,17 +22,17 @@ export async function generateMetadata({
   if (!meta) return {};
   const url = `https://quicx.dev/docs/${slug}`;
   return {
-    title: `${meta.title} — Quicx Docs`,
+    title: `${meta.title} - Quicx Docs`,
     description: meta.description,
     alternates: { canonical: `/docs/${slug}` },
     openGraph: {
-      title: `${meta.title} — Quicx Docs`,
+      title: `${meta.title} - Quicx Docs`,
       description: meta.description,
       url,
       type: "article",
     },
     twitter: {
-      title: `${meta.title} — Quicx Docs`,
+      title: `${meta.title} - Quicx Docs`,
       description: meta.description,
     },
   };
