@@ -21,6 +21,7 @@ export const metadata: Metadata = {
     type: "website",
   },
   twitter: {
+    card: "summary_large_image",
     title: "Quicx - Deterministic Task Queue Engine",
     description:
       "O(1) allocation, zero fragmentation, 63 KB binary. A task queue daemon built on PMAD — no GC pauses, no jitter.",
