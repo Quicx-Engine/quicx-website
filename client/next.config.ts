@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         source: "/:path*.svg",
         headers: [{ key: "X-Robots-Tag", value: "noindex" }],
       },
+      {
+        source: "/install:ext(.sh)?",
+        headers: [{ key: "X-Robots-Tag", value: "noindex" }],
+      },
     ];
   },
   async rewrites() {

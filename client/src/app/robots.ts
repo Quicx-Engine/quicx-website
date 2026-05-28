@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: "/api/"
+      disallow: ["/api/", "/install", "/install.sh"]
     },
     sitemap: "https://quicx.dev/sitemap.xml",
   };
