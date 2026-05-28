@@ -129,7 +129,7 @@ export default function RootLayout({
         "applicationCategory": "DeveloperApplication",
         "applicationSubCategory": "Task Queue, Message Queue",
         "softwareVersion": "1.0.0",
-        "releaseNotes": "https://quicx.dev/docs",
+        "releaseNotes": "https://quicx.dev/docs/changelog",
         "description":
           "Quicx is a lightweight, deterministic task queue daemon built on the PMAD slab allocator. It delivers O(1) allocation, zero fragmentation, and a compact binary protocol — no GC pauses, no jitter, one 63 KB static binary.",
         "featureList": [
@@ -155,6 +155,7 @@ export default function RootLayout({
         },
         "publisher": { "@id": "https://quicx.dev/#organization" },
         "sameAs": ["https://github.com/anastassow/Quicx"],
+        "inLanguage": "en-US"
       },
     ],
   };

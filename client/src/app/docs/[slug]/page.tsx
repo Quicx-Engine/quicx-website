@@ -67,7 +67,7 @@ export default async function DocsSectionPage({
   const techArticleJsonLd = {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    "headline": `${meta.title} — Quicx Documentation`,
+    "headline": `${meta.title} - Quicx Documentation`,
     "description": meta.lede,
     "url": `https://quicx.dev/docs/${slug}`,
     "inLanguage": "en-US",
@@ -77,16 +77,12 @@ export default async function DocsSectionPage({
       "url": "https://www.linkedin.com/in/dimitar-anastasov-339a94310/",
     },
     "publisher": {
-      "@type": "Organization",
-      "name": "Quicx",
-      "url": "https://quicx.dev",
+      "@id": "https://quicx.dev/#organization"
     },
     "datePublished": "2026-04-21",
     "dateModified": "2026-05-11",
     "about": {
-      "@type": "SoftwareApplication",
-      "name": "Quicx",
-      "url": "https://quicx.dev",
+      "@id": "https://quicx.dev/#software"
     },
   };
 
