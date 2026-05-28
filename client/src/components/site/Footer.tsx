@@ -36,15 +36,15 @@ const nav: { title: string; items: { label: string; href: string }[] }[] = [
       { label: "Java client", href: "/docs/java-client" },
     ],
   },
-  {
-    title: "Company",
-    items: [
-      { label: "About Nefara", href: "https://www.nefara.org" },
-      { label: "Contact", href: "https://www.nefara.org/en#contact" },
-      { label: "Security", href: "#" },
-      { label: "License", href: "#" },
-    ],
-  },
+  // {
+  //   title: "Company",
+  //   items: [
+  //     { label: "About Nefara", href: "https://www.nefara.org" },
+  //     { label: "Contact", href: "https://www.nefara.org/en#contact" },
+  //     { label: "Security", href: "#" },
+  //     { label: "License", href: "#" },
+  //   ],
+  // },
 ];
 
 export function Footer() {
@@ -53,7 +53,7 @@ export function Footer() {
       <div className="pointer-events-none absolute inset-0 bg-dots opacity-20" />
 
       {/* Main footer */}
-      <div className="relative mx-auto grid w-full max-w-7xl grid-cols-2 gap-10 px-6 py-16 lg:grid-cols-5 lg:gap-16 lg:px-10">
+      <div className="relative mx-auto grid w-full max-w-7xl grid-cols-2 gap-10 px-6 py-16 lg:grid-cols-4 lg:gap-16 lg:px-10">
         {/* Brand column */}
         <div className="col-span-2 lg:col-span-2">
           <Image
@@ -104,7 +104,7 @@ export function Footer() {
       </div>
 
       {/* Built-by strip — Nefara logo MUST sit on white */}
-      <div className="relative border-t border-quicx-line bg-quicx-bg">
+      {/* <div className="relative border-t border-quicx-line bg-quicx-bg">
         <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-6 px-6 py-10 lg:flex-row lg:px-10">
           <p className="font-[family-name:var(--font-barlow-condensed)] text-sm uppercase tracking-[0.3em] text-quicx-dim">
             <span className="text-quicx-orange-bright">“</span>
@@ -116,7 +116,7 @@ export function Footer() {
             <span className="text-[12px] uppercase tracking-[0.24em] text-quicx-dim">
               Built by
             </span>
-            {/* White surface for Nefara */}
+            // White surface for Nefara
             <div className="flex items-center gap-3 rounded-full bg-white px-5 py-2.5 shadow-[0_0_0_1px_rgba(255,255,255,0.08)]">
               <Image
                 src="/nefara-logo.svg"
@@ -128,13 +128,13 @@ export function Footer() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Legal bar */}
       <div className="relative border-t border-quicx-line">
         <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-[12px] text-quicx-dim sm:flex-row lg:px-10">
           <p>
-            © {new Date().getFullYear()} Nefara. All rights reserved.
+            © {new Date().getFullYear()} Quicx. All rights reserved.
           </p>
           <div className="flex items-center gap-5">
             <a className="hover:text-quicx-text" href="#">

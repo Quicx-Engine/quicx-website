@@ -79,7 +79,7 @@ export function ChangelogSection() {
 
         <Callout variant="tip" title="Subscribe to release notes">
           The canonical source of release notes is the{" "}
-          <a href="https://github.com/nefara/quicx/releases">GitHub releases page</a>. Watch
+          <a target="_blank" href="https://github.com/Quicx-Engine/Quicx-Releases">GitHub releases page</a>. Watch
           the repository for notifications — every release bundles a signed tarball plus the
           matching <InlineCode>SHA256SUMS</InlineCode>.
         </Callout>

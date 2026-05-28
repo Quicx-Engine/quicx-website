@@ -77,8 +77,8 @@ export default async function DocsSectionPage({
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Nefara",
-      "url": "https://www.nefara.org",
+      "name": "Quicx",
+      "url": "https://quicx.dev",
     },
     "datePublished": "2026-04-21",
     "dateModified": "2026-05-11",

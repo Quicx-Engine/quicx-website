@@ -58,7 +58,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Dimitar Anastasov", url: "https://www.linkedin.com/in/dimitar-anastasov-339a94310/" }],
   creator: "Dimitar Anastasov",
-  publisher: "Nefara",
+  publisher: "Quicx",
   robots: {
     index: true,
     follow: true,
@@ -109,11 +109,11 @@ export default function RootLayout({
       {
         "@type": "Organization",
         "@id": "https://quicx.dev/#organization",
-        "name": "Nefara",
-        "url": "https://www.nefara.org",
+        "name": "Quicx",
+        "url": "https://quicx.org",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://quicx.dev/nefara-logo.svg",
+          "url": "https://quicx.dev/quicx-logo.svg",
         },
         "sameAs": [
           "https://github.com/anastassow",
