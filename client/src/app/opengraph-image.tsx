@@ -5,7 +5,29 @@ export const alt = "Quicx — Deterministic task queue engine";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function Image() {
+async function loadGoogleFont(family: string, weight: number) {
+  const url = `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}:wght@${weight}&display=swap`;
+  const css = await (
+    await fetch(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      },
+    })
+  ).text();
+  const match = css.match(
+    /src: url\((https:\/\/[^)]+\.(?:ttf|otf))\) format/
+  );
+  if (!match) throw new Error(`Could not extract font URL for ${family}`);
+  return await (await fetch(match[1])).arrayBuffer();
+}
+
+export default async function Image() {
+  const [archivo400, archivo600, jetbrains500] = await Promise.all([
+    loadGoogleFont("Archivo", 400),
+    loadGoogleFont("Archivo", 600),
+    loadGoogleFont("JetBrains Mono", 500),
+  ]);
   return new ImageResponse(
     (
       <div
@@ -16,7 +38,7 @@ export default function Image() {
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-start",
-          justifyContent: "flex-end",
+          justifyContent: "center",
           padding: "64px",
           position: "relative",
           overflow: "hidden",
@@ -91,46 +113,42 @@ export default function Image() {
             display: "flex",
           }}
         />
-        {/* Diamond + label */}
+        {/* Docs-style kicker: num — gradient line — label */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: "12px",
             marginBottom: "28px",
+            fontFamily: "JetBrains Mono, monospace",
+            fontSize: "16px",
+            fontWeight: 500,
+            textTransform: "uppercase",
+            letterSpacing: "4.8px",
           }}
         >
+          <span style={{ color: "#6a7487" }}>Quicx</span>
           <div
             style={{
-              width: "9px",
-              height: "9px",
-              background: "#FF5700",
-              transform: "rotate(45deg)",
+              display: "flex",
+              width: "48px",
+              height: "2px",
+              flexShrink: 0,
+              backgroundImage:
+                "linear-gradient(to right, rgba(255,87,0,0.7), transparent)",
             }}
           />
-          <span
-            style={{
-              color: "#FF7A33",
-              fontSize: "13px",
-              letterSpacing: "4px",
-              textTransform: "uppercase",
-              fontFamily: "Arial, sans-serif",
-              fontWeight: 600,
-            }}
-          >
-            Task Queue Engine
-          </span>
+          <span style={{ color: "#ff7a33" }}>Configure it once. Run it forever.</span>
         </div>
 
         {/* Main headline */}
         <div
           style={{
-            fontSize: "96px",
-            fontWeight: 800,
-            color: "#ffffff",
-            lineHeight: 1.0,
-            letterSpacing: "-3px",
-            fontFamily: "Arial Black, Arial, sans-serif",
+            fontSize: "72px",
+            fontWeight: 600,
+            color: "#f4f6fb",
+            lineHeight: 1.1,
+            fontFamily: "Archivo, Arial, sans-serif",
             marginBottom: "20px",
           }}
         >
@@ -142,13 +160,13 @@ export default function Image() {
           style={{
             fontSize: "28px",
             color: "#8a9ba8",
-            fontFamily: "Arial, sans-serif",
+            fontFamily: "Archivo, Arial, sans-serif",
             marginBottom: "44px",
             maxWidth: "760px",
             lineHeight: 1.45,
           }}
         >
-          PMAD slab allocator. Zero jitter. 63 KB.
+          PMAD slab allocator. Zero jitter. 63 KB. 
         </div>
 
         {/* Stats badges */}
@@ -191,6 +209,28 @@ export default function Image() {
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts: [
+        {
+          name: "Archivo",
+          data: archivo400,
+          weight: 400,
+          style: "normal",
+        },
+        {
+          name: "Archivo",
+          data: archivo600,
+          weight: 600,
+          style: "normal",
+        },
+        {
+          name: "JetBrains Mono",
+          data: jetbrains500,
+          weight: 500,
+          style: "normal",
+        },
+      ],
+    }
   );
 }
