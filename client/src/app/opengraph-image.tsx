@@ -10,7 +10,7 @@ export default function Image() {
     (
       <div
         style={{
-          background: "#060d10",
+          background: "#0b1920",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -22,39 +22,73 @@ export default function Image() {
           overflow: "hidden",
         }}
       >
-        {/* Orange radial glow */}
-        <div
-          style={{
-            position: "absolute",
-            top: "-120px",
-            left: "-60px",
-            width: "720px",
-            height: "720px",
-            background:
-              "radial-gradient(circle, rgba(255,87,0,0.22), transparent 65%)",
-          }}
-        />
-        {/* Subtle grid */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            opacity: 0.07,
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)",
-            backgroundSize: "44px 44px",
-          }}
-        />
-        {/* Top accent line */}
+        {/* bg-grid (opacity 0.5) */}
         <div
           style={{
             position: "absolute",
             top: 0,
             left: 0,
-            right: 0,
-            height: "3px",
-            background:
-              "linear-gradient(90deg, transparent, #FF5700 25%, #FF7A33 50%, #FF5700 75%, transparent)",
+            width: "1200px",
+            height: "630px",
+            opacity: 0.5,
+            backgroundImage:
+              "linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+            display: "flex",
+          }}
+        />
+        {/* radial-hero-glow — top ellipse */}
+        <div
+          style={{
+            position: "absolute",
+            top: "0px",
+            left: "0px",
+            width: "1200px",
+            height: "600px",
+            transform: "translateY(-50%)",
+            backgroundImage:
+              "radial-gradient(ellipse at center, rgba(255,87,0,0.12) 0%, transparent 60%)",
+            display: "flex",
+          }}
+        />
+        {/* radial-hero-glow — bottom ellipse */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: "0",
+            left: "0px",
+            width: "1200px",
+            height: "550px",
+            transform: "translateY(50%)",
+            backgroundImage:
+              "radial-gradient(ellipse at center, rgba(255,87,0,0.05) 0%, transparent 60%)",
+            display: "flex",
+          }}
+        />
+        {/* Top hairline — via-quicx-line-strong */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "1200px",
+            height: "1px",
+            backgroundImage:
+              "linear-gradient(to right, transparent, rgba(255,255,255,0.14), transparent)",
+            display: "flex",
+          }}
+        />
+        {/* Bottom hairline — via-quicx-orange/30 */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            width: "1200px",
+            height: "2px",
+            backgroundImage:
+              "linear-gradient(to right, transparent, rgba(255,87,0,0.3), transparent)",
+            display: "flex",
           }}
         />
         {/* Diamond + label */}
@@ -100,7 +134,7 @@ export default function Image() {
             marginBottom: "20px",
           }}
         >
-          Quicx
+          Quicx - Deterministic Task Queue Engine
         </div>
 
         {/* Tagline */}
@@ -114,7 +148,7 @@ export default function Image() {
             lineHeight: 1.45,
           }}
         >
-          Deterministic task queue. PMAD slab allocator. Zero jitter. 63 KB.
+          PMAD slab allocator. Zero jitter. 63 KB.
         </div>
 
         {/* Stats badges */}
