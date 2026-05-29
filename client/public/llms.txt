@@ -15,6 +15,6 @@ Contact: https://www.linkedin.com/in/dimitar-anastasov-339a94310/
 - Java client library available (QuicxClient, QuicxWorker)
     
 # Main Resources
-Home: https://quicx.dev/
+Home: https://quicx.dev
 Documentation: https://quicx.dev/docs
 Installer: https://quicx.dev/install.sh

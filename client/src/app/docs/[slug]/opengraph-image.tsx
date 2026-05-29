@@ -1,8 +1,16 @@
 import { ImageResponse } from "next/og";
+import {
+  sectionMeta,
+  sectionSlugs,
+} from "@/components/site/docs/sections-meta";
 
-export const alt = "Quicx — Deterministic task queue engine";
+export const alt = "Quicx Documentation";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+
+export function generateStaticParams() {
+  return sectionSlugs.map((slug) => ({ slug }));
+}
 
 async function loadGoogleFont(family: string, weight: number) {
   const url = `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}:wght@${weight}&display=swap`;
@@ -21,12 +29,22 @@ async function loadGoogleFont(family: string, weight: number) {
   return await (await fetch(match[1])).arrayBuffer();
 }
 
-export default async function Image() {
+export default async function Image({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const meta = sectionMeta[slug] ?? sectionMeta["installation"];
+
   const [archivo400, archivo600, jetbrains500] = await Promise.all([
     loadGoogleFont("Archivo", 400),
     loadGoogleFont("Archivo", 600),
     loadGoogleFont("JetBrains Mono", 500),
   ]);
+
+  const titleFontSize = meta.title.length > 24 ? 60 : 72;
+
   return new ImageResponse(
     (
       <div
@@ -126,7 +144,7 @@ export default async function Image() {
             letterSpacing: "4.8px",
           }}
         >
-          <span style={{ color: "#6a7487" }}>Quicx</span>
+          <span style={{ color: "#6a7487" }}>{meta.num}</span>
           <div
             style={{
               display: "flex",
@@ -137,21 +155,22 @@ export default async function Image() {
                 "linear-gradient(to right, rgba(255,87,0,0.7), transparent)",
             }}
           />
-          <span style={{ color: "#ff7a33" }}>Configure it once. Run it forever.</span>
+          <span style={{ color: "#ff7a33" }}>{meta.kicker}</span>
         </div>
 
         {/* Main headline */}
         <div
           style={{
-            fontSize: "72px",
+            fontSize: `${titleFontSize}px`,
             fontWeight: 600,
             color: "#f4f6fb",
             lineHeight: 1.1,
             fontFamily: "Archivo, Arial, sans-serif",
             marginBottom: "20px",
+            maxWidth: "1072px",
           }}
         >
-          Quicx - Deterministic Task Queue Engine
+          {meta.title}
         </div>
 
         {/* Tagline */}
@@ -161,35 +180,11 @@ export default async function Image() {
             color: "#8a9ba8",
             fontFamily: "Archivo, Arial, sans-serif",
             marginBottom: "44px",
-            maxWidth: "760px",
+            maxWidth: "1000px",
             lineHeight: 1.45,
           }}
         >
-          PMAD slab allocator. Zero jitter. 63 KB. 
-        </div>
-
-        {/* Stats badges */}
-        <div style={{ display: "flex", gap: "14px", flexWrap: "nowrap" }}>
-          {["19.1 ns alloc", ">460 M ops/s", "63 KB binary", "0% fragmentation"].map(
-            (stat) => (
-              <div
-                key={stat}
-                style={{
-                  fontSize: "13px",
-                  color: "#FF7A33",
-                  border: "1px solid rgba(255,87,0,0.38)",
-                  background: "rgba(255,87,0,0.07)",
-                  padding: "8px 16px",
-                  borderRadius: "4px",
-                  fontFamily: "monospace",
-                  letterSpacing: "0.6px",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {stat}
-              </div>
-            )
-          )}
+          {meta.lede}
         </div>
 
         {/* URL watermark */}
@@ -204,25 +199,15 @@ export default async function Image() {
             letterSpacing: "2px",
           }}
         >
-          quicx.dev
+          {`quicx.dev/docs/${slug}`}
         </div>
       </div>
     ),
     {
       ...size,
       fonts: [
-        {
-          name: "Archivo",
-          data: archivo400,
-          weight: 400,
-          style: "normal",
-        },
-        {
-          name: "Archivo",
-          data: archivo600,
-          weight: 600,
-          style: "normal",
-        },
+        { name: "Archivo", data: archivo400, weight: 400, style: "normal" },
+        { name: "Archivo", data: archivo600, weight: 600, style: "normal" },
         {
           name: "JetBrains Mono",
           data: jetbrains500,

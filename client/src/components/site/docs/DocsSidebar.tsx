@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { DocsSearch } from "./DocsSearch";
 import { X } from "lucide-react";
@@ -19,19 +21,18 @@ export type DocsNavGroup = {
 
 export function DocsSidebar({
   groups,
-  activeSectionId,
-  onNavigate,
-  onNavigateTo,
   isOpen,
   onClose,
 }: {
   groups: DocsNavGroup[];
-  activeSectionId: string;
-  onNavigate: (sectionId: string) => void;
-  onNavigateTo: (sectionId: string, elementId: string) => void;
   isOpen: boolean;
   onClose: () => void;
 }) {
+  const pathname = usePathname();
+  const activeSlug = pathname?.startsWith("/docs/")
+    ? pathname.slice("/docs/".length).split("/")[0].split("#")[0]
+    : groups[0]?.items[0]?.id ?? "";
+
   return (
     <>
       {/* Mobile backdrop */}
@@ -66,13 +67,7 @@ export function DocsSidebar({
               <X className="size-4" />
             </button>
           </div>
-          <DocsSearch
-            groups={groups}
-            onNavigateTo={(s, e) => {
-              onNavigateTo(s, e);
-              onClose();
-            }}
-          />
+          <DocsSearch groups={groups} onAfterNavigate={onClose} />
         </div>
 
         <ul className="space-y-5 px-3 text-[13.5px]">
@@ -83,14 +78,12 @@ export function DocsSidebar({
               </h4>
               <ul className="space-y-0.5">
                 {g.items.map((item) => {
-                  const isActive = activeSectionId === item.id;
+                  const isActive = activeSlug === item.id;
                   return (
                     <li key={item.id}>
-                      <button
-                        onClick={() => {
-                          onNavigate(item.id);
-                          onClose();
-                        }}
+                      <Link
+                        href={`/docs/${item.id}`}
+                        onClick={onClose}
                         className={cn(
                           "flex w-full items-center gap-2 border-l-2 px-3 py-2 text-left text-[13px] transition",
                           isActive
@@ -105,7 +98,7 @@ export function DocsSidebar({
                           )}
                         />
                         {item.label}
-                      </button>
+                      </Link>
                     </li>
                   );
                 })}

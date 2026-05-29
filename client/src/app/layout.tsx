@@ -58,7 +58,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Dimitar Anastasov", url: "https://www.linkedin.com/in/dimitar-anastasov-339a94310/" }],
   creator: "Dimitar Anastasov",
-  publisher: "Nefara",
+  publisher: "Quicx",
   robots: {
     index: true,
     follow: true,
@@ -109,11 +109,11 @@ export default function RootLayout({
       {
         "@type": "Organization",
         "@id": "https://quicx.dev/#organization",
-        "name": "Nefara",
-        "url": "https://www.nefara.org",
+        "name": "Quicx",
+        "url": "https://quicx.org",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://quicx.dev/nefara-logo.svg",
+          "url": "https://quicx.dev/quicx-logo.svg",
         },
         "sameAs": [
           "https://github.com/anastassow",
@@ -129,7 +129,7 @@ export default function RootLayout({
         "applicationCategory": "DeveloperApplication",
         "applicationSubCategory": "Task Queue, Message Queue",
         "softwareVersion": "1.0.0",
-        "releaseNotes": "https://quicx.dev/docs",
+        "releaseNotes": "https://quicx.dev/docs/changelog",
         "description":
           "Quicx is a lightweight, deterministic task queue daemon built on the PMAD slab allocator. It delivers O(1) allocation, zero fragmentation, and a compact binary protocol — no GC pauses, no jitter, one 63 KB static binary.",
         "featureList": [
@@ -155,6 +155,7 @@ export default function RootLayout({
         },
         "publisher": { "@id": "https://quicx.dev/#organization" },
         "sameAs": ["https://github.com/anastassow/Quicx"],
+        "inLanguage": "en-US"
       },
     ],
   };
