@@ -2,6 +2,7 @@ set -e
 
 REPO="Quicx-Engine/Quicx-Releases"
 INSTALL_DIR="/usr/local/bin"
+LATEST_VERSION="v1.0.2"
 
 VERSION="${QUICX_VERSION:-latest}"
 
@@ -56,7 +57,7 @@ info "Resolving version: $VERSION"
 
 # decide version folder
 if [ "$VERSION" = "latest" ]; then
-  VERSION_DIR="v1.0.1"
+  VERSION_DIR="$LATEST_VERSION"
 else
   VERSION_DIR="$VERSION"
 fi

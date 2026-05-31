@@ -1,4 +1,5 @@
 import React from "react";
+import { CURRENT_VERSION } from "@/lib/version";
 import { Terminal as TerminalIcon } from "lucide-react";
 import { CodeBlock } from "@/components/site/docs/CodeBlock";
 import {
@@ -45,7 +46,7 @@ export function CliReferenceSection() {
         window
         filename="~ $ quicx"
         language="sh"
-        code={`quicx v1.0.1 — lightweight task queue daemon
+        code={`quicx v${CURRENT_VERSION} — lightweight task queue daemon
 
 usage:
   quicx start --config FILE
@@ -103,7 +104,7 @@ usage:
             language="sh"
             code={`user@host ~ $ quicx status
 
-  quicx v1.0.1
+  quicx v${CURRENT_VERSION}
   ─────────────────────────────────────────
   uptime     0h 0m 6s
 

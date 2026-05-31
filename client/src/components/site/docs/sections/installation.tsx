@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CURRENT_VERSION } from "@/lib/version";
 import { CodeBlock } from "@/components/site/docs/CodeBlock";
 import { Callout } from "@/components/site/docs/Callout";
 import {
@@ -112,9 +113,7 @@ sh install-quicx.sh`}
         window
         filename="~ $"
         language="sh"
-        code={`user@host ~ % quicx version
-quicx v1.0.1
-`}
+        code={`user@host ~ % quicx version\nquicx v${CURRENT_VERSION}\n`}
       />
 
       <Callout variant="tip" title="Offline / airgapped installs">

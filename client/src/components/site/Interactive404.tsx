@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { ChevronRight, Home, Book } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { CURRENT_VERSION } from "@/lib/version";
 
 export function Interactive404() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -93,7 +94,7 @@ export function Interactive404() {
             <div className="size-3 rounded-full bg-yellow-500/80" />
             <div className="size-3 rounded-full bg-green-500/80" />
             <span className="ml-2 font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-quicx-dim">
-              quicx-engine — v1.0.0
+              quicx-engine — v{CURRENT_VERSION}
             </span>
           </div>
           

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { CURRENT_VERSION } from "@/lib/version";
 
 export function FootprintVisual({ active }: { active: boolean }) {
   const [used, setUsed] = useState(0);
@@ -29,7 +30,7 @@ export function FootprintVisual({ active }: { active: boolean }) {
           <span className="text-[10px] tracking-wide text-quicx-dim">
             quicx — single binary
           </span>
-          <span className="text-[10px] text-quicx-orange-bright">v1.0.0</span>
+          <span className="text-[10px] text-quicx-orange-bright">v{CURRENT_VERSION}</span>
         </div>
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4 py-6 text-center">
           <div className="relative">

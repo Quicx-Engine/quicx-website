@@ -49,9 +49,18 @@ export function ChangelogSection() {
 
         <ul className="space-y-6">
           <Release
+            version="v1.0.2"
+            date="2026-05-31"
+            status="Current"
+            highlights={[
+              "Failed sends are now reported to the producer — no silent drops. When a task cannot be delivered, the daemon replies with MSG_FAILED so the producer is always informed.",
+              "Fixed a bug where providing a config file would merge its size classes with the built-in defaults instead of replacing them. Size classes now come exclusively from the supplied config.",
+            ]}
+          />
+          <Release
             version="v1.0.1"
             date="2026-05-19"
-            status="Current"
+            status="Stable"
             highlights={[
               "quicx start now accepts --config as optional. When omitted, the daemon boots with the built-in default configuration (port 16381, 1 MiB pool, six size classes: 32, 64, 128, 256, 512, 1024 bytes).",
               "Default config is documented in the Configuration section.",

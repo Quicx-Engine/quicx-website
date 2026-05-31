@@ -1,4 +1,5 @@
 import React from "react";
+import { CURRENT_VERSION } from "@/lib/version";
 import { CodeBlock } from "@/components/site/docs/CodeBlock";
 import { Callout } from "@/components/site/docs/Callout";
 import { Tabs } from "@/components/site/docs/Tabs";
@@ -55,9 +56,7 @@ export function QuickStartSection() {
             window
             filename="~ $"
             language="sh"
-            code={`user@host ~ $ quicx start --config /etc/quicx/quicx.conf
-config loaded: /etc/quicx/quicx.conf
-quicx v1.0.1 starting
+            code={`user@host ~ $ quicx start --config /etc/quicx/quicx.conf\nconfig loaded: /etc/quicx/quicx.conf\nquicx v${CURRENT_VERSION} starting
   port:    16381
   classes: 32 64 128 256 512 1024
 quicx listening on port 16381 [kqueue]

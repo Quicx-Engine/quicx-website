@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CURRENT_VERSION } from "@/lib/version";
 import { Terminal, TerminalLine } from "./Terminal";
 import { ConfigVisual } from "./visuals/ConfigVisual";
 import { FootprintVisual } from "./visuals/FootprintVisual";
@@ -39,7 +40,7 @@ export function VisualFor({
 
 const initialUsageSequence: TerminalLine[] = [
   { kind: "input", text: "quicx" },
-  { kind: "output", text: "quicx v1.0.0 — lightweight task queue daemon" },
+  { kind: "output", text: `quicx v${CURRENT_VERSION} — lightweight task queue daemon` },
   { kind: "blank" },
   { kind: "output", text: "usage:" },
   { kind: "output", text: "  quicx start --config FILE" },
@@ -59,7 +60,7 @@ const statusSequence: TerminalLine[] = [
   { kind: "clear" },
   { kind: "input", text: "quicx status" },
   { kind: "blank" },
-  { kind: "output", text: "  quicx v1.0.0", className: "text-quicx-text" },
+  { kind: "output", text: `  quicx v${CURRENT_VERSION}`, className: "text-quicx-text" },
   { kind: "output", text: "  ─────────────────────────────────────────", className: "text-quicx-dim" },
   { kind: "output", text: "  uptime     0h 0m 7s" },
   { kind: "blank" },

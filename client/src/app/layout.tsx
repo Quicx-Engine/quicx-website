@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CURRENT_VERSION } from "@/lib/version";
 import { Anton, Archivo, Barlow_Condensed, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -128,7 +129,7 @@ export default function RootLayout({
         "operatingSystem": "Linux, macOS",
         "applicationCategory": "DeveloperApplication",
         "applicationSubCategory": "Task Queue, Message Queue",
-        "softwareVersion": "1.0.0",
+        "softwareVersion": CURRENT_VERSION,
         "releaseNotes": "https://quicx.dev/docs/changelog",
         "description":
           "Quicx is a lightweight, deterministic task queue daemon built on the PMAD slab allocator. It delivers O(1) allocation, zero fragmentation, and a compact binary protocol — no GC pauses, no jitter, one 63 KB static binary.",
