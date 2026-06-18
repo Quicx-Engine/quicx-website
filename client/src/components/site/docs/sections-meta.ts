@@ -47,7 +47,7 @@ export const sectionMeta: Record<string, SectionMeta> = {
   "pmad-allocator": {
     num: "§ 02.02",
     kicker: "Core Concepts",
-    title: "PMAD — Predictive Memory Allocator",
+    title: "PMAD — Pool-based Memory Allocator",
     lede: "A slab allocator written in C that delivers O(1) allocation and deallocation with zero fragmentation and zero system calls at runtime. Every allocation the daemon makes — task envelopes, wire buffers, worker registration slots — comes out of PMAD. Fragmentation is 0 % by design: every block is pre-sized to a declared class, so there is no splitting, no coalescing, and no wasted space.",
     toc: [
       { id: "pmad-architecture", label: "Architecture" },

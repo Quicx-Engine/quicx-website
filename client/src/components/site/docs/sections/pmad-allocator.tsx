@@ -48,7 +48,7 @@ export function PmadSection() {
       <div className="relative overflow-hidden rounded-2xl border border-quicx-line bg-white p-4 sm:p-6">
         <Image
           src="/pmad-architecture.svg"
-          alt="PMAD — Predictive Memory Allocator architecture overview"
+          alt="PMAD — Pool-based Memory Allocator architecture overview"
           width={1920}
           height={1760}
           className="h-auto w-full"
@@ -117,35 +117,38 @@ export function PmadSection() {
       <Table
         headers={["Metric", "Value"]}
         rows={[
-          ["Sustained allocation latency", <strong key="pl">19.1 ns</strong>],
-          ["Peak throughput", ">460 M ops/s"],
-          ["Jitter (σ)", "0.0 ns (deterministic)"],
+          ["P50 allocation latency", <strong key="p50">2.59 ns</strong>],
+          ["P99.9 allocation latency", "6.50 ns"],
+          ["Latency vs block size", "Flat — 2.59 ns P50 from 16B to 4096B (O(1) guarantee, demonstrated)"],
+          ["Peak throughput", "748.9 Mops/s @ 16B · 690.6 Mops/s @ 64B"],
+          ["Worst-case under churn (1024B)", "~40 µs (system allocator: 6.95 ms)"],
           ["Fragmentation", "0 %"],
           ["Runtime syscalls", "Zero"],
-          ["Configurability", "Fully user-defined size classes"],
+          ["Correctness", "19/19 tests pass"],
         ]}
       />
 
       <SubHeading id="pmad-configurations">Reference configurations</SubHeading>
 
       <Table
-        headers={["Profile", "Size classes (B)", "Split (%)", "Avg. latency", "Throughput", "Suitability"]}
+        headers={["Profile", "Size classes (B)", "Split (%)", "Suitability"]}
         rows={[
-          ["Max throughput", <InlineCode key="a">{"{16}"}</InlineCode>, "100", "19.1 ns", "436.9 M/s", "Small-object velocity"],
-          ["Min overhead", <InlineCode key="b">{"{4096}"}</InlineCode>, "100", "19.7 ns", "254.0 M/s", "Bulk data density"],
-          ["Balanced", <InlineCode key="c">{"{64, 256, 1024}"}</InlineCode>, "60 / 30 / 10", "20.6 ns", "462.6 M/s", "Mixed workloads"],
-          ["Latency-optimised", <InlineCode key="d">{"{32, 128}"}</InlineCode>, "80 / 20", "19.8 ns", "426.2 M/s", "Critical signalling"],
-          ["HFT / network", <InlineCode key="e">{"{32, 128, 512, …}"}</InlineCode>, "60 / 20 / …", "24.7 ns", "397.2 M/s", "L3 packet processing"],
-          ["Embedded / RTOS", <InlineCode key="f">{"{8, 16, 32, …}"}</InlineCode>, "30 / 30 / …", "22.3 ns", "327.7 M/s", "Deterministic control"],
+          ["Max throughput", <InlineCode key="a">{"{16}"}</InlineCode>, "100", "Small-object velocity"],
+          ["Min overhead", <InlineCode key="b">{"{4096}"}</InlineCode>, "100", "Bulk data density"],
+          ["Balanced", <InlineCode key="c">{"{64, 256, 1024}"}</InlineCode>, "60 / 30 / 10", "Mixed workloads"],
+          ["Latency-optimised", <InlineCode key="d">{"{32, 128}"}</InlineCode>, "80 / 20", "Critical signalling"],
+          ["HFT / network", <InlineCode key="e">{"{32, 128, 512, …}"}</InlineCode>, "60 / 20 / …", "L3 packet processing"],
+          ["Embedded / RTOS", <InlineCode key="f">{"{8, 16, 32, …}"}</InlineCode>, "30 / 30 / …", "Deterministic control"],
         ]}
       />
 
       <Callout variant="perf" title="What these numbers actually mean">
-        <strong className="text-quicx-text">Zero jitter</strong> is not marketing — PMAD&rsquo;s
-        instruction path is identical for every allocation, so the only variance you can measure
-        is system-level noise.{" "}
-        <strong className="text-quicx-text">Zero runtime syscalls</strong> means kernel
-        scheduling never interrupts an allocation. Your 1 000 000<sup>th</sup>{" "}
+        <strong className="text-quicx-text">Flat tail</strong> — PMAD moves only 2.5× from P50
+        to P99.9 (2.59 → 6.50 ns), the tightest spread of every allocator tested. jemalloc fans
+        out 18.5× over the same range; the system allocator 15.3×. The remaining variance is
+        OS scheduling noise, not allocator behaviour.{" "}
+        <strong className="text-quicx-text">Zero runtime syscalls</strong> means the kernel never
+        interrupts an allocation — your millionth{" "}
         <InlineCode>pmad_alloc</InlineCode> is as fast as your first.
       </Callout>
 
