@@ -22,7 +22,7 @@
   /* Text */
   --quicx-text: #f4f6fb;
   --quicx-muted: #9aa3b2;
-  --quicx-dim: #6a7487;
+  --quicx-dim: #7c8598;
 
   /* shadcn base (dark-first, with neutral palette) */
   --background: var(--quicx-bg);

@@ -84,9 +84,9 @@ export function Footer() {
         {/* Nav columns */}
         {nav.map((col) => (
           <div key={col.title}>
-            <h4 className="font-[family-name:var(--font-barlow-condensed)] text-xs uppercase tracking-[0.28em] text-quicx-orange-bright">
+            <h3 className="font-[family-name:var(--font-barlow-condensed)] text-xs uppercase tracking-[0.28em] text-quicx-orange-bright">
               {col.title}
-            </h4>
+            </h3>
             <ul className="mt-4 space-y-2.5">
               {col.items.map((it) => (
                 <li key={it.label}>
