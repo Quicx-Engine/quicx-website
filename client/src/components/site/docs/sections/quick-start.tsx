@@ -58,7 +58,7 @@ export function QuickStartSection() {
             language="sh"
             code={`user@host ~ $ quicx start --config /etc/quicx/quicx.conf\nconfig loaded: /etc/quicx/quicx.conf\nquicx v${CURRENT_VERSION} starting
   port:    16381
-  classes: 32 64 128 256 512 1024
+  classes: 64 (16B–1024B, 16B steps)
 quicx listening on port 16381 [kqueue]
 quicx cli socket: /tmp/quicx.sock`}
           />

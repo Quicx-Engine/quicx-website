@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CURRENT_VERSION } from "@/lib/version";
+import { cn } from "@/lib/utils";
 import { Terminal, TerminalLine } from "./Terminal";
 import { ConfigVisual } from "./visuals/ConfigVisual";
 import { FootprintVisual } from "./visuals/FootprintVisual";
@@ -20,7 +21,7 @@ export function VisualFor({
 }) {
   switch (id) {
     case "observability":
-      return <TerminalShowcase active={active} />;
+      return <TerminalShowcase active={active} expanded={expanded} />;
     case "configurability":
       return <ConfigVisual active={active} />;
     case "lightweight":
@@ -60,29 +61,27 @@ const statusSequence: TerminalLine[] = [
   { kind: "clear" },
   { kind: "input", text: "quicx status" },
   { kind: "blank" },
-  { kind: "output", text: `  quicx v${CURRENT_VERSION}`, className: "text-quicx-text" },
-  { kind: "output", text: "  ─────────────────────────────────────────", className: "text-quicx-dim" },
-  { kind: "output", text: "  uptime     0h 0m 7s" },
+  { kind: "output", text: `  quicx v${CURRENT_VERSION}  ·  pid 3709  ·  up 0h 0m 02s`, className: "text-quicx-text" },
   { kind: "blank" },
-  { kind: "output", text: "  workers    idle: 0     busy: 0     total: 0" },
-  { kind: "output", text: "  queue      waiting: 0" },
+  { kind: "output", text: "  tasks     submitted           0" },
+  { kind: "output", text: "            completed           0   ░░░░░░░░░░░░░░░░░░░░     0.0%" },
+  { kind: "output", text: "            in flight           0   = 0 queued + 0 running" },
   { kind: "blank" },
-  { kind: "output", text: "  tasks      submitted: 0" },
-  { kind: "output", text: "             completed: 0" },
-  { kind: "output", text: "             failed:    0" },
+  { kind: "output", text: "  memory    592.8 KiB / 8.00 MiB    █░░░░░░░░░░░░░░░░░░░     7.2%" },
+  { kind: "output", text: "            usable 8.00 MiB · 64 size classes" },
   { kind: "blank" },
-  { kind: "output", text: "  memory     32 / 913408 bytes (0.0%)" },
-  { kind: "blank" },
-  { kind: "output", text: "  PMAD:", className: "text-quicx-orange-bright" },
-  { kind: "output", text: "      32B  [░░░░░░░░░░░░░░░░░░░░]  1 / 2184" },
-  { kind: "output", text: "      64B  [░░░░░░░░░░░░░░░░░░░░]  0 / 3276" },
-  { kind: "output", text: "     128B  [░░░░░░░░░░░░░░░░░░░░]  0 / 1820" },
-  { kind: "output", text: "     256B  [░░░░░░░░░░░░░░░░░░░░]  0 /  770" },
-  { kind: "output", text: "     512B  [░░░░░░░░░░░░░░░░░░░░]  0 /  238" },
-  { kind: "output", text: "    1024B  [░░░░░░░░░░░░░░░░░░░░]  0 /   80" },
+  { kind: "output", text: "            16B        1 /   5,241  ░░░░░░░░░░░░░░░░░░░░     0.0%" },
+  { kind: "output", text: "            64B        0 /  12,580  ░░░░░░░░░░░░░░░░░░░░     0.0%" },
+  { kind: "output", text: "            ...        (62 more size classes)" },
 ];
 
-function TerminalShowcase({ active }: { active: boolean }) {
+function TerminalShowcase({
+  active,
+  expanded,
+}: {
+  active: boolean;
+  expanded?: boolean;
+}) {
   const [hasHovered, setHasHovered] = useState(false);
 
   useEffect(() => {
@@ -96,7 +95,7 @@ function TerminalShowcase({ active }: { active: boolean }) {
       : initialUsageSequence;
 
   return (
-    <div className="h-full p-5">
+    <div className={cn("p-5", expanded ? "h-[600px]" : "h-full")}>
       <Terminal
         lines={currentLines}
         active={true}

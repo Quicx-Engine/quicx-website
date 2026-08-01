@@ -62,9 +62,11 @@ export const sectionMeta: Record<string, SectionMeta> = {
     title: "Binary Protocol",
     lede: "Every frame on the wire is a 6-byte header followed by a variable-length payload. No framing ambiguity, no partial reads, no text encoding — parsing is a couple of pointer reads.",
     toc: [
+      { id: "protocol-participants", label: "Participants & transport" },
       { id: "protocol-frame-header", label: "Frame header" },
       { id: "protocol-message-types", label: "Message types" },
       { id: "payload-formats", label: "Payload formats" },
+      { id: "protocol-flow", label: "End-to-end flow" },
     ],
   },
   "cli-reference": {

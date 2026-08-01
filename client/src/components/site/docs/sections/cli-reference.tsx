@@ -2,6 +2,7 @@ import React from "react";
 import { CURRENT_VERSION } from "@/lib/version";
 import { Terminal as TerminalIcon } from "lucide-react";
 import { CodeBlock } from "@/components/site/docs/CodeBlock";
+import { Callout } from "@/components/site/docs/Callout";
 import {
   SectionHeaderFor,
   Prose,
@@ -68,7 +69,8 @@ usage:
             <p>
               <InlineCode>--config</InlineCode> is optional. When omitted, the daemon starts
               with the built-in default configuration (port <InlineCode>16381</InlineCode>,
-              1 MiB pool, six size classes). Pass a path to override any or all values.
+              8 MiB pool, 64 exact-fit size classes from 16 to 1024 bytes). Pass a path to
+              override any or all values.
             </p>
           </Prose>
         </CliCommand>
@@ -90,11 +92,11 @@ usage:
               <InlineCode>/tmp/quicx.sock</InlineCode> Unix socket and sends{" "}
               <InlineCode>MSG_STATS</InlineCode>, then renders the{" "}
               <InlineCode>MSG_STATS_RESPONSE</InlineCode> as a human-readable table. Shows{" "}
-              <strong>uptime</strong>, <strong>worker pool state</strong>,{" "}
-              <strong>queue depth</strong>, <strong>task counters</strong>,{" "}
-              <strong>memory usage</strong> and a per-size-class{" "}
-              <strong>PMAD slab breakdown</strong>. Safe to script — exits non-zero if the
-              daemon is unreachable.
+              <strong>uptime</strong>, <strong>task counters</strong> (including{" "}
+              <strong>in-flight</strong>, derived as submitted − completed − failed),{" "}
+              <strong>memory usage</strong> against your configured pool, and a{" "}
+              <strong>per-size-class utilization</strong> breakdown. Safe to script — exits
+              non-zero if the daemon is unreachable.
             </p>
           </Prose>
 
@@ -104,29 +106,38 @@ usage:
             language="sh"
             code={`user@host ~ $ quicx status
 
-  quicx v${CURRENT_VERSION}
-  ─────────────────────────────────────────
-  uptime     0h 0m 6s
+  quicx v${CURRENT_VERSION}  ·  pid 3709  ·  up 0h 0m 02s
 
-  workers    idle: 0     busy: 0     total: 0
-  queue      waiting: 0
+  tasks     submitted           0
+            completed           0   ░░░░░░░░░░░░░░░░░░░░     0.0%
+            in flight           0   = 0 queued + 0 running
 
-  tasks      submitted: 0
-             completed: 0
-             failed:    0
+  memory    592.8 KiB / 8.00 MiB    █░░░░░░░░░░░░░░░░░░░     7.2%
+            usable 8.00 MiB · 64 size classes
 
-  memory     32 / 913408 bytes (0.0%)
-
-  PMAD:
-      32B  [░░░░░░░░░░░░░░░░░░░░]  1 / 2184
-      64B  [░░░░░░░░░░░░░░░░░░░░]  0 / 3276
-     128B  [░░░░░░░░░░░░░░░░░░░░]  0 / 1820
-     256B  [░░░░░░░░░░░░░░░░░░░░]  0 / 770
-     512B  [░░░░░░░░░░░░░░░░░░░░]  0 / 238
-    1024B  [░░░░░░░░░░░░░░░░░░░░]  0 / 80
+            16B        1 /   5,241  ░░░░░░░░░░░░░░░░░░░░     0.0%
+            64B        0 /  12,580  ░░░░░░░░░░░░░░░░░░░░     0.0%
+            ...        (62 more size classes)
 
 user@host ~ $`}
           />
+
+          <p className="mt-3 text-[13.5px] leading-relaxed text-quicx-muted">
+            Redesigned in v1.0.3 — bar charts, thousands separators and human-readable byte
+            sizes replace the raw counters from earlier releases. New fields exposed on the
+            wire: <InlineCode>workers_registered</InlineCode> (ever registered, not just
+            currently live), <InlineCode>pool_size</InlineCode> (bytes requested from the OS),{" "}
+            <InlineCode>usable_bytes</InlineCode> (after the metadata carve-out) and{" "}
+            <InlineCode>used_bytes</InlineCode> (metadata + live blocks).
+          </p>
+
+          <Callout variant="warn" title="CLI and daemon must match versions">
+            The stats wire format grew in v1.0.3 (<InlineCode>StatsHeader</InlineCode>: 48 → 73
+            bytes). If <InlineCode>quicx status</InlineCode> and the daemon it&rsquo;s talking to
+            are different releases, it detects the length mismatch and prints{" "}
+            <InlineCode>daemon speaks a different stats format — restart the daemon to match</InlineCode>{" "}
+            instead of misparsing the response.
+          </Callout>
         </CliCommand>
 
         <CliCommand cmd="quicx version" title="print the binary version + build metadata">

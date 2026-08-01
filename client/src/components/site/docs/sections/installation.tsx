@@ -58,28 +58,35 @@ sh install-quicx.sh`}
             def: (
               <>
                 Reads <InlineCode>uname -s</InlineCode> and <InlineCode>uname -m</InlineCode>{" "}
-                to pick the right artifact — <InlineCode>linux-x86_64</InlineCode>,{" "}
-                <InlineCode>linux-arm64</InlineCode>,{" "}
+                to pick the right platform string — <InlineCode>linux-x86_64</InlineCode>,{" "}
+                <InlineCode>linux-aarch64</InlineCode>,{" "}
                 <InlineCode>darwin-x86_64</InlineCode> or{" "}
                 <InlineCode>darwin-arm64</InlineCode>.
               </>
             ),
           },
           {
-            term: "2 · fetch",
+            term: "2 · resolve version",
             def: (
               <>
-                Downloads the signed release tarball from{" "}
-                <InlineCode>releases.quicx.dev</InlineCode> over HTTPS.
+                Defaults to <InlineCode>latest</InlineCode>, which resolves to the version
+                pinned in the script itself (currently{" "}
+                <InlineCode>v{CURRENT_VERSION}</InlineCode>). Set{" "}
+                <InlineCode>QUICX_VERSION</InlineCode> to pin a specific release —{" "}
+                <InlineCode>{CURRENT_VERSION}</InlineCode> and{" "}
+                <InlineCode>v{CURRENT_VERSION}</InlineCode> are both accepted.
               </>
             ),
           },
           {
-            term: "3 · verify",
+            term: "3 · fetch",
             def: (
               <>
-                Checks the SHA‑256 against the signed <InlineCode>SHA256SUMS</InlineCode>{" "}
-                file. Exits non-zero if the hash does not match.
+                Downloads the <InlineCode>quicx-&lt;platform&gt;</InlineCode> binary for that
+                version straight from{" "}
+                <InlineCode>Quicx-Engine/Quicx-Releases</InlineCode> on GitHub, over HTTPS,
+                via <InlineCode>curl</InlineCode> (falling back to{" "}
+                <InlineCode>wget</InlineCode>).
               </>
             ),
           },
@@ -87,11 +94,9 @@ sh install-quicx.sh`}
             term: "4 · install",
             def: (
               <>
-                Places the <InlineCode>quicx</InlineCode> binary in{" "}
-                <InlineCode>/usr/local/bin</InlineCode> (or{" "}
-                <InlineCode>~/.local/bin</InlineCode> if the user does not have root). Writes
-                a default <InlineCode>quicx.conf</InlineCode> to{" "}
-                <InlineCode>~/.config/quicx/</InlineCode>.
+                Marks the binary executable and moves it into{" "}
+                <InlineCode>/usr/local/bin</InlineCode>, retrying with{" "}
+                <InlineCode>sudo</InlineCode> if that directory isn&rsquo;t writable.
               </>
             ),
           },
@@ -99,12 +104,20 @@ sh install-quicx.sh`}
             term: "5 · verify",
             def: (
               <>
-                Runs <InlineCode>quicx version</InlineCode> and prints the resolved install
-                path so you know the <InlineCode>PATH</InlineCode> lookup works.
+                Checks that <InlineCode>quicx</InlineCode> resolves on{" "}
+                <InlineCode>PATH</InlineCode>. If it doesn&rsquo;t, prints the exact{" "}
+                <InlineCode>export PATH=…</InlineCode> line to add instead of failing silently.
               </>
             ),
           },
         ]}
+      />
+
+      <CodeBlock
+        window
+        filename="pin a specific version"
+        language="sh"
+        code={`QUICX_VERSION=${CURRENT_VERSION} curl -fsSL https://quicx.dev/install.sh | sh`}
       />
 
       <SubHeading id="verify-installation">Verify it worked</SubHeading>
@@ -117,13 +130,14 @@ sh install-quicx.sh`}
       />
 
       <Callout variant="tip" title="Offline / airgapped installs">
-        Download the release archive directly from{" "}
-        <a href="https://github.com/anastassow/Quicx/tree/main/releases">
-          github.com/anastassow/Quicx/tree/main/releases
+        Download the release binary directly from{" "}
+        <a href="https://github.com/Quicx-Engine/Quicx-Releases">
+          github.com/Quicx-Engine/Quicx-Releases
         </a>
-        , copy the binary into your image, and drop the{" "}
-        <InlineCode>quicx.conf</InlineCode> alongside it. No network access is required at
-        runtime — Quicx never calls home.
+        , copy it into your image, and drop a <InlineCode>quicx.conf</InlineCode> alongside it
+        (or rely on the built-in default — see{" "}
+        <Link href="/docs/configuration">Configuration</Link>). No network access is required
+        at runtime — Quicx never calls home.
       </Callout>
     </section>
   );

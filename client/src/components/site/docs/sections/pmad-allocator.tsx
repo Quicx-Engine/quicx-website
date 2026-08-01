@@ -64,8 +64,38 @@ export function PmadSection() {
               <>
                 The thin facade in <InlineCode>incPMAD.h</InlineCode> —{" "}
                 <InlineCode>pmad_init</InlineCode>, <InlineCode>pmad_alloc</InlineCode>,{" "}
-                <InlineCode>pmad_free</InlineCode>, <InlineCode>pmad_destroy</InlineCode>.
-                This is the entire contract the daemon consumes.
+                <InlineCode>pmad_free</InlineCode>, <InlineCode>pmad_destroy</InlineCode>,{" "}
+                <InlineCode>pmad_get_stats</InlineCode>. This is the entire contract the daemon
+                consumes. As of v1.0.3 every entry point takes an explicit{" "}
+                <InlineCode>PMAD*</InlineCode> — there is no process-global allocator instance
+                anymore, which is what lets each daemon shard eventually own its own pool.
+              </>
+            ),
+          },
+          {
+            term: "Hard limits",
+            def: (
+              <>
+                <InlineCode>MAX_PMAD_CLASSES</InlineCode> is 64 (up from 32) and{" "}
+                <InlineCode>MAX_SIZE_OF_SIZE_CLASS</InlineCode> is 1024 bytes (down from 4096) as
+                of v1.0.3. Allocations above 1024 bytes are rejected outright — there is no
+                fallback to a general-purpose heap.
+              </>
+            ),
+          },
+          {
+            term: "Failure reporting",
+            def: (
+              <>
+                <InlineCode>pmad_alloc</InlineCode> used to return a bare{" "}
+                <InlineCode>void*</InlineCode> — <InlineCode>NULL</InlineCode> meant
+                &ldquo;something went wrong&rdquo; with no way to tell what. It now returns a{" "}
+                <InlineCode>PmadStatus</InlineCode> with the pointer as an out-param, and five
+                codes distinguish causes: <InlineCode>PMAD_ERR_TOO_MANY_SIZE_CLASSES</InlineCode>,{" "}
+                <InlineCode>PMAD_ERR_DEALLOCATING_MMAP</InlineCode>,{" "}
+                <InlineCode>PMAD_ERR_ALLOCATION_OF_0_NOT_ALLOWED</InlineCode>,{" "}
+                <InlineCode>PMAD_ERR_ALLOCATION_TOO_BIG</InlineCode>, and{" "}
+                <InlineCode>PMAD_ERR_OUT_OF_MEMORY</InlineCode>.
               </>
             ),
           },
@@ -104,6 +134,15 @@ export function PmadSection() {
         ]}
       />
 
+      <Callout variant="note" title="Memory accounting is now real">
+        <InlineCode>pool-&gt;used</InlineCode> used to be initialised to zero and never moved —
+        the number was meaningless. As of v1.0.3 it&rsquo;s maintained on every path: seeded
+        with <InlineCode>sizeof(MemoryPool)</InlineCode> plus the size-class array at init, plus
+        every <InlineCode>BlockHeader</InlineCode> at split, then adjusted on every alloc and
+        free. This is what makes <InlineCode>quicx status</InlineCode>&rsquo;s memory numbers
+        trustworthy.
+      </Callout>
+
       <SubHeading id="pmad-benchmarks">Benchmarks</SubHeading>
 
       <Prose>
@@ -119,7 +158,7 @@ export function PmadSection() {
         rows={[
           ["P50 allocation latency", <strong key="p50">2.59 ns</strong>],
           ["P99.9 allocation latency", "6.50 ns"],
-          ["Latency vs block size", "Flat — 2.59 ns P50 from 16B to 4096B (O(1) guarantee, demonstrated)"],
+          ["Latency vs block size", "Flat — 2.59 ns P50 from 16B to 1024B (O(1) guarantee, demonstrated)"],
           ["Peak throughput", "748.9 Mops/s @ 16B · 690.6 Mops/s @ 64B"],
           ["Worst-case under churn (1024B)", "~40 µs (system allocator: 6.95 ms)"],
           ["Fragmentation", "0 %"],
@@ -134,7 +173,7 @@ export function PmadSection() {
         headers={["Profile", "Size classes (B)", "Split (%)", "Suitability"]}
         rows={[
           ["Max throughput", <InlineCode key="a">{"{16}"}</InlineCode>, "100", "Small-object velocity"],
-          ["Min overhead", <InlineCode key="b">{"{4096}"}</InlineCode>, "100", "Bulk data density"],
+          ["Min overhead", <InlineCode key="b">{"{1024}"}</InlineCode>, "100", "Bulk data density"],
           ["Balanced", <InlineCode key="c">{"{64, 256, 1024}"}</InlineCode>, "60 / 30 / 10", "Mixed workloads"],
           ["Latency-optimised", <InlineCode key="d">{"{32, 128}"}</InlineCode>, "80 / 20", "Critical signalling"],
           ["HFT / network", <InlineCode key="e">{"{32, 128, 512, …}"}</InlineCode>, "60 / 20 / …", "L3 packet processing"],

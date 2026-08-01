@@ -24,7 +24,7 @@ export function ArchitectureSection() {
           clients that speak the same binary protocol — the first frame they send tells the
           daemon which role they&rsquo;re playing.
         </p>
-        <p>There are exactly three horizontal message paths:</p>
+        <p>There are four horizontal message paths:</p>
       </Prose>
 
       <KeyList
@@ -46,8 +46,9 @@ export function ArchitectureSection() {
               <>
                 Workers announce themselves with <InlineCode>MSG_READY</InlineCode> and block
                 reading. The daemon pushes <InlineCode>MSG_TASK</InlineCode> frames to the
-                first idle worker. If the queue is empty, the daemon replies with{" "}
-                <InlineCode>MSG_WAIT</InlineCode>.
+                first idle worker as soon as one is queued. If the queue is empty, the worker
+                simply stays blocked — <InlineCode>MSG_WAIT</InlineCode> is defined on the wire
+                but nothing in the daemon actually sends it.
               </>
             ),
           },
@@ -59,6 +60,19 @@ export function ArchitectureSection() {
                 <InlineCode>MSG_FAILED&nbsp;{"{task_id, reason}"}</InlineCode> on failure.{" "}
                 <InlineCode>MSG_HEARTBEAT</InlineCode> / <InlineCode>MSG_PONG</InlineCode>{" "}
                 keep the socket from half-closing under long idle.
+              </>
+            ),
+          },
+          {
+            term: "daemon → producer",
+            def: (
+              <>
+                As of v1.0.3, the daemon forwards the worker&rsquo;s outcome back over the
+                producer&rsquo;s original connection —{" "}
+                <InlineCode>MSG_DONE&nbsp;{"{task_id}"}</InlineCode> or{" "}
+                <InlineCode>MSG_FAILED&nbsp;{"{task_id, reason}"}</InlineCode> with the
+                worker&rsquo;s real reason. A producer&rsquo;s socket now spans the task&rsquo;s
+                full lifetime, not just the initial submit.
               </>
             ),
           },
@@ -78,9 +92,12 @@ export function ArchitectureSection() {
         </p>
         <p>
           Scaling horizontally means running multiple independent Quicx daemons behind a
-          simple TCP load balancer. Because every socket is stateless at the protocol level
-          (a submit is one request, one reply), there is no session to pin and no replication
-          to coordinate.
+          simple TCP load balancer. A task never crosses daemons — it&rsquo;s queued, run and
+          completed on whichever instance the producer happened to land on — so there&rsquo;s
+          still no replication to coordinate. The one thing that changed in v1.0.3: since
+          completion is now reported back on the producer&rsquo;s original connection, that
+          socket has to stay pinned to its daemon for the life of the task, not just for the
+          initial submit.
         </p>
       </Prose>
     </section>

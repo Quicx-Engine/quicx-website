@@ -2,7 +2,7 @@ set -e
 
 REPO="Quicx-Engine/Quicx-Releases"
 INSTALL_DIR="/usr/local/bin"
-LATEST_VERSION="v1.0.2"
+LATEST_VERSION="v1.0.3"
 
 VERSION="${QUICX_VERSION:-latest}"
 
@@ -55,11 +55,14 @@ esac
 download_binary() {
 info "Resolving version: $VERSION"
 
-# decide version folder
+# decide version folder — accept "1.0.3" and "v1.0.3" alike
 if [ "$VERSION" = "latest" ]; then
   VERSION_DIR="$LATEST_VERSION"
 else
-  VERSION_DIR="$VERSION"
+  case "$VERSION" in
+    v*) VERSION_DIR="$VERSION" ;;
+    *)  VERSION_DIR="v${VERSION}" ;;
+  esac
 fi
 
 BASE_URL="https://raw.githubusercontent.com/${REPO}/main/releases/${VERSION_DIR}"
