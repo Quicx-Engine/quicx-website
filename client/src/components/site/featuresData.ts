@@ -109,17 +109,17 @@ export const features: Feature[] = [
   },
   {
     id: "lightweight",
-    title: "63 KB. Bounded memory.",
+    title: "54 KB. Zero growth.",
     modalTitle: "One binary. One memory budget. No surprises.",
     shortSummary:
-      "A single ~63 KB static binary that never drifts past the memory budget you set. Drop it next to your backend — bounded by design.",
+      "A single 54.4 KB binary that never drifts past the memory budget you set. Measured: 9,584 KB RSS idle, 9,584 KB after 443,912 tasks.",
     description:
-      "Quicx ships as a single ~63 KB static binary. There's no runtime, no JVM, no scheduler to tune. You set a pool_size and that is the memory ceiling — enforced by PMAD, not by hope.",
+      "Quicx ships as a single 54.4 KB binary built at -O2, with nothing stripped and no runtime dependencies. There's no VM, no JVM, no scheduler to tune. You set a pool_size and that is the memory ceiling — enforced by PMAD, not by hope.",
     bullets: [
-      "Single static binary, no runtime dependencies",
-      "Hard memory ceiling, enforced by the allocator",
-      "Instant boot — no warmup, no profile-guided jitter",
-      "Safe to co-locate on the same VM as your backend",
+      "54.4 KB binary, ~2,480 lines of C, no runtime dependencies",
+      "0 KB RSS growth across 443,912 measured tasks",
+      "Peak usage 10.7 % of the default 8 MB pool under that load",
+      "Hard ceiling enforced by the allocator, not by convention",
     ],
     tint: tealTint,
     footnotes: [
@@ -128,42 +128,42 @@ export const features: Feature[] = [
         body: "Just a binary. No interpreter, no VM, no package manager.",
       },
       {
-        title: "Bounded at all times",
-        body: "Configured ceiling, enforced by the allocator — never swell.",
+        title: "Measured, not asserted",
+        body: "Idle RSS and post-run RSS are identical to the kilobyte — see the Benchmarks page.",
       },
       {
         title: "Co-locate safely",
-        body: "Runs happily on the same VM as your backend without stealing memory.",
+        body: "A broker whose ceiling you declared can share a VM with your backend.",
       },
     ],
   },
   {
     id: "performance",
-    title: "0.181 ms. 21,000 tasks/s.",
-    modalTitle: "Throughput without tail latency",
+    title: "51 µs p50. 74,300 tasks/s.",
+    modalTitle: "Measured end to end, not at the enqueue",
     shortSummary:
-      "0.181 ms average latency, 21,000 tasks per second, sustained on a single node. No GC pauses, no allocator jitter.",
+      "74,300 tasks/sec end to end on one thread, 51 µs median from submit to done. Measured with C clients on one machine — reproducible with bench/run.sh.",
     description:
-      "Deterministic memory layout means deterministic performance. The same task walks the same code path every time. No GC pauses, no arena resizes — just predictable hundreds-of-microseconds latency.",
+      "One Quicx task is a full lifecycle: producer submits → daemon acks → daemon dispatches → worker parses the payload → worker reports done → producer is notified. Five protocol messages. Every figure below times that whole round trip, not a single enqueue.",
     bullets: [
-      "0.181 ms average end-to-end latency",
-      "21,000 tasks per second, sustained",
-      "No GC pauses or allocator jitter",
-      "Predictable p99 under load",
+      "74,300 tasks/sec end to end, single thread, 0 errors",
+      "51 µs p50 · 67 µs p90 · 111 µs p99 · 174 µs p99.9",
+      "Open loop at 40k/s offered — stalls charged in full",
+      "p50 flat from 10k/s to 40k/s offered",
     ],
     tint: amberTint,
     footnotes: [
       {
-        title: "Deterministic hot path",
-        body: "Same allocation path every time. No branching for slow cases.",
+        title: "submit → done, not submit → ack",
+        body: "An ack only means the daemon received the frame. These numbers wait for a worker to finish the work.",
       },
       {
-        title: "Sustained, not peak",
-        body: "Throughput holds steady — no warmup cliffs, no degradation curve.",
+        title: "C clients, not Python",
+        body: "A Python client saturates before the daemon does and ends up measuring itself.",
       },
       {
-        title: "Written close to the metal",
-        body: "Pure native code. No runtime overhead between your task and the CPU.",
+        title: "Coordinated omission corrected",
+        body: "Latency is timed from the scheduled send, so a stall cannot hide behind a client that slows down too.",
       },
     ],
   },
@@ -189,7 +189,7 @@ export const features: Feature[] = [
       },
       {
         title: "Minimal opcode surface",
-        body: "Five opcodes — no JSON layer, no accidental polymorphism.",
+        body: "Twelve opcodes — no JSON layer, no accidental polymorphism.",
       },
       {
         title: "Versioned",

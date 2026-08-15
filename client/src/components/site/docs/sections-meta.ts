@@ -69,6 +69,32 @@ export const sectionMeta: Record<string, SectionMeta> = {
       { id: "protocol-flow", label: "End-to-end flow" },
     ],
   },
+  "benchmarks": {
+    num: "§ 02.04",
+    kicker: "Core Concepts",
+    title: "Benchmarks",
+    lede: "74,300 tasks/sec end to end at 51 µs median, with zero memory growth over 443,912 tasks. Every figure here was measured on one machine with the harness in bench/, and anything that was not measured is labelled with its provenance.",
+    toc: [
+      { id: "reference-run", label: "Reference run" },
+      { id: "bench-throughput", label: "Throughput" },
+      { id: "bench-latency", label: "Latency" },
+      { id: "bench-memory", label: "Memory" },
+      { id: "bench-footprint", label: "Footprint" },
+      { id: "bench-methodology", label: "Methodology" },
+      { id: "bench-comparison", label: "Comparison" },
+    ],
+  },
+  "limitations": {
+    num: "§ 02.05",
+    kicker: "Core Concepts",
+    title: "Limitations",
+    lede: "Quicx is a fast in-memory broker, not a durable one. No persistence, no redelivery, no retries, one global FIFO, one core. Part of the latency advantage is work Quicx is not doing — here is exactly which work.",
+    toc: [
+      { id: "not-implemented", label: "What Quicx does not do" },
+      { id: "feature-matrix", label: "Feature for feature" },
+      { id: "when-to-use", label: "When Quicx is the right call" },
+    ],
+  },
   "cli-reference": {
     num: "§ 03.01",
     kicker: "Reference",

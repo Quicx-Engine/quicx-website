@@ -1,4 +1,13 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { HEADLINE } from "@/lib/benchmarks";
+
+const heroStats = [
+  { value: HEADLINE.throughput, unit: "tasks/sec", note: "end to end, 1 thread" },
+  { value: HEADLINE.latency, unit: "p50", note: "submit → done" },
+  { value: HEADLINE.memoryDelta, unit: "growth", note: "over 443,912 tasks" },
+  { value: HEADLINE.binary, unit: "binary", note: "zero dependencies" },
+];
 
 export function Hero() {
   return (
@@ -24,14 +33,43 @@ export function Hero() {
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-7xl flex-col items-center justify-center px-6 py-24 text-center lg:px-10 lg:py-32">
         {/* Headline */}
         <h1 className="hero-display mx-auto max-w-6xl text-[clamp(2.5rem,7.5vw,7.5rem)] text-white">
-          <span className="block">Quicx adapts for you</span>
-          <span className="block">not you for it</span>
+          <span className="block">Never asks the OS</span>
+          <span className="block">for another byte</span>
         </h1>
 
         {/* Subtitle */}
         <p className="mx-auto mt-16 max-w-2xl text-[15px] leading-relaxed text-quicx-muted sm:text-[17px]">
-          Configure it once. Run it forever. Watch it breathe. Lightweight by
-          design. No surprises.
+          A deterministic-memory task queue, written in C. You give it a memory
+          budget at startup — it uses exactly that, tells you precisely what it
+          is using, and never grows.
+        </p>
+
+        {/* Measured stat strip */}
+        <div className="mx-auto mt-12 grid w-full max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-lg border border-quicx-line bg-quicx-line sm:grid-cols-4">
+          {heroStats.map((s) => (
+            <div
+              key={s.unit}
+              className="flex flex-col items-center gap-1 bg-[#0a1a22] px-3 py-4"
+            >
+              <span className="font-[family-name:var(--font-jetbrains-mono)] text-[19px] font-semibold tabular-nums text-quicx-text sm:text-[22px]">
+                {s.value}
+              </span>
+              <span className="font-[family-name:var(--font-barlow-condensed)] text-[11px] uppercase tracking-[0.22em] text-quicx-orange-bright">
+                {s.unit}
+              </span>
+              <span className="text-[11px] text-quicx-dim">{s.note}</span>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 font-[family-name:var(--font-jetbrains-mono)] text-[11.5px] text-quicx-dim">
+          Measured on one machine with{" "}
+          <Link
+            href="/docs/benchmarks"
+            className="text-quicx-muted underline decoration-quicx-orange/40 underline-offset-4 hover:text-quicx-text"
+          >
+            bench/run.sh
+          </Link>
+          . Nothing here is estimated.
         </p>
 
         {/* CTAs */}

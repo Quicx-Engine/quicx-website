@@ -1,11 +1,28 @@
 # Quicx
 
-> Quicx is a lightweight, deterministic task queue engine with a custom PMAD slab allocator and a fast binary protocol. Configure it once. Run it forever.
+> Quicx is a deterministic-memory task queue daemon written in C. You give it a memory budget at startup; it uses exactly that, reports precisely what it is using, and never grows.
 
-Quicx runs a single-threaded event loop (epoll/kqueue) on top of a custom PMAD slab allocator for deterministic, zero-fragmentation memory, and a custom binary protocol (6-byte header, push/pop/ack/err). Written in C, with a Java client library (QuicxClient, QuicxWorker).
+Quicx runs a single-threaded event loop (epoll/kqueue) on top of PMAD, a custom slab allocator that maps its pool once and hands out fixed size classes in O(1), and speaks a compact binary protocol (6-byte header, 12 message types). Written in C, with a Java client library (QuicxClient, QuicxWorker).
+
+## Measured performance
+
+All figures below come from one run of `bench/run.sh` on an Apple M4 Pro (12 cores, 24 GB, macOS 26.5.1, arm64, Apple clang 17), quicxd built -O2, default 8 MB PMAD pool, loopback TCP, 8 workers, 8 producer connections, C clients. Nothing is estimated or extrapolated.
+
+- Throughput: 74,300 tasks/sec end to end, single thread (443,912 tasks, 0 errors). One task = five protocol messages: submit, ack, dispatch, done, notify — not a single enqueue.
+- Latency (submit → done, open loop at 40k/s offered): 51 µs p50, 67 µs p90, 111 µs p99, 174 µs p99.9. Flat from 10k/s to 40k/s.
+- Memory: idle RSS 9,584 KB; after 443,912 tasks 9,584 KB. Delta 0 KB. Peak 10.7 % of the default 8 MB pool.
+- Footprint: 54.4 KB binary (-O2), no runtime dependencies, ~2,480 lines of C, 1 thread.
+
+Latency is measured submit → done, not submit → ack. Latency runs are open loop and timed from the scheduled send (coordinated-omission corrected); throughput runs are closed loop. Clients are C, because a Python client saturates before the daemon does and ends up measuring itself.
+
+## Limitations
+
+Quicx is a fast in-memory broker, not a durable one. No persistence (a restart loses the queue), no redelivery if a worker dies mid-task, no retries or dead-lettering, no priorities/delays/named queues (one global FIFO), payloads capped at 1024 bytes, single core, and Java is the only client library. Delivery is at-most-once. If you need at-least-once delivery, use beanstalkd or Redis Streams.
 
 ## Docs
 - [Documentation](https://quicx.dev/docs): Full docs — architecture, configuration, CLI reference, Java client
+- [Benchmarks](https://quicx.dev/docs/benchmarks): Measured results, methodology, and comparison provenance
+- [Limitations](https://quicx.dev/docs/limitations): What Quicx does not do, and feature-for-feature comparison
 - [Installer](https://quicx.dev/install.sh): One-line install script
 
 ## Resources

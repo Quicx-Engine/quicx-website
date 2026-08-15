@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArchitectureDiagram } from "@/components/site/Architecture";
 import {
   SectionHeaderFor,
@@ -86,9 +87,11 @@ export function ArchitectureSection() {
           Multi-node queues pay a tax in the form of leader elections, replication logs and
           consistent hashing. Quicx is optimised for the much more common case where your
           queue lives on the <strong>same host</strong> (or at worst, the same availability
-          zone) as your producers and workers. One daemon is enough to saturate a 10 GbE NIC
-          with short tasks and — because of PMAD — it does so with{" "}
-          <strong>zero allocation jitter</strong> under sustained load.
+          zone) as your producers and workers. One daemon measured{" "}
+          <strong>74,300 tasks/sec end to end</strong> on a single thread over loopback, at a
+          51 µs median — see <Link href="/docs/benchmarks">Benchmarks</Link> for the harness and the
+          caveats. Because of PMAD it does that with <strong>zero allocation jitter</strong>{" "}
+          and no memory growth under sustained load.
         </p>
         <p>
           Scaling horizontally means running multiple independent Quicx daemons behind a

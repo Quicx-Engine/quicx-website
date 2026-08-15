@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     template: "%s | Quicx",
   },
   description:
-    "Quicx is a lightweight, deterministic task queue daemon built on the PMAD slab allocator. O(1) allocation, zero fragmentation, 63 KB static binary. Configure it once. Run it forever.",
+    "Quicx is a deterministic-memory task queue daemon written in C. Fixed PMAD pool, exact accounting, no allocator surprises — 74,300 tasks/sec at 51 µs median end-to-end, 54 KB binary, zero dependencies.",
   metadataBase: new URL("https://quicx.dev"),
   keywords: [
     "task queue",
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Quicx — Deterministic Task Queue Engine",
     description:
-      "O(1) allocation, zero fragmentation, 63 KB binary. A task queue daemon built on the PMAD slab allocator — no GC pauses, no allocator jitter. Configure it once. Run it forever.",
+      "A task queue that never asks the OS for another byte. 74,300 tasks/sec end to end at 51 µs median, 0 KB memory growth, 54 KB binary — every figure measured with bench/run.sh.",
     type: "website",
     url: "https://quicx.dev",
     siteName: "Quicx",
@@ -86,7 +86,7 @@ export const metadata: Metadata = {
     creator: "@quicxdev",
     title: "Quicx — Deterministic Task Queue Engine",
     description:
-      "O(1) allocation, zero fragmentation, 63 KB binary. A task queue daemon built on the PMAD slab allocator — no GC pauses, no jitter.",
+      "A task queue that never asks the OS for another byte. 74,300 tasks/sec at 51 µs median end-to-end, 0 KB memory growth, 54 KB binary — all measured.",
   },
 };
 
@@ -132,12 +132,14 @@ export default function RootLayout({
         "softwareVersion": CURRENT_VERSION,
         "releaseNotes": "https://quicx.dev/docs/changelog",
         "description":
-          "Quicx is a lightweight, deterministic task queue daemon built on the PMAD slab allocator. It delivers O(1) allocation, zero fragmentation, and a compact binary protocol — no GC pauses, no jitter, one 63 KB static binary.",
+          "Quicx is a deterministic-memory task queue daemon written in C, built on the PMAD slab allocator. You declare a memory budget at startup; the daemon uses exactly that and never grows. Measured at 74,300 tasks/sec end to end with a 51 µs median, in a 54 KB binary with no runtime dependencies.",
         "featureList": [
+          "Fixed memory pool — 0 KB RSS growth measured over 443,912 tasks",
           "O(1) deterministic allocation via PMAD slab allocator",
           "Zero fragmentation — pre-sized size classes",
-          "19.1 ns allocation latency",
-          "63 KB static binary — no runtime dependencies",
+          "74,300 tasks/sec end to end on one thread (measured)",
+          "51 µs median submit-to-done latency (measured)",
+          "54 KB binary — no runtime dependencies",
           "Compact binary protocol with 12 message types",
           "Java client published to Maven Central",
           "Real-time CLI observability with quicx status",

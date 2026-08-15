@@ -1,83 +1,60 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { LATENCY_PERCENTILES, LATENCY_BY_LOAD } from "@/lib/benchmarks";
 
-function buildSparkline(latency: number, isActive: boolean) {
-  const points = Array.from({ length: 40 }, (_, i) => {
-    const y =
-      28 +
-      Math.sin(i * 0.45) * 6 +
-      (isActive ? Math.sin(i + latency * 50) * 4 : 0);
-    return { x: (i / 39) * 100, y };
-  });
-  const path = points
-    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
-    .join(" ");
-  const areaPath = `${path} L 100 60 L 0 60 Z`;
-  return { path, areaPath };
-}
+/**
+ * Static by design. Every value here is a measured figure from bench/run.sh —
+ * the only thing `active` drives is the reveal animation, never the numbers.
+ */
+const maxUs = Math.max(...LATENCY_PERCENTILES.map((p) => p.us));
+const maxLoadUs = Math.max(...LATENCY_BY_LOAD.map((r) => r.p50us));
 
 export function PerformanceVisual({ active }: { active: boolean }) {
-  const [mounted, setMounted] = useState(false);
-  const [latency, setLatency] = useState(0.181);
-  const [throughput, setThroughput] = useState(21000);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!active) return;
-    const id = setInterval(() => {
-      setLatency(+(0.17 + Math.random() * 0.04).toFixed(3));
-      setThroughput(20400 + Math.round(Math.random() * 1200));
-    }, 900);
-    return () => clearInterval(id);
-  }, [active]);
-
-  const { path, areaPath } = useMemo(
-    () => (mounted ? buildSparkline(latency, active) : { path: "", areaPath: "" }),
-    [mounted, latency, active]
-  );
-
   return (
     <div className="grid h-full grid-cols-2 gap-3 p-4">
       {/* Latency */}
       <div className="flex flex-col overflow-hidden rounded-lg border border-white/10 bg-[#061219] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
         <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-3 py-2">
           <span className="text-[10px] tracking-wide text-quicx-dim">
-            avg latency
+            submit → done
           </span>
-          <span className="text-[10px] text-quicx-orange-bright">live</span>
+          <span className="text-[10px] text-quicx-orange-bright">measured</span>
         </div>
         <div className="flex flex-1 flex-col justify-between px-4 py-3">
           <div>
             <div className="flex items-baseline gap-1 font-[family-name:var(--font-jetbrains-mono)]">
               <span className="text-3xl font-semibold tabular-nums text-quicx-text">
-                {latency.toFixed(3)}
+                51
               </span>
-              <span className="text-sm text-quicx-dim">ms</span>
+              <span className="text-sm text-quicx-dim">µs</span>
             </div>
             <div className="mt-1 text-[10.5px] text-quicx-dim">
-              p99 · inside PMAD arena
+              p50 · open loop @ 40k/s offered
             </div>
           </div>
-          <svg viewBox="0 0 100 60" className="mt-2 h-14 w-full" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="grad-lat" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor="#FF5700" stopOpacity="0.45" />
-                <stop offset="100%" stopColor="#FF5700" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <path d={areaPath} fill="url(#grad-lat)" />
-            <path
-              d={path}
-              fill="none"
-              stroke="#FF7A33"
-              strokeWidth="1.2"
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
+
+          <ul className="mt-3 space-y-2">
+            {LATENCY_PERCENTILES.map((p, i) => (
+              <li key={p.label} className="flex items-center gap-2">
+                <span className="w-9 shrink-0 font-[family-name:var(--font-jetbrains-mono)] text-[10px] text-quicx-dim">
+                  {p.label}
+                </span>
+                <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+                  <span
+                    className="block h-full rounded-full bg-gradient-to-r from-quicx-orange to-quicx-orange-bright"
+                    style={{
+                      width: active ? `${(p.us / maxUs) * 100}%` : "0%",
+                      transition: "width 600ms cubic-bezier(.2,.8,.2,1)",
+                      transitionDelay: `${i * 70}ms`,
+                    }}
+                  />
+                </span>
+                <span className="w-11 shrink-0 text-right font-[family-name:var(--font-jetbrains-mono)] text-[10px] tabular-nums text-quicx-text">
+                  {p.value}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 
@@ -93,30 +70,40 @@ export function PerformanceVisual({ active }: { active: boolean }) {
           <div>
             <div className="flex items-baseline gap-1 font-[family-name:var(--font-jetbrains-mono)]">
               <span className="text-3xl font-semibold tabular-nums text-quicx-text">
-                {new Intl.NumberFormat("en-US").format(throughput)}
+                74,300
               </span>
             </div>
             <div className="mt-1 text-[10.5px] text-quicx-dim">
-              sustained · single node
+              end to end · single thread · 0 errors
             </div>
           </div>
 
-          <div className="mt-2 flex items-end gap-1 h-14">
-            {Array.from({ length: 20 }).map((_, i) => {
-              const base = 35 + Math.sin(i * 0.7 + throughput * 0.0002) * 15;
-              const h = Math.min(Math.max(base, 15), 95);
-              return (
-                <div
-                  key={i}
-                  className="flex-1 rounded-sm bg-gradient-to-t from-quicx-orange/60 to-quicx-orange-bright shadow-[0_0_8px_rgba(255,87,0,0.3)]"
-                  style={{
-                    height: active ? `${h}%` : "5%",
-                    transition: "height 700ms cubic-bezier(.2,.8,.2,1)",
-                    transitionDelay: `${i * 20}ms`
-                  }}
-                />
-              );
-            })}
+          <div className="mt-3">
+            <div className="mb-2 text-[10px] text-quicx-dim">
+              p50 vs offered load — flat
+            </div>
+            <ul className="space-y-2">
+              {LATENCY_BY_LOAD.map((r, i) => (
+                <li key={r.offered} className="flex items-center gap-2">
+                  <span className="w-9 shrink-0 font-[family-name:var(--font-jetbrains-mono)] text-[10px] text-quicx-dim">
+                    {r.offered}
+                  </span>
+                  <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+                    <span
+                      className="block h-full rounded-full bg-gradient-to-r from-quicx-orange to-quicx-orange-bright"
+                      style={{
+                        width: active ? `${(r.p50us / maxLoadUs) * 100}%` : "0%",
+                        transition: "width 600ms cubic-bezier(.2,.8,.2,1)",
+                        transitionDelay: `${i * 70}ms`,
+                      }}
+                    />
+                  </span>
+                  <span className="w-11 shrink-0 text-right font-[family-name:var(--font-jetbrains-mono)] text-[10px] tabular-nums text-quicx-text">
+                    {r.p50}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

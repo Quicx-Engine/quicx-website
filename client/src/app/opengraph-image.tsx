@@ -165,12 +165,12 @@ export default async function Image() {
             lineHeight: 1.45,
           }}
         >
-          PMAD slab allocator. Zero jitter. 63 KB. 
+          Fixed memory pool. Exact accounting. Measured, not asserted.
         </div>
 
         {/* Stats badges */}
         <div style={{ display: "flex", gap: "14px", flexWrap: "nowrap" }}>
-          {["19.1 ns alloc", ">460 M ops/s", "63 KB binary", "0% fragmentation"].map(
+          {["74,300 tasks/s", "51 µs p50 end-to-end", "0 KB growth", "54 KB binary"].map(
             (stat) => (
               <div
                 key={stat}

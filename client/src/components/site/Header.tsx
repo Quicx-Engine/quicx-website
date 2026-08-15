@@ -31,9 +31,15 @@ export function Header() {
           </a>
           <a
             className="transition hover:text-quicx-text"
-            href="/#performance"
+            href="/#measured"
           >
-            Performance
+            Benchmarks
+          </a>
+          <a
+            className="transition hover:text-quicx-text"
+            href="/#limits"
+          >
+            Limits
           </a>
           <a
             className="transition hover:text-quicx-text"

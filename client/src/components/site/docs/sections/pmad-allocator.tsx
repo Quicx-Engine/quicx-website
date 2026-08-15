@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Callout } from "@/components/site/docs/Callout";
 import {
   SectionHeaderFor,
@@ -147,8 +148,11 @@ export function PmadSection() {
 
       <Prose>
         <p>
-          Measured on Apple Silicon (<InlineCode>-O3 -march=native</InlineCode>). Full
-          benchmark source and reproduction instructions are available on{" "}
+          These are <strong>allocator micro-benchmarks</strong>, measured separately from the
+          daemon on Apple Silicon (<InlineCode>-O3 -march=native</InlineCode>) with the
+          harness in the PMAD repository — not the end-to-end task-queue numbers. For those,
+          see <Link href="/docs/benchmarks">Benchmarks</Link>. Full source and reproduction
+          instructions are on{" "}
           <a href="https://github.com/anastassow/PMAD">github.com/anastassow/PMAD</a>.
         </p>
       </Prose>

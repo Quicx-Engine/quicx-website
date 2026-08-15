@@ -6,6 +6,8 @@ import { ConfigurationSection } from "@/components/site/docs/sections/configurat
 import { ArchitectureSection } from "@/components/site/docs/sections/architecture";
 import { PmadSection } from "@/components/site/docs/sections/pmad-allocator";
 import { BinaryProtocolSection } from "@/components/site/docs/sections/binary-protocol";
+import { BenchmarksSection } from "@/components/site/docs/sections/benchmarks";
+import { LimitationsSection } from "@/components/site/docs/sections/limitations";
 import { CliReferenceSection } from "@/components/site/docs/sections/cli-reference";
 import { JavaClientSection } from "@/components/site/docs/sections/java-client";
 import { ChangelogSection } from "@/components/site/docs/sections/changelog";
@@ -68,6 +70,25 @@ export const nav: DocsNavGroup[] = [
           { id: "payload-formats", label: "Payload formats" },
         ],
       },
+      {
+        id: "benchmarks",
+        label: "Benchmarks",
+        toc: [
+          { id: "bench-throughput", label: "Throughput" },
+          { id: "bench-latency", label: "Latency" },
+          { id: "bench-memory", label: "Memory" },
+          { id: "bench-methodology", label: "Methodology" },
+          { id: "bench-comparison", label: "Comparison" },
+        ],
+      },
+      {
+        id: "limitations",
+        label: "Limitations",
+        toc: [
+          { id: "not-implemented", label: "What Quicx does not do" },
+          { id: "feature-matrix", label: "Feature for feature" },
+        ],
+      },
     ],
   },
   {
@@ -104,6 +125,8 @@ export const sectionComponents: Record<string, ComponentType> = {
   "architecture": ArchitectureSection,
   "pmad-allocator": PmadSection,
   "binary-protocol": BinaryProtocolSection,
+  "benchmarks": BenchmarksSection,
+  "limitations": LimitationsSection,
   "cli-reference": CliReferenceSection,
   "java-client": JavaClientSection,
   "changelog": ChangelogSection,

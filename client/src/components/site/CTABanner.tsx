@@ -16,7 +16,7 @@ export function CTABanner() {
             className="h-px w-10 bg-gradient-to-r from-transparent to-quicx-orange/60"
           />
           <span className="inline-flex items-center gap-2 font-[family-name:var(--font-jetbrains-mono)] text-[11px] uppercase tracking-[0.34em] text-quicx-orange-bright">
-            <span className="text-quicx-dim">§ 04</span>
+            <span className="text-quicx-dim">§ 06</span>
             <span className="text-quicx-dim">/</span>
             <span>Get started</span>
           </span>

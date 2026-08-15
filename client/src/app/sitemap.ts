@@ -11,9 +11,11 @@ const docEntryMeta: DocEntry[] = [
   { slug: "installation",     lastModified: "2026-05-11", priority: 0.9, changeFrequency: "monthly"  },
   { slug: "quick-start",      lastModified: "2026-05-13", priority: 0.9, changeFrequency: "monthly"  },
   { slug: "configuration",    lastModified: "2026-05-12", priority: 0.8, changeFrequency: "monthly"  },
-  { slug: "architecture",     lastModified: "2026-05-06", priority: 0.7, changeFrequency: "monthly"  },
+  { slug: "architecture",     lastModified: "2026-08-15", priority: 0.7, changeFrequency: "monthly"  },
   { slug: "pmad-allocator",   lastModified: "2026-04-29", priority: 0.7, changeFrequency: "monthly"  },
   { slug: "binary-protocol",  lastModified: "2026-05-24", priority: 0.7, changeFrequency: "monthly"  },
+  { slug: "benchmarks",       lastModified: "2026-08-15", priority: 0.9, changeFrequency: "monthly"  },
+  { slug: "limitations",      lastModified: "2026-08-15", priority: 0.8, changeFrequency: "monthly"  },
   { slug: "cli-reference",    lastModified: "2026-05-03", priority: 0.8, changeFrequency: "monthly"  },
   { slug: "java-client",      lastModified: "2026-05-15", priority: 0.8, changeFrequency: "monthly"  },
   { slug: "changelog",        lastModified: "2026-05-22", priority: 0.6, changeFrequency: "weekly"   },
@@ -25,7 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: baseUrl,
-      lastModified: new Date("2026-05-28"),
+      lastModified: new Date("2026-08-15"),
       changeFrequency: "weekly",
       priority: 1,
       images: [`${baseUrl}/opengraph-image`],
