@@ -4,7 +4,9 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/:path*.svg",
+        // Every public SVG except the favicon — Google needs to crawl
+        // /icon.svg to show it next to search results.
+        source: "/:file((?!icon\\.svg$).*\\.svg)",
         headers: [{ key: "X-Robots-Tag", value: "noindex" }],
       },
       {

@@ -21,9 +21,9 @@ const nav: { title: string; items: { label: string; href: string }[] }[] = [
   {
     title: "Product",
     items: [
-      { label: "Features", href: "#features" },
-      { label: "Architecture", href: "#architecture" },
-      { label: "Performance", href: "#performance" },
+      { label: "Features", href: "/#features" },
+      { label: "Architecture", href: "/#architecture" },
+      { label: "Performance", href: "/#performance" },
       { label: "Changelog", href: "/docs/changelog" },
     ],
   },

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CURRENT_VERSION } from "@/lib/version";
+import { SITE_URL, baseOpenGraph, baseTwitter } from "@/lib/seo";
 import { Anton, Archivo, Barlow_Condensed, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
   },
   description:
     "Quicx is a deterministic-memory task queue daemon written in C. Fixed PMAD pool, exact accounting, no allocator surprises — 74,300 tasks/sec at 51 µs median end-to-end, 54 KB binary, zero dependencies.",
-  metadataBase: new URL("https://quicx.dev"),
+  metadataBase: new URL(SITE_URL),
   keywords: [
     "task queue",
     "task queue engine",
@@ -76,14 +77,12 @@ export const metadata: Metadata = {
     description:
       "A task queue that never asks the OS for another byte. 74,300 tasks/sec end to end at 51 µs median, 0 KB memory growth, 54 KB binary — every figure measured with bench/run.sh.",
     type: "website",
-    url: "https://quicx.dev",
-    siteName: "Quicx",
-    locale: "en_US",
+    url: SITE_URL,
+    ...baseOpenGraph,
   },
   twitter: {
     card: "summary_large_image",
-    site: "@quicxdev",
-    creator: "@quicxdev",
+    ...baseTwitter,
     title: "Quicx — Deterministic Task Queue Engine",
     description:
       "A task queue that never asks the OS for another byte. 74,300 tasks/sec at 51 µs median end-to-end, 0 KB memory growth, 54 KB binary — all measured.",
@@ -111,10 +110,12 @@ export default function RootLayout({
         "@type": "Organization",
         "@id": "https://quicx.dev/#organization",
         "name": "Quicx",
-        "url": "https://quicx.org",
+        "url": "https://quicx.dev",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://quicx.dev/quicx-logo.svg",
+          "url": "https://quicx.dev/apple-icon.png",
+          "width": 180,
+          "height": 180,
         },
         "sameAs": [
           "https://github.com/anastassow",

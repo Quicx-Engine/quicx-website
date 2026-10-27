@@ -5,6 +5,7 @@ import {
   sectionMeta,
   sectionSlugs,
 } from "@/components/site/docs/sections";
+import { SITE_URL, baseOpenGraph, baseTwitter } from "@/lib/seo";
 
 type Params = { slug: string };
 
@@ -20,21 +21,28 @@ export async function generateMetadata({
   const { slug } = await params;
   const meta = sectionMeta[slug];
   if (!meta) return {};
-  const url = `https://quicx.dev/docs/${slug}`;
+  const url = `${SITE_URL}/docs/${slug}`;
+  const title = `${meta.title} - Quicx Docs`;
+  const description = meta.description ?? meta.lede;
   return {
-    title: `${meta.title} - Quicx Docs`,
-    description: meta.lede,
+    // absolute: the root template would otherwise append a second "| Quicx"
+    title: { absolute: title },
+    description,
     alternates: { canonical: url },
     openGraph: {
-      title: `${meta.title} - Quicx Docs`,
-      description: meta.lede,
+      ...baseOpenGraph,
+      title,
+      description,
       url,
       type: "article",
+      publishedTime: "2026-04-21",
+      modifiedTime: meta.updated,
     },
     twitter: {
+      ...baseTwitter,
       card: "summary_large_image",
-      title: `${meta.title} - Quicx Docs`,
-      description: meta.lede,
+      title,
+      description,
     },
   };
 }
@@ -68,8 +76,10 @@ export default async function DocsSectionPage({
     "@context": "https://schema.org",
     "@type": "TechArticle",
     "headline": `${meta.title} - Quicx Documentation`,
-    "description": meta.lede,
+    "description": meta.description ?? meta.lede,
     "url": `https://quicx.dev/docs/${slug}`,
+    "mainEntityOfPage": `https://quicx.dev/docs/${slug}`,
+    "image": `https://quicx.dev/docs/${slug}/opengraph-image`,
     "inLanguage": "en-US",
     "author": {
       "@type": "Person",
@@ -80,9 +90,12 @@ export default async function DocsSectionPage({
       "@id": "https://quicx.dev/#organization"
     },
     "datePublished": "2026-04-21",
-    "dateModified": "2026-05-11",
+    "dateModified": meta.updated,
     "about": {
       "@id": "https://quicx.dev/#software"
+    },
+    "isPartOf": {
+      "@id": "https://quicx.dev/#website"
     },
   };
 

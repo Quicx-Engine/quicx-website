@@ -7,23 +7,26 @@ import { HonestLimits } from "@/components/site/HonestLimits";
 import { CTABanner } from "@/components/site/CTABanner";
 import { Footer } from "@/components/site/Footer";
 import type { Metadata } from "next";
+import { SITE_URL, baseOpenGraph, baseTwitter } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Quicx - Deterministic Task Queue Engine",
   description:
-    "Quicx is a task queue daemon with a fixed memory pool: 74,300 tasks/sec end to end at 51 µs median, zero memory growth, 54 KB binary, no dependencies. Every figure measured with bench/run.sh.",
+    "Quicx is a task queue daemon with a fixed memory pool: 74,300 tasks/sec at 51 µs median, zero memory growth, 54 KB binary, no dependencies. All measured.",
   alternates: {
-    canonical: "https://quicx.dev",
+    canonical: SITE_URL,
   },
   openGraph: {
     title: "Quicx - Deterministic Task Queue Engine",
     description:
       "Fixed memory pool, exact accounting, no allocator surprises. 74,300 tasks/sec at 51 µs median end-to-end latency, 54 KB binary, zero dependencies — all measured, all reproducible.",
-    url: "https://quicx.dev",
+    url: SITE_URL,
     type: "website",
+    ...baseOpenGraph,
   },
   twitter: {
     card: "summary_large_image",
+    ...baseTwitter,
     title: "Quicx - Deterministic Task Queue Engine",
     description:
       "Fixed memory pool, exact accounting, no allocator surprises. 74,300 tasks/sec at 51 µs median end-to-end, 54 KB binary, zero dependencies.",
