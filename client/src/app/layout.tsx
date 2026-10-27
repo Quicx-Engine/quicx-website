@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CURRENT_VERSION } from "@/lib/version";
 import { SITE_URL, baseOpenGraph, baseTwitter } from "@/lib/seo";
 import { Anton, Archivo, Barlow_Condensed, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const anton = Anton({
@@ -177,6 +178,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-quicx-bg text-quicx-text">
         {children}
+        <Analytics />
       </body>
     </html>
   );
