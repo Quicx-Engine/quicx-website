@@ -118,10 +118,7 @@ export default function RootLayout({
           "width": 180,
           "height": 180,
         },
-        "sameAs": [
-          "https://github.com/anastassow",
-          "https://www.linkedin.com/in/dimitar-anastasov-339a94310/",
-        ],
+        "sameAs": ["https://github.com/Quicx-Engine"],
       },
       {
         "@type": "SoftwareApplication",
@@ -157,9 +154,13 @@ export default function RootLayout({
           "@type": "Person",
           "name": "Dimitar Anastasov",
           "url": "https://www.linkedin.com/in/dimitar-anastasov-339a94310/",
+          "sameAs": [
+            "https://github.com/anastassow",
+            "https://www.linkedin.com/in/dimitar-anastasov-339a94310/",
+          ],
         },
         "publisher": { "@id": "https://quicx.dev/#organization" },
-        "sameAs": ["https://github.com/anastassow/Quicx"],
+        "sameAs": ["https://github.com/Quicx-Engine/Quicx-Releases"],
         "inLanguage": "en-US"
       },
     ],

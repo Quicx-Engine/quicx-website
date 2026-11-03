@@ -27,7 +27,7 @@ export function DocsPageFooterCta() {
             Install Quicx <ArrowRight className="size-4" />
           </Link>
           <a
-            href="https://github.com/anastassow/Quicx"
+            href="https://github.com/Quicx-Engine/Quicx-Releases"
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 rounded border border-quicx-line px-4 py-2 font-[family-name:var(--font-barlow-condensed)] text-[14px] font-semibold uppercase tracking-wide text-quicx-muted transition hover:border-white/20 hover:text-quicx-text"

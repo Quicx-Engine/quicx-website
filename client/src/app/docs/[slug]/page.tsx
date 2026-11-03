@@ -62,7 +62,9 @@ export default async function DocsSectionPage({
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quicx.dev" },
-      { "@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://quicx.dev/docs" },
+      // /docs is a 308 to installation — point straight at the destination so
+      // crawlers don't keep rediscovering a redirect from every docs page.
+      { "@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://quicx.dev/docs/installation" },
       {
         "@type": "ListItem",
         "position": 3,

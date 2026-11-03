@@ -35,7 +35,7 @@ export function DocsTopbar({ onMenuToggle }: { onMenuToggle: () => void }) {
           Home
         </a>
         <a
-          href="https://github.com/anastassow/Quicx"
+          href="https://github.com/Quicx-Engine/Quicx-Releases"
           target="_blank"
           rel="noreferrer"
           className="font-[family-name:var(--font-barlow-condensed)] text-[11px] uppercase tracking-[0.08em] text-quicx-muted transition hover:text-quicx-text"

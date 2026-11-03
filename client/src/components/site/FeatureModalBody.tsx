@@ -26,7 +26,7 @@ export function FeatureModalBody({ feature }: { feature: Feature }) {
                   Start with Quicx
                 </Button>
               </a>
-              <a href="/docs">
+              <a href="/docs/installation">
                 <Button
                   size="lg"
                   variant="outline"

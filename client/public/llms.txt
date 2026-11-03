@@ -20,12 +20,12 @@ Latency is measured submit → done, not submit → ack. Latency runs are open l
 Quicx is a fast in-memory broker, not a durable one. No persistence (a restart loses the queue), no redelivery if a worker dies mid-task, no retries or dead-lettering, no priorities/delays/named queues (one global FIFO), payloads capped at 1024 bytes, single core, and Java is the only client library. Delivery is at-most-once. If you need at-least-once delivery, use beanstalkd or Redis Streams.
 
 ## Docs
-- [Documentation](https://quicx.dev/docs): Full docs — architecture, configuration, CLI reference, Java client
+- [Documentation](https://quicx.dev/docs/installation): Full docs — architecture, configuration, CLI reference, Java client
 - [Benchmarks](https://quicx.dev/docs/benchmarks): Measured results, methodology, and comparison provenance
 - [Limitations](https://quicx.dev/docs/limitations): What Quicx does not do, and feature-for-feature comparison
 - [Installer](https://quicx.dev/install.sh): One-line install script
 
 ## Resources
 - [Home](https://quicx.dev): Product overview and landing page
-- [Repository](https://github.com/anastassow/Quicx): Source code
+- [Releases](https://github.com/Quicx-Engine/Quicx-Releases): Release binaries and checksums
 - [Contact](https://www.linkedin.com/in/dimitar-anastasov-339a94310/): Author, Dimitar Anastasov

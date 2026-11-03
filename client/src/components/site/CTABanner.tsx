@@ -58,7 +58,7 @@ export function CTABanner() {
               <ArrowRight className="size-4" />
             </button>
           </a>
-          <a href="/docs">
+          <a href="/docs/installation">
             <button className="inline-flex h-12 items-center gap-2 rounded border border-quicx-orange/60 bg-transparent px-8 font-[family-name:var(--font-barlow-condensed)] text-[15px] font-semibold uppercase tracking-wider text-quicx-orange transition hover:border-quicx-orange hover:bg-quicx-orange/10 hover:text-quicx-orange-bright">
               <BookOpen className="size-4" />
               Read the docs

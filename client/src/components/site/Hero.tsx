@@ -82,7 +82,7 @@ export function Hero() {
               Start with Quicx
             </Button>
           </a>
-          <a href="/docs">
+          <a href="/docs/installation">
             <Button
               size="lg"
               variant="outline"

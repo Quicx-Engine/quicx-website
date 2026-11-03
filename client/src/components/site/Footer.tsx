@@ -30,7 +30,7 @@ const nav: { title: string; items: { label: string; href: string }[] }[] = [
   {
     title: "Developers",
     items: [
-      { label: "Documentation", href: "/docs" },
+      { label: "Documentation", href: "/docs/installation" },
       { label: "Quick start", href: "/docs/quick-start" },
       { label: "CLI reference", href: "/docs/cli-reference" },
       { label: "Java client", href: "/docs/java-client" },
@@ -75,7 +75,7 @@ export function Footer() {
             <FooterIconLink href="https://www.linkedin.com/in/dimitar-anastasov-339a94310/" label="LinkedIn">
               <LinkedInIcon className="size-[14px]" />
             </FooterIconLink>
-            <FooterIconLink href="/docs" label="Documentation">
+            <FooterIconLink href="/docs/installation" label="Documentation">
               <BookOpen className="size-4" />
             </FooterIconLink>
           </div>

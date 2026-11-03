@@ -132,7 +132,7 @@ export function Interactive404() {
                   </Link>
 
                   <Link 
-                    href="/docs"
+                    href="/docs/installation"
                     className="group flex flex-1 items-center justify-between rounded-md border border-quicx-line bg-white/[0.02] px-4 py-3 text-quicx-muted transition-all hover:border-quicx-orange/50 hover:bg-quicx-orange/10 hover:text-quicx-orange-bright"
                   >
                     <div className="flex items-center gap-3">

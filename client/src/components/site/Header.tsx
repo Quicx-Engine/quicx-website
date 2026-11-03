@@ -43,7 +43,7 @@ export function Header() {
           </a>
           <a
             className="transition hover:text-quicx-text"
-            href="/docs"
+            href="/docs/installation"
           >
             Docs
           </a>
