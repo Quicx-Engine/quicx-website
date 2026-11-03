@@ -5,7 +5,7 @@ import {
   sectionMeta,
   sectionSlugs,
 } from "@/components/site/docs/sections";
-import { SITE_URL, baseOpenGraph, baseTwitter } from "@/lib/seo";
+import { SITE_URL, baseOpenGraph } from "@/lib/seo";
 
 type Params = { slug: string };
 
@@ -39,7 +39,6 @@ export async function generateMetadata({
       modifiedTime: meta.updated,
     },
     twitter: {
-      ...baseTwitter,
       card: "summary_large_image",
       title,
       description,

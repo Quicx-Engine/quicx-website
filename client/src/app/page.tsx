@@ -7,7 +7,7 @@ import { HonestLimits } from "@/components/site/HonestLimits";
 import { CTABanner } from "@/components/site/CTABanner";
 import { Footer } from "@/components/site/Footer";
 import type { Metadata } from "next";
-import { SITE_URL, baseOpenGraph, baseTwitter } from "@/lib/seo";
+import { SITE_URL, baseOpenGraph } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Quicx - Deterministic Task Queue Engine",
@@ -26,7 +26,6 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    ...baseTwitter,
     title: "Quicx - Deterministic Task Queue Engine",
     description:
       "Fixed memory pool, exact accounting, no allocator surprises. 74,300 tasks/sec at 51 µs median end-to-end, 54 KB binary, zero dependencies.",

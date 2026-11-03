@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CURRENT_VERSION } from "@/lib/version";
-import { SITE_URL, baseOpenGraph, baseTwitter } from "@/lib/seo";
+import { SITE_URL, baseOpenGraph } from "@/lib/seo";
 import { Anton, Archivo, Barlow_Condensed, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
@@ -83,7 +83,6 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    ...baseTwitter,
     title: "Quicx — Deterministic Task Queue Engine",
     description:
       "A task queue that never asks the OS for another byte. 74,300 tasks/sec at 51 µs median end-to-end, 0 KB memory growth, 54 KB binary — all measured.",
