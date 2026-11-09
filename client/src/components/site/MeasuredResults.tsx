@@ -7,7 +7,7 @@ import {
   MEMORY_RUN,
   METHODOLOGY,
 } from "@/lib/benchmarks";
-import { Odometer, Reveal } from "./motion";
+import { NumberReveal, Reveal } from "./motion";
 import { Container, SectionHead, TextLink } from "./primitives";
 
 const AXIS_MAX_US = 200;
@@ -44,7 +44,7 @@ function Figure({
     <div>
       <h3 className="caps-label text-quicx-dim">{label}</h3>
       <p className="mt-4 flex items-baseline gap-2 font-mono">
-        <Odometer
+        <NumberReveal
           value={value}
           delay={delay}
           className="text-[clamp(2.75rem,4.6vw,3.75rem)] font-medium leading-none tracking-[-0.04em] text-quicx-text"

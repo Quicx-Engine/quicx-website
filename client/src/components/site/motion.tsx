@@ -101,14 +101,14 @@ export function Reveal({
   );
 }
 
-const DIGITS = Array.from({ length: 20 }, (_, i) => i % 10);
-
 /**
- * A figure whose digits roll into place, each column a full turn past its
- * value. The final value is in the markup (and read out once to assistive
- * tech); the roll only plays inside a running reveal or a `.odo-run` parent.
+ * A measured figure that prints into place: each character rises out of its
+ * own mask, left to right. Only the real value is ever on screen, so no
+ * in-between number can be mistaken for a result. The value is in the markup
+ * (and read out once to assistive tech); the rise only plays inside a running
+ * reveal or a `.odo-run` parent.
  */
-export function Odometer({
+export function NumberReveal({
   value,
   delay = 0,
   className,
@@ -117,36 +117,39 @@ export function Odometer({
   delay?: number;
   className?: string;
 }) {
-  let k = 0;
   return (
-    <span className={cn("odo", className)}>
+    <span className={cn("num", className)}>
       <span className="sr-only">{value}</span>
       <span aria-hidden className="inline-flex">
-        {Array.from(value).map((ch, i) => {
-          if (ch < "0" || ch > "9") return <span key={i}>{ch}</span>;
-          const n = Number(ch);
-          const idx = k++;
-          return (
-            <span key={i} className="odo-digit">
-              <span
-                className="odo-col"
-                style={
-                  {
-                    transform: `translateY(-${10 + n}em)`,
-                    "--i": idx,
-                    "--d": `${delay}ms`,
-                  } as React.CSSProperties
-                }
-              >
-                {DIGITS.map((d, j) => (
-                  <span key={j}>{d}</span>
-                ))}
-              </span>
+        {Array.from(value).map((ch, i) => (
+          <span key={i} className="num-cell">
+            <span
+              className="num-glyph"
+              style={{ "--i": i, "--d": `${delay}ms` } as React.CSSProperties}
+            >
+              {ch === " " ? "\u00a0" : ch}
             </span>
-          );
-        })}
+          </span>
+        ))}
       </span>
     </span>
+  );
+}
+
+const WIDE_QUERY = "(min-width: 1024px)";
+
+function subscribeWide(onChange: () => void) {
+  const mq = window.matchMedia(WIDE_QUERY);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+
+/** True at the lg breakpoint and up; false on the server and during hydration. */
+export function useWideScreen() {
+  return useSyncExternalStore(
+    subscribeWide,
+    () => window.matchMedia(WIDE_QUERY).matches,
+    () => false
   );
 }
 

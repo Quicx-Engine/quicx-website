@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useId, useRef } from "react";
 import { HEADLINE, MEMORY_RUN } from "@/lib/benchmarks";
 import { cn } from "@/lib/utils";
-import { Odometer } from "./motion";
+import { NumberReveal } from "./motion";
 
 /**
  * The hero's signature: the apool budget drawn as a fixed frame. Each band is
@@ -849,7 +849,7 @@ export function PoolInstrument() {
             <dt className="sr-only">{r.unit}</dt>
             <dd>
               <span className="flex items-baseline gap-1.5 font-mono">
-                <Odometer
+                <NumberReveal
                   value={r.value}
                   delay={700 + i * 120}
                   className="text-[24px] font-medium leading-none tracking-[-0.02em] text-quicx-text"

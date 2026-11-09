@@ -1,7 +1,7 @@
 "use client";
 
 import { HEADLINE, LATENCY_PERCENTILES, LATENCY_BY_MACHINE } from "@/lib/benchmarks";
-import { Odometer, useStageReveal } from "../motion";
+import { NumberReveal, useStageReveal } from "../motion";
 import { Panel } from "./Panel";
 
 /**
@@ -54,7 +54,7 @@ export function PerformanceVisual({ active }: { active: boolean }) {
     >
       <Panel title="submit → done" meta="measured" bodyClassName="flex h-full flex-col px-4 py-4 sm:px-5 sm:py-5">
         <p className="flex items-baseline gap-1.5 font-mono">
-          <Odometer
+          <NumberReveal
             value={HEADLINE.latencyUs}
             delay={100}
             className="text-[40px] font-medium leading-none tracking-[-0.04em] text-quicx-text sm:text-[44px]"
@@ -80,7 +80,7 @@ export function PerformanceVisual({ active }: { active: boolean }) {
       </Panel>
 
       <Panel title="throughput" meta="tasks/s" bodyClassName="flex h-full flex-col px-4 py-4 sm:px-5 sm:py-5">
-        <Odometer
+        <NumberReveal
           value={HEADLINE.throughput}
           delay={180}
           className="font-mono text-[40px] font-medium leading-none tracking-[-0.04em] text-quicx-text sm:text-[44px]"

@@ -378,42 +378,41 @@
   animation-delay: var(--d, 0ms);
 }
 
-/* Odometer: each digit column rolls one full turn into its value. */
-@keyframes odo-roll {
+/* Measured figures print into place: each character rises out of its own
+   mask, left to right. Only the true value is ever drawn, so nothing on screen
+   reads as a wrong result mid-animation. The mask is padded so the comma's
+   tail and the glyph tops are never cut once settled. */
+@keyframes num-rise {
   from {
-    transform: translateY(0);
+    transform: translateY(135%);
   }
 }
 
-.odo {
+.num {
   display: inline-flex;
   position: relative;
 }
 
-.odo-digit {
+.num-cell {
   display: inline-block;
-  height: 1em;
-  line-height: 1;
   overflow: hidden;
+  line-height: 1;
+  padding-block: 0.1em 0.24em;
+  margin-block: -0.1em -0.24em;
 }
 
-.odo-col {
-  display: block;
+.num-glyph {
+  display: inline-block;
 }
 
-.odo-col > span {
-  display: block;
-  height: 1em;
+.odo-run .num-glyph,
+[data-reveal="run"] .num-glyph {
+  animation: num-rise 820ms var(--ease-out) both;
+  animation-delay: calc(var(--d, 0ms) + var(--i, 0) * 42ms);
 }
 
-.odo-run .odo-col,
-[data-reveal="run"] .odo-col {
-  animation: odo-roll 1.7s var(--ease-out) both;
-  animation-delay: calc(var(--d, 0ms) + var(--i, 0) * 85ms);
-}
-
-[data-reveal="armed"] .odo-col {
-  transform: translateY(0) !important;
+[data-reveal="armed"] .num-glyph {
+  transform: translateY(135%);
 }
 
 /* Bars that measure something grow from their zero. */
@@ -537,6 +536,26 @@
 .config-fill[data-step="drain"] {
   clip-path: inset(0 0 0 100%);
   transition: clip-path var(--drain-ms, 420ms) cubic-bezier(0.5, 0, 0.75, 0);
+}
+
+/* Principles tour (wide screens): the selected entry's rule fills over the
+   time it holds the stage; when it is full, the next principle takes over.
+   Paused, it simply holds where it is. */
+@keyframes tour-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.tour-fill {
+  animation: tour-fill var(--dwell, 9000ms) linear both;
+}
+
+[data-tour="paused"] .tour-fill {
+  animation-play-state: paused;
 }
 
 /* Docs navigation (React <ViewTransition>): the old article leaves quickly, the
@@ -928,8 +947,8 @@
   .wire-rl,
   .byte-in,
   .flip-in,
-  .odo-run .odo-col,
-  [data-reveal] .odo-col,
+  .odo-run .num-glyph,
+  [data-reveal] .num-glyph,
   [data-reveal] .grow-x,
   [data-reveal] .reveal-fade,
   [data-reveal] .footprint-sweep,

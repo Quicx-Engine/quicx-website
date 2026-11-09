@@ -3,7 +3,7 @@
 import { CURRENT_VERSION } from "@/lib/version";
 import { FOOTPRINT, MEMORY_RUN } from "@/lib/benchmarks";
 import { cn } from "@/lib/utils";
-import { Odometer, useStageReveal } from "../motion";
+import { NumberReveal, useStageReveal } from "../motion";
 import { Panel } from "./Panel";
 
 /**
@@ -43,7 +43,7 @@ export function FootprintVisual({ active }: { active: boolean }) {
       <Panel title="quicx, single binary" meta={`v${CURRENT_VERSION}`}>
         <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3 px-4 py-4 sm:px-6 sm:py-5">
           <p className="flex items-baseline gap-2 font-mono">
-            <Odometer
+            <NumberReveal
               value="54.9"
               delay={150}
               className="text-[46px] font-medium leading-none tracking-[-0.04em] text-quicx-text sm:text-[52px]"
