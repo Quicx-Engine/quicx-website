@@ -9,7 +9,7 @@ import { Panel } from "./Panel";
 const steps = [
   { label: "Install the binary", cmd: "curl -fsSL https://quicx.dev/install.sh | sh" },
   { label: "Start the daemon", cmd: "quicx start --config quicx.conf" },
-  { label: "Add the Java client", cmd: "dev.quicx:quicx-client:1.0.0" },
+  { label: "Add the Java client", cmd: "dev.quicx:quicx-client:2.0.0" },
   { label: "Submit a task", cmd: 'client.submit("send_email", payload)' },
   { label: "Run a worker", cmd: 'worker.handle("send_email", …).start()' },
 ];

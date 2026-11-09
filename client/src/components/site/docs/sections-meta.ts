@@ -127,14 +127,14 @@ export const sectionMeta: Record<string, SectionMeta> = {
     num: "§ 03.02",
     kicker: "Reference",
     title: "Java Client",
-    lede: "dev.quicx:quicx-client is a small, dependency-free Java 11+ library. Two classes carry the whole surface area: QuicxClient for producers, QuicxWorker for consumers.",
-    description: "dev.quicx:quicx-client is a small, dependency-free Java 11+ library. QuicxClient submits tasks, QuicxWorker consumes them — that is the whole API.",
-    updated: "2026-05-28",
+    lede: "dev.quicx:quicx-client 2.0.0 is a small, dependency-free Java 11+ library. QuicxClient submits tasks and can wait for their result; QuicxWorker runs them, reconnecting and reporting on its own.",
+    description: "dev.quicx:quicx-client 2.0.0, a dependency-free Java 11+ library: QuicxClient submits tasks and waits for results, QuicxWorker runs them.",
+    updated: "2026-11-10",
     toc: [
       { id: "java-build-setup", label: "Add it to your build" },
       { id: "QuicxClient", label: "QuicxClient — producers" },
       { id: "QuicxWorker", label: "QuicxWorker — consumers" },
-      { id: "QuicxException", label: "QuicxException" },
+      { id: "QuicxException", label: "Errors and limits" },
     ],
   },
   "changelog": {

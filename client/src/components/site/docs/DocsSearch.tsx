@@ -91,11 +91,11 @@ const searchIndex = [
   { id: "quicx-start", label: "quicx start", group: "Reference", breadcrumbs: "Reference → CLI Reference", keywords: "run daemon server start" },
   { id: "quicx-status", label: "quicx status", group: "Reference", breadcrumbs: "Reference → CLI Reference", keywords: "monitor live ui terminal" },
   { id: "quicx-stop", label: "quicx stop", group: "Reference", breadcrumbs: "Reference → CLI Reference", keywords: "kill pid shutdown" },
-  { id: "java-client", label: "Java Client", group: "Reference", breadcrumbs: "Reference → Java Client", keywords: "sdk library dependency dev.quicx" },
+  { id: "java-client", label: "Java Client", group: "Reference", breadcrumbs: "Reference → Java Client", keywords: "sdk library dependency dev.quicx submitAndWait submitAsync" },
   { id: "java-build-setup", label: "Add it to your build", group: "Reference", breadcrumbs: "Reference → Java Client", keywords: "maven gradle pom.xml" },
   { id: "QuicxClient", label: "QuicxClient — producers", group: "Reference", breadcrumbs: "Reference → Java Client", keywords: "push messages enqueue" },
   { id: "QuicxWorker", label: "QuicxWorker — consumers", group: "Reference", breadcrumbs: "Reference → Java Client", keywords: "pop listen process block" },
-  { id: "QuicxException", label: "QuicxException", group: "Reference", breadcrumbs: "Reference → Java Client", keywords: "error handling try catch" },
+  { id: "QuicxException", label: "Errors and limits", group: "Reference", breadcrumbs: "Reference → Java Client", keywords: "QuicxException QuicxRejectedException QuicxConnectionException queue full error handling limits" },
   { id: "changelog", label: "Changelog", group: "Reference", breadcrumbs: "Reference → Changelog", keywords: "updates versions releases history" },
 ];
 

@@ -84,7 +84,7 @@ quicx cli socket: /tmp/quicx.sock`}
                     code={`<dependency>
   <groupId>dev.quicx</groupId>
   <artifactId>quicx-client</artifactId>
-  <version>1.0.0</version>
+  <version>2.0.0</version>
 </dependency>`}
                   />
                 ),
@@ -97,7 +97,7 @@ quicx cli socket: /tmp/quicx.sock`}
                     filename="build.gradle.kts"
                     language="kotlin"
                     code={`dependencies {
-    implementation("dev.quicx:quicx-client:1.0.0")
+    implementation("dev.quicx:quicx-client:2.0.0")
 }`}
                   />
                 ),
@@ -110,7 +110,7 @@ quicx cli socket: /tmp/quicx.sock`}
                     filename="build.gradle"
                     language="groovy"
                     code={`dependencies {
-    implementation 'dev.quicx:quicx-client:1.0.0'
+    implementation 'dev.quicx:quicx-client:2.0.0'
 }`}
                   />
                 ),
@@ -122,9 +122,10 @@ quicx cli socket: /tmp/quicx.sock`}
         <Step index="03" title="Submit your first task">
           <Prose>
             <p>
-              <InlineCode>QuicxClient</InlineCode> is a stateless, thread-safe producer
-              handle. Every <InlineCode>submit()</InlineCode> opens a connection, sends{" "}
-              <InlineCode>MSG_SUBMIT</InlineCode>, reads the acknowledgment, and closes.
+              <InlineCode>QuicxClient</InlineCode> is a thread-safe producer handle that keeps
+              one connection to the daemon. <InlineCode>submit()</InlineCode> sends{" "}
+              <InlineCode>MSG_SUBMIT</InlineCode> and returns the task id once the daemon has
+              queued it; <InlineCode>submitAndWait()</InlineCode> also waits for the result.
             </p>
           </Prose>
           <CodeBlock
