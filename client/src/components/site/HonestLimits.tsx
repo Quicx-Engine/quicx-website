@@ -40,7 +40,7 @@ export function HonestLimits() {
               <div className="col-start-2 md:col-start-auto md:text-right">
                 {"status" in l && l.status && (
                   <span className="inline-flex items-center gap-2 caps-label text-quicx-orange-bright">
-                    <span aria-hidden className="live-dot size-1.5 rounded-full bg-quicx-orange" />
+                    <span aria-hidden data-loop className="live-dot size-1.5 rounded-full bg-quicx-orange" />
                     {l.status}
                   </span>
                 )}

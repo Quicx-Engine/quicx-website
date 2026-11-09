@@ -80,7 +80,7 @@ export function ArchitectureFlow() {
               <div className="flex items-center gap-3 rounded-[3px] border border-quicx-line-strong bg-quicx-bg-2 px-3 py-2 text-[14px] text-quicx-text">
                 <span
                   aria-hidden
-                  className="flow-dot size-1.5 shrink-0 bg-quicx-orange"
+                  data-loop className="flow-dot size-1.5 shrink-0 bg-quicx-orange"
                   style={{ "--i": i } as React.CSSProperties}
                 />
                 {step}

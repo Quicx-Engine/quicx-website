@@ -71,7 +71,7 @@ export function InstallCommand({
       >
         {copied ? (
           <>
-            <Check aria-hidden className={emphasis ? "size-3.5" : "size-3.5 text-quicx-orange-bright"} />
+            <Check aria-hidden className={emphasis ? "copy-check size-3.5" : "copy-check size-3.5 text-quicx-orange-bright"} />
             Copied
           </>
         ) : (

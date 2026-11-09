@@ -97,7 +97,7 @@ export function MeasuredResults() {
             </p>
             <div className="mt-auto pt-8">
               <p className="text-[13px] text-quicx-dim">One task, five protocol messages:</p>
-              <ol className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1.5 font-mono text-[12.5px]">
+              <ol data-loop className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1.5 font-mono text-[12.5px]">
                 {LIFECYCLE.map((step, i) => (
                   <li
                     key={step}

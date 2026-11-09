@@ -31,7 +31,7 @@ export default function CopyButton({ code }: { code: string }) {
     >
       {copied ? (
         <>
-          <Check aria-hidden className="size-3.5 text-quicx-orange-bright" />
+          <Check aria-hidden className="copy-check size-3.5 text-quicx-orange-bright" />
           Copied
         </>
       ) : (

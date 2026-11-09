@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Docs pages cross-fade into each other (React <ViewTransition>, see
+  // app/docs/[slug]/page.tsx). Browsers without the API just swap instantly.
+  experimental: {
+    viewTransition: true,
+  },
   async headers() {
     return [
       {

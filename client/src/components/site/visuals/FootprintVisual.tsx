@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { CURRENT_VERSION } from "@/lib/version";
 import { FOOTPRINT, MEMORY_RUN } from "@/lib/benchmarks";
 import { cn } from "@/lib/utils";
@@ -12,43 +11,29 @@ import { Panel } from "./Panel";
  * the queue full, and after the burst drained (median of 3 runs, macOS
  * phys_footprint). The line only joins those samples; v1.0.4, sampled the same
  * way, held 9,200 KB at all three. The sweep replays the run from left to right.
+ *
+ * The replay is pure CSS (see .footprint-sweep in globals.css): the line is
+ * uncovered by one clip-path animation and each sample appears as the sweep
+ * reaches it, so React renders the chart once instead of once per frame.
  */
 const STAGES = [
   { label: "idle", kb: 1056 },
   { label: "queue full", kb: 9088 },
-  { label: "after the burst", kb: 2080 },
+  { label: "after the burst", short: "drained", kb: 2080 },
 ] as const;
 const V104_KB = 9200;
 const AXIS_KB = 10 * 1024;
 const PEAK_PCT = MEMORY_RUN.poolPeakPct;
+const SWEEP_DELAY_MS = 450;
 const SWEEP_MS = 2600;
+// The sweep eases in and out symmetrically, so it passes the middle sample at
+// exactly half its duration: the samples land at 0, ½ and 1 of SWEEP_MS.
+const reachedAt = (i: number) => SWEEP_DELAY_MS + (i / (STAGES.length - 1)) * SWEEP_MS;
 const xAt = (i: number) => (i / (STAGES.length - 1)) * 100;
 const yAt = (kb: number) => (1 - kb / AXIS_KB) * 100;
 
-const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-
 export function FootprintVisual({ active }: { active: boolean }) {
   const reveal = useStageReveal(active);
-  // Progress through the run, 0 → 1.
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    if (reveal !== "run") return;
-    let raf = 0;
-    const t0 = performance.now() + 450;
-    const tick = (now: number) => {
-      const t = Math.min(1, Math.max(0, (now - t0) / SWEEP_MS));
-      setProgress(easeInOut(t));
-      if (t < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(raf);
-      setProgress(0);
-    };
-  }, [reveal]);
-
-  const p = reveal === "static" ? 1 : progress;
 
   return (
     <div
@@ -114,10 +99,10 @@ export function FootprintVisual({ active }: { active: boolean }) {
 
               {/* v2: the three samples, joined; the sweep reveals them left to right */}
               <svg
-                className="absolute inset-0 h-full w-full overflow-visible"
+                className="footprint-sweep absolute inset-0 h-full w-full overflow-visible"
                 viewBox="0 0 100 100"
                 preserveAspectRatio="none"
-                style={{ clipPath: `inset(-10% ${(1 - p) * 100}% -10% -2%)` }}
+                style={{ "--d": `${SWEEP_DELAY_MS}ms`, "--dur": `${SWEEP_MS}ms` } as React.CSSProperties}
               >
                 <polyline
                   points={STAGES.map((st, i) => `${xAt(i)},${yAt(st.kb)}`).join(" ")}
@@ -132,43 +117,39 @@ export function FootprintVisual({ active }: { active: boolean }) {
                 <span
                   key={st.label}
                   className={cn(
-                    "absolute size-2.5 -translate-x-1/2 -translate-y-1/2 border-2 border-quicx-orange transition-[opacity,transform] duration-300",
-                    i === STAGES.length - 1 ? "bg-quicx-orange" : "bg-quicx-well",
-                    p >= i / (STAGES.length - 1) - 0.001 ? "scale-100 opacity-100" : "scale-0 opacity-0"
+                    "footprint-point absolute size-2.5 -translate-x-1/2 -translate-y-1/2 border-2 border-quicx-orange",
+                    i === STAGES.length - 1 ? "bg-quicx-orange" : "bg-quicx-well"
                   )}
-                  style={{ left: `${xAt(i)}%`, top: `${yAt(st.kb)}%` }}
+                  style={{ left: `${xAt(i)}%`, top: `${yAt(st.kb)}%`, "--d": `${reachedAt(i)}ms` } as React.CSSProperties}
                 />
-              ))}
-              {STAGES.map((st, i) => (
-                <span
-                  key={`${st.label}-v`}
-                  className={cn(
-                    "absolute whitespace-nowrap font-mono text-[11px] text-quicx-text transition-opacity duration-500",
-                    i === 0 ? "left-2" : i === STAGES.length - 1 ? "right-2 text-right" : "-translate-x-1/2",
-                    i === 1 ? "translate-y-3" : "-translate-y-[calc(100%+10px)]",
-                    p >= i / (STAGES.length - 1) - 0.001 ? "opacity-100" : "opacity-0"
-                  )}
-                  style={{ top: `${yAt(st.kb)}%`, ...(i === 1 ? { left: `${xAt(i)}%` } : {}) }}
-                >
-                  {st.kb.toLocaleString("en-US")} KB
-                </span>
               ))}
             </div>
 
-            {/* x axis */}
+            {/* x axis: each sample's name, and its reading once the line gets there */}
             <span />
-            <div className="relative h-5 font-mono text-[11px] text-quicx-dim">
+            <div className="grid grid-cols-3 gap-2 pt-1.5 font-mono text-[11px] leading-tight">
               {STAGES.map((st, i) => (
-                <span
+                <div
                   key={st.label}
-                  className={cn(
-                    "absolute top-1.5 whitespace-nowrap",
-                    i === 0 ? "left-0" : i === STAGES.length - 1 ? "right-0" : "-translate-x-1/2"
-                  )}
-                  style={i === 1 ? { left: `${xAt(i)}%` } : undefined}
+                  className={cn("min-w-0", i === 1 && "text-center", i === STAGES.length - 1 && "text-right")}
                 >
-                  {st.label}
-                </span>
+                  <div className="text-quicx-dim">
+                    {"short" in st ? (
+                      <>
+                        <span className="sm:hidden">{st.short}</span>
+                        <span className="hidden sm:inline">{st.label}</span>
+                      </>
+                    ) : (
+                      st.label
+                    )}
+                  </div>
+                  <div
+                    className="reveal-fade mt-1 tabular-nums text-quicx-text"
+                    style={{ "--d": `${reachedAt(i) + 80}ms` } as React.CSSProperties}
+                  >
+                    {st.kb.toLocaleString("en-US")} KB
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -177,7 +158,7 @@ export function FootprintVisual({ active }: { active: boolean }) {
         <div className="mt-4 font-mono text-[12px]">
           <div className="flex justify-between gap-3">
             <span className="text-quicx-dim">peak use of the {MEMORY_RUN.poolSize} pool, under load</span>
-            <span className="text-quicx-orange-bright">{PEAK_PCT} %</span>
+            <span className="shrink-0 whitespace-nowrap text-quicx-orange-bright">{PEAK_PCT} %</span>
           </div>
           <div aria-hidden className="relative mt-1.5 h-2 bg-white/[0.05]">
             <span

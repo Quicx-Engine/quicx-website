@@ -752,7 +752,7 @@ export function PoolInstrument() {
           </span>
         </div>
         <span className="flex items-center gap-2 font-mono text-[12px] text-quicx-dim">
-          <span aria-hidden className="live-dot size-1.5 rounded-full bg-quicx-orange" />
+          <span aria-hidden data-loop className="live-dot size-1.5 rounded-full bg-quicx-orange" />
           6 of 68 sizes, illustrated
         </span>
       </div>

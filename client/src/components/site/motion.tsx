@@ -149,3 +149,43 @@ export function Odometer({
     </span>
   );
 }
+
+/**
+ * Pauses every decorative loop (`data-loop`) while it is off screen, so a
+ * blinking caret or a pulsing status dot costs nothing once scrolled past.
+ * Mounted once in the root layout; picks up loops that mount later too.
+ */
+export function MotionGovernor() {
+  useEffect(() => {
+    if (!("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) e.target.toggleAttribute("data-paused", !e.isIntersecting);
+      },
+      { rootMargin: "64px 0px" }
+    );
+    const seen = new WeakSet<Element>();
+    const watch = (el: Element) => {
+      if (seen.has(el)) return;
+      seen.add(el);
+      io.observe(el);
+    };
+    const scan = (root: Element | Document) => {
+      if (root instanceof Element && root.hasAttribute("data-loop")) watch(root);
+      root.querySelectorAll("[data-loop]").forEach(watch);
+    };
+    scan(document);
+    const mo = new MutationObserver((records) => {
+      for (const r of records)
+        r.addedNodes.forEach((n) => {
+          if (n.nodeType === Node.ELEMENT_NODE) scan(n as Element);
+        });
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+    return () => {
+      io.disconnect();
+      mo.disconnect();
+    };
+  }, []);
+  return null;
+}

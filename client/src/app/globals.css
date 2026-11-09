@@ -484,6 +484,113 @@
   animation-delay: calc(var(--i) * 1s + 0.5s);
 }
 
+/* Footprint stage: the measured line is uncovered left to right, and each
+   sample pops in as the sweep reaches it. The sweep's ease is symmetric, so
+   the middle sample is reached at exactly half the duration. */
+@keyframes footprint-sweep {
+  from {
+    clip-path: inset(-10% 100% -10% -2%);
+  }
+  to {
+    clip-path: inset(-10% 0% -10% -2%);
+  }
+}
+
+@keyframes point-in {
+  from {
+    opacity: 0;
+    scale: 0;
+  }
+}
+
+[data-reveal="armed"] .footprint-sweep {
+  clip-path: inset(-10% 100% -10% -2%);
+}
+
+[data-reveal="run"] .footprint-sweep {
+  animation: footprint-sweep var(--dur, 2600ms) cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+[data-reveal="armed"] .footprint-point {
+  opacity: 0;
+  scale: 0;
+}
+
+[data-reveal="run"] .footprint-point {
+  animation: point-in 320ms var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+
+/* Configuration stage: the arriving size's pages fill the fixed pool from the
+   left and drain from the left as well, oldest first, like the FIFO they hold.
+   clip-path only: nothing is laid out, the block texture never stretches. */
+.config-fill {
+  clip-path: inset(0 100% 0 0);
+}
+
+.config-fill[data-step="fill"] {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path var(--fill-ms, 1100ms) var(--ease-out);
+}
+
+.config-fill[data-step="drain"] {
+  clip-path: inset(0 0 0 100%);
+  transition: clip-path var(--drain-ms, 420ms) cubic-bezier(0.5, 0, 0.75, 0);
+}
+
+/* Docs navigation (React <ViewTransition>): the old article leaves quickly, the
+   new one settles in a beat later. Opacity and a 6px rise only, no slide: the
+   reader stays in the same place. */
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-rise-in {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+::view-transition-old(.docs-out) {
+  animation: vt-fade-out 120ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(.docs-in) {
+  animation: vt-rise-in 240ms cubic-bezier(0.16, 1, 0.3, 1) 70ms both;
+}
+
+/* Docs tabs and "On this page": one indicator slides to the new position.
+   Both are 1px elements scaled to size, so the move is a transform. */
+.tab-indicator {
+  transition: transform 260ms var(--ease-out);
+}
+
+.toc-marker {
+  transition: transform 240ms var(--ease-out);
+}
+
+@keyframes tab-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+.tab-panel-in {
+  animation: tab-panel-in 220ms var(--ease-out) both;
+}
+
+/* Copy confirmed: the check draws itself once (lucide's check is ~24 units). */
+.copy-check path,
+.copy-check polyline {
+  stroke-dasharray: 24;
+  animation: draw 320ms var(--ease-out) both;
+}
+
 /* Stage swap in the principles index: the incoming visual is scanned in from
    the top behind a single orange line, like an instrument redrawing. */
 @keyframes stage-scan {
@@ -497,14 +604,14 @@
 
 @keyframes stage-scanline {
   0% {
-    top: 0;
+    transform: translateY(0);
     opacity: 1;
   }
   80% {
     opacity: 1;
   }
   100% {
-    top: 100%;
+    transform: translateY(100%);
     opacity: 0;
   }
 }
@@ -513,15 +620,23 @@
   animation: stage-scan 640ms var(--ease-out) both;
 }
 
+/* A full-height layer that moves by transform, carrying the 1px line on its
+   top edge, so the scan never lays anything out. */
 .stage-scanline {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  animation: stage-scanline 640ms var(--ease-out) both;
+}
+
+.stage-scanline::before {
+  content: "";
   position: absolute;
   inset-inline: 0;
   top: 0;
-  z-index: 2;
   height: 1px;
   background: var(--quicx-orange);
-  pointer-events: none;
-  animation: stage-scanline 640ms var(--ease-out) both;
 }
 
 .stage-notes {
@@ -783,7 +898,20 @@
   transition: transform 140ms linear;
 }
 
+/* Decorative loops stop while off screen (MotionGovernor sets data-paused). */
+[data-loop][data-paused],
+[data-loop][data-paused] * {
+  animation-play-state: paused !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .config-fill,
+  .tab-indicator,
+  .toc-marker {
+    transition: none !important;
+  }
+  .tab-panel-in,
+  .copy-check path,
   .path-flow,
   .node-pulse,
   .caret-blink,
@@ -804,6 +932,8 @@
   [data-reveal] .odo-col,
   [data-reveal] .grow-x,
   [data-reveal] .reveal-fade,
+  [data-reveal] .footprint-sweep,
+  [data-reveal] .footprint-point,
   [data-reveal] .lifecycle-step,
   [data-reveal] .lifecycle-arrow {
     animation: none !important;
@@ -823,6 +953,11 @@
   }
   html {
     scroll-behavior: auto;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
 

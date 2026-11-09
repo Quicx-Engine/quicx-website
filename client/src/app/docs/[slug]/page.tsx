@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ViewTransition } from "react";
 import { notFound } from "next/navigation";
 import {
   sectionComponents,
@@ -110,7 +111,11 @@ export default async function DocsSectionPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(techArticleJsonLd) }}
       />
-      <Section />
+      {/* Same place, different content: the article cross-fades on navigation
+          while the sidebar and header stay put. */}
+      <ViewTransition key={slug} enter="docs-in" exit="docs-out" default="none">
+        <Section />
+      </ViewTransition>
     </>
   );
 }

@@ -65,7 +65,7 @@ export function Interactive404() {
                   {!answered && (
                     <span
                       aria-hidden
-                      className="caret-blink ml-px inline-block h-[1.1em] w-[0.55em] translate-y-[3px] bg-quicx-orange"
+                      data-loop className="caret-blink ml-px inline-block h-[1.1em] w-[0.55em] translate-y-[3px] bg-quicx-orange"
                     />
                   )}
                 </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useId, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export type Tab = {
@@ -22,6 +22,21 @@ export function Tabs({
   const active = tabs.find((t) => t.id === activeId) ?? tabs[0];
   const base = useId();
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  // The orange underline is one element that slides to the selected tab, so the
+  // eye follows the change instead of seeing one line vanish and another appear.
+  const [bar, setBar] = useState<{ x: number; w: number } | null>(null);
+  const activeIndex = Math.max(0, tabs.findIndex((t) => t.id === active.id));
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      const el = refs.current[activeIndex];
+      if (el) setBar({ x: el.offsetLeft, w: el.offsetWidth });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    refs.current.forEach((el) => el && ro.observe(el));
+    return () => ro.disconnect();
+  }, [activeIndex, tabs.length]);
 
   const move = (from: number, delta: number) => {
     const next = (from + delta + tabs.length) % tabs.length;
@@ -31,7 +46,7 @@ export function Tabs({
 
   return (
     <div className={className}>
-      <div role="tablist" className="flex items-center gap-5 border-b border-quicx-line">
+      <div role="tablist" className="relative flex items-center gap-5 border-b border-quicx-line">
         {tabs.map((t, i) => {
           const isActive = t.id === active.id;
           return (
@@ -52,9 +67,11 @@ export function Tabs({
                 if (e.key === "ArrowLeft") move(i, -1);
               }}
               className={cn(
-                "relative -mb-px border-b-2 pb-2.5 pt-1 text-[14px] font-medium transition-colors",
+                "relative -mb-px border-b-2 pb-2.5 pt-1 text-[14px] font-medium transition-colors duration-200",
                 isActive
-                  ? "border-quicx-orange text-quicx-text"
+                  ? bar
+                    ? "border-transparent text-quicx-text"
+                    : "border-quicx-orange text-quicx-text"
                   : "border-transparent text-quicx-dim hover:text-quicx-body"
               )}
             >
@@ -62,6 +79,13 @@ export function Tabs({
             </button>
           );
         })}
+        {bar && (
+          <span
+            aria-hidden
+            className="tab-indicator pointer-events-none absolute -bottom-px left-0 h-0.5 w-px origin-left bg-quicx-orange"
+            style={{ transform: `translateX(${bar.x}px) scaleX(${bar.w})` }}
+          />
+        )}
       </div>
       <div
         id={`${base}-panel`}
@@ -69,7 +93,9 @@ export function Tabs({
         aria-labelledby={`${base}-tab-${active.id}`}
         className="pt-4"
       >
-        {active.content}
+        <div key={active.id} className="tab-panel-in">
+          {active.content}
+        </div>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { CURRENT_VERSION } from "@/lib/version";
 import { SITE_URL, baseOpenGraph } from "@/lib/seo";
 import { Archivo, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { MotionGovernor } from "@/components/site/motion";
 import "./globals.css";
 
 // One family across three widths: the wdth axis carries the condensed display
@@ -166,6 +167,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-quicx-bg text-quicx-text">
         {children}
+        <MotionGovernor />
         <Analytics />
       </body>
     </html>
