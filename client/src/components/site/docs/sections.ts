@@ -64,7 +64,7 @@ export const nav: DocsNavGroup[] = [
       },
       {
         id: "binary-protocol",
-        label: "Binary Protocol",
+        label: "QXP Protocol",
         toc: [
           { id: "protocol-frame-header", label: "Frame header" },
           { id: "protocol-message-types", label: "Message types" },

@@ -26,7 +26,7 @@ export function ArchitectureSection() {
         <p>
           Quicx is deliberately flat. A single <strong>daemon</strong>{" "}process owns the task
           queue, the worker pool and the <Link href="/docs/allocator">apool allocator</Link>. Producers and workers are plain TCP
-          clients that speak the same binary protocol — the first frame they send tells the
+          clients that speak the same protocol, QXP — the first frame they send tells the
           daemon which role they&rsquo;re playing.
         </p>
         <p>There are four message paths, one in each direction across the two hops in the diagram:</p>

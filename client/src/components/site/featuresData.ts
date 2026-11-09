@@ -127,12 +127,12 @@ export const features: Feature[] = [
   },
   {
     id: "protocol",
-    title: "Tight binary protocol.",
+    title: "QXP, a tight binary protocol.",
     modalTitle: "A binary wire, designed for the hot path",
     shortSummary:
-      "Quicx speaks its own compact binary protocol — opcodes, lengths, and payloads moving at line rate. No JSON, no bloat.",
+      "Quicx speaks QXP, the Quicx Protocol: its own compact binary protocol — opcodes, lengths, and payloads moving at line rate. No JSON, no bloat.",
     description:
-      "The Quicx protocol is a fixed-layout binary wire format: a 6-byte header — version (1B), type (1B), length (4B) — followed by a payload of up to 1,024 bytes that lands in the one allocator block holding its task. Producers, daemon, and workers all speak it directly.",
+      "QXP, the Quicx Protocol, is a fixed-layout binary wire format designed for Quicx: a 6-byte header — version (1B), type (1B), length (4B) — followed by a payload of up to 1,024 bytes that lands in the one allocator block holding its task. Producers, daemon, and workers all speak it directly.",
     bullets: [
       "6-byte header: version (1B), type (1B), length (4B)",
       "Variable-length payload, read straight into the task's block",

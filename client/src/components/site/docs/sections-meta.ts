@@ -71,9 +71,9 @@ export const sectionMeta: Record<string, SectionMeta> = {
   "binary-protocol": {
     num: "§ 02.03",
     kicker: "Core Concepts",
-    title: "Binary Protocol",
-    lede: "Every frame on the wire is a 6-byte header followed by a variable-length payload. No framing ambiguity, no partial reads, no text encoding — parsing is a couple of pointer reads.",
-    description: "Every Quicx frame is a 6-byte header plus a variable-length payload. No framing ambiguity, no partial reads, no text encoding — just pointer reads.",
+    title: "QXP Protocol",
+    lede: "QXP, the Quicx Protocol, is the wire format designed for Quicx. Every frame is a 6-byte header followed by a variable-length payload. No framing ambiguity, no partial reads, no text encoding — parsing is a couple of pointer reads.",
+    description: "QXP, the Quicx Protocol: every frame is a 6-byte header plus a variable-length payload. No framing ambiguity, no text encoding, just pointer reads.",
     updated: "2026-11-09",
     toc: [
       { id: "protocol-participants", label: "Participants & transport" },

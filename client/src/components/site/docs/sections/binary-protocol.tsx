@@ -148,12 +148,21 @@ export function BinaryProtocolSection() {
     <section className="space-y-8">
       <SectionHeaderFor slug="binary-protocol" />
 
+      <Prose>
+        <p>
+          <strong>QXP</strong> (the Quicx Protocol) is Quicx&rsquo;s own protocol, designed by
+          Dimitar Anastasov for Quicx. Producers, workers and the <InlineCode>quicx</InlineCode>{" "}
+          CLI all speak it; the Java client is one implementation of it, and this page is enough
+          to write another in any language.
+        </p>
+      </Prose>
+
       <SubHeading id="protocol-participants">Participants &amp; transport</SubHeading>
 
       <Prose>
         <p>
           Producer and Worker both connect to the <strong>same TCP port</strong> (
-          <InlineCode>server_start</InlineCode>, <InlineCode>server.c:233</InlineCode>). There is
+          <InlineCode>server_start</InlineCode>, <InlineCode>server.c:265</InlineCode>). There is
           no separate producer port or worker port — a connection starts as{" "}
           <InlineCode>CONN_UNKNOWN</InlineCode> and only becomes{" "}
           <InlineCode>CONN_PRODUCER</InlineCode> or <InlineCode>CONN_WORKER</InlineCode> once the

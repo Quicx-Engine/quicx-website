@@ -40,7 +40,7 @@ export function Architecture() {
           </div>
           <figcaption className="grid grid-cols-1 gap-x-10 gap-y-4 border-t border-quicx-line px-4 py-5 sm:px-6 lg:grid-cols-12 lg:items-end">
             <p className="max-w-[72ch] text-[15px] leading-[1.65] text-quicx-muted lg:col-span-9">
-              Producers submit tasks over a compact binary protocol. The daemon routes, queues and
+              Producers submit tasks over QXP, Quicx&rsquo;s own compact binary protocol. The daemon routes, queues and
               dispatches them to a fixed pool of workers. Every task on that path is one block from{" "}
               <code className="font-mono text-[14px] text-quicx-orange-bright">apool</code>, its
               page allocator, inside one fixed budget. One daemon, three role-based endpoints, one

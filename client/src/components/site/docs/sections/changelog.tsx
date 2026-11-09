@@ -80,7 +80,7 @@ export function ChangelogSection() {
               "One block per task: the payload sits right behind the 64 B Task record, so a task is one allocation and one free, and a SUBMIT that does not fit is refused in one place.",
               "⚠️ quicx.conf has [memory] and [allocator] sections and is validated strictly: an unknown key or a bad value stops the daemon with the file and line. Old files still load; their class lines are ignored with a note.",
               "--port on the command line now wins over the config file, and the start lines reach a log file.",
-              "The wire protocol is unchanged: 1.x clients and workers work with 2.0.",
+              "The wire protocol now has a name: QXP, the Quicx Protocol. Its format is unchanged, so 1.x clients and workers work with 2.0.",
             ]}
           />
           <Release

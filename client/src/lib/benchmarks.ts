@@ -144,7 +144,7 @@ export const LIMITATIONS = [
   },
   {
     title: "Client libraries beyond Java",
-    body: "dev.quicx:quicx-client is the only one. Every other language talks the wire protocol directly — it is documented and small.",
+    body: "dev.quicx:quicx-client is the only one. Every other language talks QXP, the Quicx Protocol, directly — it is documented and small.",
   },
   {
     title: "Payloads above 1 KB",

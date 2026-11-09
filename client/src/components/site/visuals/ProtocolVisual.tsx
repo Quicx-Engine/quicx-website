@@ -6,7 +6,7 @@ import { useStageReveal } from "../motion";
 import { Panel } from "./Panel";
 
 /**
- * One task, traced across the wire exactly as the Binary Protocol page lays it
+ * One task, traced across the wire exactly as the QXP Protocol page lays it
  * out: submit, ack, ready, dispatch, done, and done forwarded to the producer
  * (since v1.0.3). The frame panel shows the real bytes of each message for a
  * `send_email` task with id 0x0A42.

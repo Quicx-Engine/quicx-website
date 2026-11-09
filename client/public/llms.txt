@@ -2,7 +2,7 @@
 
 > Quicx is a deterministic-memory task queue daemon written in C. You give it a memory budget at startup; it never uses more, reports precisely what it is using, and gives back what a burst used once the queue drains.
 
-Quicx runs a single-threaded event loop (epoll/kqueue) on top of apool, an adaptive page allocator: the budget is mapped once, and 16 KiB pages go to whichever block sizes the traffic sends and come back when they empty. A task is one block — a 64-byte record with its payload behind it. It speaks a compact binary protocol (6-byte header, 12 message types). Written in C, with a Java client library (QuicxClient, QuicxWorker). Current version: 2.0.0.
+Quicx runs a single-threaded event loop (epoll/kqueue) on top of apool, an adaptive page allocator: the budget is mapped once, and 16 KiB pages go to whichever block sizes the traffic sends and come back when they empty. A task is one block — a 64-byte record with its payload behind it. It speaks QXP, the Quicx Protocol, its own compact binary protocol (6-byte header, 12 message types). Written in C, with a Java client library (QuicxClient, QuicxWorker). Current version: 2.0.0.
 
 ## Measured performance (Quicx 2.0.0)
 
@@ -23,6 +23,7 @@ Quicx is a fast in-memory broker, not a durable one. No persistence (a restart l
 ## Docs
 - [Documentation](https://quicx.dev/docs/installation): Full docs — architecture, configuration, CLI reference, Java client
 - [Allocator](https://quicx.dev/docs/allocator): apool v2, its features from the allocator literature, and their measured effect
+- [QXP Protocol](https://quicx.dev/docs/binary-protocol): QXP, the Quicx Protocol: frame header, message types, payload formats
 - [Benchmarks](https://quicx.dev/docs/benchmarks): Measured results on two machines, methodology, and comparison provenance
 - [Limitations](https://quicx.dev/docs/limitations): What Quicx does not do, and feature-for-feature comparison
 - [Changelog](https://quicx.dev/docs/changelog): What changed in 2.0.0

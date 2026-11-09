@@ -69,7 +69,7 @@ quicx cli socket: /tmp/quicx.sock`}
             <p>
               The client lives on Maven Central under{" "}
               <InlineCode>dev.quicx:quicx-client</InlineCode>. It&rsquo;s a tiny jar (no
-              transitive dependencies) that speaks the Quicx binary protocol directly.
+              transitive dependencies) that speaks QXP, the Quicx Protocol, directly.
             </p>
           </Prose>
           <Tabs
