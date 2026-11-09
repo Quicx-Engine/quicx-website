@@ -1,3 +1,4 @@
+import { TriangleAlert } from "lucide-react";
 import { Callout } from "@/components/site/docs/Callout";
 import { DocsPageFooterCta } from "@/components/site/docs/DocsPageFooterCta";
 import {
@@ -17,25 +18,44 @@ function Release({
   highlights: string[];
 }) {
   return (
-    <li className="rounded-lg border border-quicx-line bg-[#0a1a22] p-5">
-      <div className="flex flex-wrap items-baseline gap-3">
-        <span className="font-[family-name:var(--font-jetbrains-mono)] text-[18px] font-semibold text-quicx-text">
+    <li className="grid grid-cols-1 gap-x-8 gap-y-4 border-t border-quicx-line pt-7 first:border-t-0 first:pt-0 md:grid-cols-[9rem_minmax(0,1fr)]">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 md:flex-col md:gap-1.5">
+        <span className="font-mono text-[20px] font-medium tracking-[-0.02em] text-quicx-text">
           {version}
         </span>
-        <span className="font-[family-name:var(--font-jetbrains-mono)] text-[12px] text-quicx-dim">
+        <time dateTime={date} className="font-mono text-[12.5px] text-quicx-dim">
           {date}
-        </span>
-        <span className="rounded border border-quicx-orange/40 bg-quicx-orange/10 px-2 py-0.5 font-[family-name:var(--font-barlow-condensed)] text-[10.5px] uppercase tracking-[0.26em] text-quicx-orange-bright">
+        </time>
+        <span
+          className={
+            status === "Current"
+              ? "mt-1 inline-flex w-fit items-center gap-1.5 caps-label text-quicx-orange-bright"
+              : "mt-1 inline-flex w-fit caps-label text-quicx-dim"
+          }
+        >
+          {status === "Current" && <span aria-hidden className="size-1.5 rounded-full bg-quicx-orange" />}
           {status}
         </span>
       </div>
-      <ul className="mt-4 space-y-2 text-[13.5px] text-quicx-muted">
-        {highlights.map((h, i) => (
-          <li key={i} className="flex gap-3">
-            <span aria-hidden className="mt-[9px] size-1.5 shrink-0 rotate-45 bg-quicx-orange" />
-            <span>{h}</span>
-          </li>
-        ))}
+      <ul className="space-y-3 text-[15px] leading-[1.7] text-quicx-body">
+        {highlights.map((h, i) => {
+          // Breaking changes are flagged in the source text with a warning sign;
+          // draw it as an icon rather than an emoji.
+          const breaking = h.startsWith("⚠️");
+          const text = breaking ? h.replace(/^⚠️\s*/, "") : h;
+          return (
+            <li key={i} className="flex gap-3">
+              <span className="flex h-[1.7em] w-4 shrink-0 items-center justify-center">
+                {breaking ? (
+                  <TriangleAlert aria-label="Breaking change" className="size-4 text-[#f0c66b]" />
+                ) : (
+                  <span aria-hidden className="size-1.5 bg-quicx-orange/80" />
+                )}
+              </span>
+              <span>{text}</span>
+            </li>
+          );
+        })}
       </ul>
     </li>
   );
@@ -47,11 +67,37 @@ export function ChangelogSection() {
       <section className="space-y-8">
         <SectionHeaderFor slug="changelog" />
 
-        <ul className="space-y-6">
+        <ul className="space-y-10">
+          <Release
+            version="v2.0.0"
+            date="2026-11-09"
+            status="Current"
+            highlights={[
+              "New allocator, apool v2. 16 KiB pages go to the block sizes that are actually arriving and come back when they empty, instead of a split fixed at startup. The default 8 MiB now holds 46,593 tasks of 100 B instead of 655 and 30,947 nginx log lines instead of 1,433, measured the same on macOS and Linux.",
+              "Memory goes back to the OS after a burst: about 2 MB held once the queue drains, where 1.0.4 held the whole 9 MB from startup. Throughput and latency are unchanged.",
+              "Each allocator idea from the literature has its own switch — reserve, hardening, purge, fullest-first — measured one by one; see the apool v2 Allocator page.",
+              "Fixed: in 1.0.4 a queue full of 16 B or 32 B tasks could lock out every new worker until a restart, because connections, workers and tasks shared size classes. Connections and workers now have their own pool.",
+              "One block per task: the payload sits right behind the 64 B Task record, so a task is one allocation and one free, and a SUBMIT that does not fit is refused in one place.",
+              "⚠️ quicx.conf has [memory] and [allocator] sections and is validated strictly: an unknown key or a bad value stops the daemon with the file and line. Old files still load; their class lines are ignored with a note.",
+              "--port on the command line now wins over the config file, and the start lines reach a log file.",
+              "The wire protocol is unchanged: 1.x clients and workers work with 2.0.",
+            ]}
+          />
+          <Release
+            version="v1.0.4"
+            date="2026-11-05"
+            status="Stable"
+            highlights={[
+              "Fixed: tasks with a payload were never delivered in v1.0.3. The frame writer had room for three pieces while TASK and SUBMIT send four, so the payload was dropped (release binaries) or the daemon aborted (clang -O2). Every payload task is delivered again, and a wire-level test now checks the exact bytes sent.",
+              "Fixed: a client could crash the daemon by sending DONE without READY on a connection whose memory had last held a payload. New connections are now zeroed before use.",
+              "Fixed: when a payload does not fit in the pool, its bytes are read off the socket before the error reply. Previously the next message on that connection was misread and answered with \"bad version\".",
+              "Fixed: when the Task record does not fit after its payload did, the payload is freed instead of leaked.",
+            ]}
+          />
           <Release
             version="v1.0.3"
             date="2026-08-01"
-            status="Current"
+            status="Stable"
             highlights={[
               "⚠️ Breaking: max payload cut from 1 MiB to 1024 bytes (PROTOCOL_MAX_PAYLOAD). It now matches the allocator's largest size class, so every accepted payload fits in exactly one PMAD block — oversized frames get a clean MSG_ERROR instead of being truncated.",
               "Producers are now told when their task completes. MSG_DONE used to only update the daemon's internal state, leaving the producer with silence; it's now forwarded to the producer the same way MSG_FAILED always was.",

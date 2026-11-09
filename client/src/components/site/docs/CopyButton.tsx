@@ -1,38 +1,45 @@
-"use client"
+"use client";
 
 import { Check, Copy } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function CopyButton({ code }: { code: string }) {
-    const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const onCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(code);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 1400);
-        } catch {
-        // ignore — clipboard access may be denied in sandboxes
-        }
-    };
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
 
-    return (
-        <button
-            onClick={onCopy}
-            className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.03] px-2 py-1 font-[family-name:var(--font-jetbrains-mono)] text-[10.5px] uppercase tracking-wider text-quicx-dim transition hover:border-quicx-orange/40 hover:text-quicx-orange-bright"
-            aria-label="Copy code"
-        >
-            {copied ? (
-                <>
-                    <Check className="size-3 text-quicx-orange-bright" />
-                    copied
-                </>
-            ) : (
-                <>
-                    <Copy className="size-3" />
-                    copy
-                </>
-            )}
-        </button>
-    )
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      if (timer.current) clearTimeout(timer.current);
+      timer.current = setTimeout(() => setCopied(false), 1400);
+    } catch {
+      // ignore — clipboard access may be denied in sandboxes
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={onCopy}
+      className="inline-flex h-7 items-center gap-1.5 rounded-[2px] px-2.5 font-control text-[11.5px] text-quicx-dim transition-colors hover:bg-white/[0.05] hover:text-quicx-text"
+      aria-label={copied ? "Copied" : "Copy code"}
+    >
+      {copied ? (
+        <>
+          <Check aria-hidden className="size-3.5 text-quicx-orange-bright" />
+          Copied
+        </>
+      ) : (
+        <>
+          <Copy aria-hidden className="size-3.5" />
+          Copy
+        </>
+      )}
+    </button>
+  );
 }

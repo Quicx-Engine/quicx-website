@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { CURRENT_VERSION } from "@/lib/version";
 import { CodeBlock } from "@/components/site/docs/CodeBlock";
 import { Callout } from "@/components/site/docs/Callout";
@@ -19,17 +20,13 @@ function Step({
   children: React.ReactNode;
 }) {
   return (
-    <li className="relative grid grid-cols-1 gap-4 md:grid-cols-[96px_1fr] md:gap-6">
-      <div className="flex items-start gap-3 md:flex-col md:items-end md:gap-2">
-        <span className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] uppercase tracking-[0.3em] text-quicx-dim">
-          Step
-        </span>
-        <span className="hero-display text-[28px] leading-none text-quicx-orange">
-          {index}
-        </span>
-      </div>
-      <div className="space-y-4">
-        <h3 className="font-[family-name:var(--font-archivo)] text-[18px] font-semibold text-quicx-text">
+    <li className="grid grid-cols-1 gap-4 border-t border-quicx-line pt-8 first:border-t-0 first:pt-0 md:grid-cols-[4.5rem_minmax(0,1fr)] md:gap-6">
+      <span aria-hidden className="display text-[44px] leading-none text-quicx-orange">
+        {index}
+      </span>
+      <div className="min-w-0 space-y-5">
+        <h3 className="text-[22px] font-semibold leading-tight tracking-[-0.01em] text-quicx-text">
+          <span className="sr-only">Step {index}: </span>
           {title}
         </h3>
         {children}
@@ -43,13 +40,14 @@ export function QuickStartSection() {
     <section className="space-y-8">
       <SectionHeaderFor slug="quick-start" />
 
-      <ol className="space-y-6">
+      <ol className="space-y-10">
         <Step index="01" title="Start the daemon">
           <Prose>
             <p>
-              Quicx needs a configuration file to know which TCP port to bind and how to
-              carve up the PMAD pool. The installer writes a sensible default to{" "}
-              <InlineCode>~/.config/quicx/quicx.conf</InlineCode>.
+              <InlineCode>quicx start</InlineCode> runs with sensible defaults — port 16381 and an
+              8 MiB memory budget — so a config file is optional. To change them, start from the
+              reference file in <Link href="/docs/configuration">Configuration</Link>; this example
+              keeps it at <InlineCode>/etc/quicx/quicx.conf</InlineCode>.
             </p>
           </Prose>
           <CodeBlock
@@ -58,7 +56,9 @@ export function QuickStartSection() {
             language="sh"
             code={`user@host ~ $ quicx start --config /etc/quicx/quicx.conf\nconfig loaded: /etc/quicx/quicx.conf\nquicx v${CURRENT_VERSION} starting
   port:    16381
-  classes: 64 (16B–1024B, 16B steps)
+  pool:    8388608 bytes, 16 KiB pages given to block sizes on demand
+  apool:   reserve, hardening, purge
+  pages:   508 for tasks (63 kept warm, 7 reserved), 3 for connections and workers
 quicx listening on port 16381 [kqueue]
 quicx cli socket: /tmp/quicx.sock`}
           />
@@ -178,9 +178,9 @@ public class EmailWorker {
       <Callout variant="perf" title="What just happened?">
         The producer opened a short-lived TCP connection, framed a{" "}
         <InlineCode>MSG_SUBMIT</InlineCode> with a 6‑byte header and a typed payload, then
-        waited for a 4‑byte <InlineCode>task_id</InlineCode>. The daemon allocated every
-        scratch buffer out of the PMAD pool — no <InlineCode>malloc</InlineCode>, no GC
-        pause — and handed the task to an idle worker. One daemon. No moving parts.
+        waited for a 4‑byte <InlineCode>task_id</InlineCode>. The daemon put the task into
+        one block of its fixed budget — no <InlineCode>malloc</InlineCode>, no GC pause — and
+        handed it to an idle worker. One daemon. No moving parts.
       </Callout>
     </section>
   );

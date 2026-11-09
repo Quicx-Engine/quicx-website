@@ -46,7 +46,7 @@ export function PmadSection() {
         </p>
       </Prose>
 
-      <div className="relative overflow-hidden rounded-2xl border border-quicx-line bg-white p-4 sm:p-6">
+      <div className="relative overflow-hidden rounded-[3px] border border-quicx-line bg-white p-4 sm:p-6">
         <Image
           src="/pmad-architecture.svg"
           alt="PMAD — Pool-based Memory Allocator architecture overview"
@@ -89,7 +89,7 @@ export function PmadSection() {
             def: (
               <>
                 <InlineCode>pmad_alloc</InlineCode> used to return a bare{" "}
-                <InlineCode>void*</InlineCode> — <InlineCode>NULL</InlineCode> meant
+                <InlineCode>void*</InlineCode> — <InlineCode>NULL</InlineCode>{" "}meant
                 &ldquo;something went wrong&rdquo; with no way to tell what. It now returns a{" "}
                 <InlineCode>PmadStatus</InlineCode> with the pointer as an out-param, and five
                 codes distinguish causes: <InlineCode>PMAD_ERR_TOO_MANY_SIZE_CLASSES</InlineCode>,{" "}
@@ -136,7 +136,7 @@ export function PmadSection() {
       />
 
       <Callout variant="note" title="Memory accounting is now real">
-        <InlineCode>pool-&gt;used</InlineCode> used to be initialised to zero and never moved —
+        <InlineCode>pool-&gt;used</InlineCode>{" "}used to be initialised to zero and never moved —
         the number was meaningless. As of v1.0.3 it&rsquo;s maintained on every path: seeded
         with <InlineCode>sizeof(MemoryPool)</InlineCode> plus the size-class array at init, plus
         every <InlineCode>BlockHeader</InlineCode> at split, then adjusted on every alloc and

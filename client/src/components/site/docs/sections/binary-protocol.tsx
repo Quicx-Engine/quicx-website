@@ -11,15 +11,15 @@ import { Callout } from "@/components/site/docs/Callout";
 
 function FrameDiagram() {
   const fields: { label: string; sub: string; color: string; flex: string }[] = [
-    { label: "version", sub: "1 byte", color: "#60a5fa", flex: "0 0 80px" },
-    { label: "type", sub: "1 byte", color: "#FF7A33", flex: "0 0 80px" },
-    { label: "length", sub: "4 bytes", color: "#5eead4", flex: "0 0 140px" },
-    { label: "payload", sub: "length bytes", color: "#a78bfa", flex: "1 1 0%" },
+    { label: "version", sub: "1 byte", color: "var(--quicx-text)", flex: "0 0 80px" },
+    { label: "type", sub: "1 byte", color: "var(--quicx-orange-bright)", flex: "0 0 80px" },
+    { label: "length", sub: "4 bytes", color: "var(--quicx-text)", flex: "0 0 140px" },
+    { label: "payload", sub: "length bytes", color: "var(--quicx-muted)", flex: "1 1 0%" },
   ];
 
   return (
     <div className="overflow-x-auto">
-      <div className="min-w-[420px] overflow-hidden rounded-lg border border-quicx-line bg-[#0a1a22]">
+      <div className="min-w-[420px] overflow-hidden rounded-[3px] border border-quicx-line-strong bg-quicx-well">
         <div
           className="flex"
           role="img"
@@ -32,16 +32,16 @@ function FrameDiagram() {
               style={{ flex: f.flex }}
             >
               <span
-                className="font-[family-name:var(--font-jetbrains-mono)] text-[13px] font-semibold"
+                className="font-mono text-[13px] font-semibold"
                 style={{ color: f.color }}
               >
                 {f.label}
               </span>
-              <span className="text-[10.5px] tracking-wider text-quicx-dim">{f.sub}</span>
+              <span className="font-mono text-[11px] text-quicx-dim">{f.sub}</span>
             </div>
           ))}
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-quicx-line bg-white/[0.02] px-4 py-2.5 font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-quicx-dim">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-quicx-line bg-white/[0.02] px-4 py-2.5 font-mono text-[11px] text-quicx-dim">
           <span>
             total header = <span className="text-quicx-muted">6 bytes fixed</span>
           </span>
@@ -57,20 +57,20 @@ function FrameDiagram() {
 function FlowDiagram() {
   return (
     <div className="overflow-x-auto">
-      <div className="min-w-[600px] overflow-hidden rounded-lg border border-quicx-line bg-[#0a1a22]">
+      <div className="min-w-[600px] overflow-hidden rounded-[3px] border border-quicx-line-strong bg-quicx-well">
         <div className="flex items-center justify-between border-b border-quicx-line bg-white/[0.02] px-4 py-2.5">
-          <span className="font-[family-name:var(--font-jetbrains-mono)] text-[11px] tracking-wide text-quicx-dim">
+          <span className="font-mono text-[11px] tracking-wide text-quicx-dim">
             one task, start to finish
           </span>
         </div>
-        <pre className="overflow-x-auto px-5 py-5 font-[family-name:var(--font-jetbrains-mono)] text-[12px] leading-relaxed text-quicx-muted">
+        <pre className="overflow-x-auto px-5 py-5 font-mono text-[12px] leading-relaxed text-quicx-muted">
           <code>{`Producer                Daemon                    Worker
    |--MSG_SUBMIT-------->|                            |
    |<--MSG_OK------------|                            |
    |                      |<--MSG_READY----------------|
    |                      |--MSG_TASK------------------>|
    |                      |<--MSG_DONE (or MSG_FAILED)--|
-   |<--MSG_FAILED---------|  (only on failure; DONE is not forwarded)`}</code>
+   |<--MSG_DONE / FAILED--|  (forwarded to the producer since v1.0.3)`}</code>
         </pre>
       </div>
     </div>
@@ -99,7 +99,7 @@ function OpcodeTable() {
       headers={["Type", "Name", "Direction"]}
       rows={rows.map(([hex, name, dir]) => [
         <InlineCode key={hex}>{hex}</InlineCode>,
-        <span key={name} className="font-[family-name:var(--font-jetbrains-mono)]">
+        <span key={name} className="font-mono">
           {name}
         </span>,
         dir,
@@ -124,26 +124,17 @@ function Payload({
   extra?: React.ReactNode;
 }) {
   return (
-    <div
-      id={`msg-${name.toLowerCase()}`}
-      className="scroll-mt-24 rounded-lg border border-quicx-line bg-[#0a1a22] p-5"
-    >
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="rounded border border-quicx-orange/40 bg-quicx-orange/10 px-2 py-0.5 font-[family-name:var(--font-jetbrains-mono)] text-[11.5px] text-quicx-orange-bright">
-          {hex}
-        </span>
-        <span className="font-[family-name:var(--font-jetbrains-mono)] text-[15px] font-semibold text-quicx-text">
-          {name}
-        </span>
-        <span className="font-[family-name:var(--font-barlow-condensed)] text-[11.5px] uppercase tracking-[0.2em] text-quicx-dim">
-          {direction}
-        </span>
+    <div id={`msg-${name.toLowerCase()}`} className="scroll-mt-24 border-t border-quicx-line pt-6">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
+        <span className="font-mono text-[13px] text-quicx-orange-bright">{hex}</span>
+        <span className="font-mono text-[16px] font-medium text-quicx-text">{name}</span>
+        <span className="text-[14px] text-quicx-dim">{direction}</span>
       </div>
-      <pre className="mt-4 overflow-x-auto rounded border border-white/5 bg-[#061219] px-3 py-3 font-[family-name:var(--font-jetbrains-mono)] text-[12px] leading-relaxed text-quicx-text">
+      <pre className="mt-4 overflow-x-auto rounded-[3px] border border-quicx-line-strong bg-quicx-well px-4 py-3.5 font-mono text-[13px] leading-[1.7] text-quicx-text">
         <code>{layout}</code>
       </pre>
       {example && (
-        <pre className="mt-3 overflow-x-auto rounded border border-white/5 bg-black/20 px-3 py-2.5 font-[family-name:var(--font-jetbrains-mono)] text-[11.5px] leading-relaxed text-quicx-muted">
+        <pre className="mt-2 overflow-x-auto rounded-[3px] border border-dashed border-quicx-line-strong px-4 py-3 font-mono text-[12.5px] leading-[1.7] text-quicx-muted">
           <code>{example}</code>
         </pre>
       )}
@@ -220,9 +211,10 @@ export function BinaryProtocolSection() {
             def: (
               <>
                 Exactly length bytes, capped at <InlineCode>PROTOCOL_MAX_PAYLOAD</InlineCode> —{" "}
-                <strong>1024 bytes</strong> as of v1.0.3 (previously 1 MiB). The cap matches
-                the allocator&rsquo;s largest size class, so every accepted payload fits in
-                exactly one PMAD block. Oversized frames get a clean{" "}
+                <strong>1024 bytes</strong>{" "}as of v1.0.3 (previously 1 MiB). Since 2.0 a task
+                is one allocator block — the 64-byte <InlineCode>Task</InlineCode> record with the
+                payload right behind it — and 1,088 bytes is apool&rsquo;s largest size, so every
+                accepted payload fits. Oversized frames get a clean{" "}
                 <InlineCode>MSG_ERROR</InlineCode> (<InlineCode>ERR_PAYLOAD_TOO_BIG</InlineCode>
                 ) instead of being truncated or read past the buffer.
               </>
@@ -277,15 +269,15 @@ export function BinaryProtocolSection() {
               <Table
                 headers={["Code", "Meaning"]}
                 rows={[
-                  [<InlineCode key="1">0x01</InlineCode>, "queue full — PMAD pool exhausted"],
+                  [<InlineCode key="1">0x01</InlineCode>, "queue full — the memory budget is used up"],
                   [<InlineCode key="2">0x02</InlineCode>, "invalid message (bad version / length / type)"],
-                  [<InlineCode key="3">0x03</InlineCode>, "payload too large for the largest size class (1024 bytes, as of v1.0.3)"],
+                  [<InlineCode key="3">0x03</InlineCode>, "payload larger than 1,024 bytes"],
                   [<InlineCode key="4">0x04</InlineCode>, "unknown task type"],
                 ]}
               />
               <p className="text-[13.5px] leading-relaxed text-quicx-muted">
                 Generic failure reply, sent to whichever peer tripped it. Outbound only — if a
-                peer ever sent <InlineCode>MSG_ERROR</InlineCode> to the daemon it&rsquo;d fail
+                peer ever sent <InlineCode>MSG_ERROR</InlineCode>{" "}to the daemon it&rsquo;d fail
                 parsing (not a recognized inbound case) and the connection gets closed.
               </p>
             </div>
@@ -299,7 +291,7 @@ export function BinaryProtocolSection() {
               Registers the connection (<InlineCode>worker_add</InlineCode>) and tags it{" "}
               <InlineCode>CONN_WORKER</InlineCode>, then calls{" "}
               <InlineCode>try_dispach</InlineCode> in case work is already queued — if a task is
-              waiting, <InlineCode>MSG_TASK</InlineCode> follows immediately. There&rsquo;s no ack
+              waiting, <InlineCode>MSG_TASK</InlineCode>{" "}follows immediately. There&rsquo;s no ack
               on success; if nothing is queued, the worker just stays blocked reading until a
               task arrives later.
             </p>
@@ -320,7 +312,7 @@ export function BinaryProtocolSection() {
         />
 
         <Callout variant="tip" title="Fixed in v1.0.3 — producers now hear about success">
-          Until this release, <code>MSG_DONE</code> only updated the daemon&rsquo;s internal
+          Until this release, <code>MSG_DONE</code>{" "}only updated the daemon&rsquo;s internal
           state — the producer was never told and got silence on a completed task. It now
           receives the same completion signal a failure would have gotten all along.
         </Callout>
@@ -373,7 +365,7 @@ export function BinaryProtocolSection() {
           extra={
             <p className="text-[13.5px] leading-relaxed text-quicx-muted">
               <InlineCode>PROTOCOL_TIMEOUT_MS</InlineCode> and{" "}
-              <InlineCode>PROTOCOL_HEARTBEAT_MS</InlineCode> are defined, but nothing actually
+              <InlineCode>PROTOCOL_HEARTBEAT_MS</InlineCode>{" "}are defined, but nothing actually
               tracks last-heartbeat time to drop stale connections — the daemon only responds to
               heartbeats, it doesn&rsquo;t enforce the timeout itself.
             </p>
@@ -391,7 +383,7 @@ export function BinaryProtocolSection() {
         />
         <Payload hex="0x0B" name="MSG_STATS" direction="CLI → daemon (unix socket)"
           layout={`(no payload — length = 0)`}
-          example={`Request for pool / queue / PMAD stats.`}
+          example={`Request for pool, queue and worker stats.`}
           extra={
             <p className="text-[13.5px] leading-relaxed text-quicx-muted">
               Sent over the Unix socket at <InlineCode>/tmp/quicx.sock</InlineCode> — not the TCP
@@ -413,7 +405,7 @@ export function BinaryProtocolSection() {
                   ],
                   [
                     "StatsClass × class_count",
-                    "one block per PMAD size class — that class's allocator stats",
+                    "one entry per block size that holds pages right now — its block size, capacity and live blocks",
                   ],
                 ]}
               />

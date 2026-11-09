@@ -1,17 +1,18 @@
 # Quicx
 
-> Quicx is a deterministic-memory task queue daemon written in C. You give it a memory budget at startup; it uses exactly that, reports precisely what it is using, and never grows.
+> Quicx is a deterministic-memory task queue daemon written in C. You give it a memory budget at startup; it never uses more, reports precisely what it is using, and gives back what a burst used once the queue drains.
 
-Quicx runs a single-threaded event loop (epoll/kqueue) on top of PMAD, a custom slab allocator that maps its pool once and hands out fixed size classes in O(1), and speaks a compact binary protocol (6-byte header, 12 message types). Written in C, with a Java client library (QuicxClient, QuicxWorker).
+Quicx runs a single-threaded event loop (epoll/kqueue) on top of apool, an adaptive page allocator: the budget is mapped once, and 16 KiB pages go to whichever block sizes the traffic sends and come back when they empty. A task is one block — a 64-byte record with its payload behind it. It speaks a compact binary protocol (6-byte header, 12 message types). Written in C, with a Java client library (QuicxClient, QuicxWorker). Current version: 2.0.0.
 
-## Measured performance
+## Measured performance (Quicx 2.0.0)
 
-All figures below come from one run of `bench/run.sh` on an Apple M4 Pro (12 cores, 24 GB, macOS 26.5.1, arm64, Apple clang 17), quicxd built -O2, default 8 MB PMAD pool, loopback TCP, 8 workers, 8 producer connections, C clients. Nothing is estimated or extrapolated.
+Measured with `bench/run.sh` and the same scripts on two machines: an Apple M4 Pro (12 cores, 24 GB, macOS 26.5.1, arm64, Apple clang 17) and an Intel Core i3-2100 (2 cores / 4 threads, 8 GB, Ubuntu 24.04, gcc 13.3). quicxd built -O2, default 8 MiB budget, loopback TCP, 8 workers, 8 producer connections, C clients. Each figure is the median of several interleaved runs, next to v1.0.4 measured the same way. Nothing is estimated or extrapolated.
 
-- Throughput: 74,300 tasks/sec end to end, single thread (443,912 tasks, 0 errors). One task = five protocol messages: submit, ack, dispatch, done, notify — not a single enqueue.
-- Latency (submit → done, open loop at 40k/s offered): 51 µs p50, 67 µs p90, 111 µs p99, 174 µs p99.9. Flat from 10k/s to 40k/s.
-- Memory: idle RSS 9,584 KB; after 443,912 tasks 9,584 KB. Delta 0 KB. Peak 10.7 % of the default 8 MB pool.
-- Footprint: 54.4 KB binary (-O2), no runtime dependencies, ~2,480 lines of C, 1 thread.
+- Capacity: 46,593 tasks of 100 B fit in the default 8 MiB (v1.0.4: 655); 8,016 of 900 B, 73,146 of 40 B, 22,044 of 300 B, 30,947 nginx log lines. Identical on both machines.
+- Throughput: 81,900 tasks/sec end to end, single thread, on the M4 Pro (v1.0.4: 82,400 — within run-to-run noise); 19,000 on the i3. One task = five protocol messages: submit, ack, dispatch, done, notify — not a single enqueue.
+- Latency (submit → done, open loop at 40k/s offered, M4 Pro): 49 µs p50, 64 µs p90, 98 µs p99, 143 µs p99.9. On the i3 at 9k/s: 123 µs p50.
+- Memory (macOS phys_footprint): 1,056 KB idle, 9,088 KB with the queue full, 2,080 KB after the burst drains (v1.0.4 held 9,200 KB throughout). Peak 2.8 % of the budget under the throughput load.
+- Footprint: 54.9 KB binary (-O2), no runtime dependencies, ~2,800 lines of C, 1 thread.
 
 Latency is measured submit → done, not submit → ack. Latency runs are open loop and timed from the scheduled send (coordinated-omission corrected); throughput runs are closed loop. Clients are C, because a Python client saturates before the daemon does and ends up measuring itself.
 
@@ -21,8 +22,10 @@ Quicx is a fast in-memory broker, not a durable one. No persistence (a restart l
 
 ## Docs
 - [Documentation](https://quicx.dev/docs/installation): Full docs — architecture, configuration, CLI reference, Java client
-- [Benchmarks](https://quicx.dev/docs/benchmarks): Measured results, methodology, and comparison provenance
+- [Allocator](https://quicx.dev/docs/allocator): apool v2, its features from the allocator literature, and their measured effect
+- [Benchmarks](https://quicx.dev/docs/benchmarks): Measured results on two machines, methodology, and comparison provenance
 - [Limitations](https://quicx.dev/docs/limitations): What Quicx does not do, and feature-for-feature comparison
+- [Changelog](https://quicx.dev/docs/changelog): What changed in 2.0.0
 - [Installer](https://quicx.dev/install.sh): One-line install script
 
 ## Resources

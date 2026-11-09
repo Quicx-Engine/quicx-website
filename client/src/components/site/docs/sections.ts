@@ -4,7 +4,7 @@ import { InstallationSection } from "@/components/site/docs/sections/installatio
 import { QuickStartSection } from "@/components/site/docs/sections/quick-start";
 import { ConfigurationSection } from "@/components/site/docs/sections/configuration";
 import { ArchitectureSection } from "@/components/site/docs/sections/architecture";
-import { PmadSection } from "@/components/site/docs/sections/pmad-allocator";
+import { AllocatorSection } from "@/components/site/docs/sections/allocator";
 import { BinaryProtocolSection } from "@/components/site/docs/sections/binary-protocol";
 import { BenchmarksSection } from "@/components/site/docs/sections/benchmarks";
 import { LimitationsSection } from "@/components/site/docs/sections/limitations";
@@ -37,8 +37,9 @@ export const nav: DocsNavGroup[] = [
         label: "Configuration",
         toc: [
           { id: "server-block", label: "[server]" },
+          { id: "memory-block", label: "[memory]" },
           { id: "allocator-block", label: "[allocator]" },
-          { id: "tuning-rules", label: "Tuning rules of thumb" },
+          { id: "upgrading", label: "Upgrading from 1.x" },
         ],
       },
     ],
@@ -52,13 +53,13 @@ export const nav: DocsNavGroup[] = [
         toc: [{ id: "single-daemon-design", label: "Why a single daemon?" }],
       },
       {
-        id: "pmad-allocator",
-        label: "PMAD Allocator",
+        id: "allocator",
+        label: "apool Allocator",
         toc: [
-          { id: "pmad-architecture", label: "Architecture" },
-          { id: "pmad-benchmarks", label: "Benchmarks" },
-          { id: "pmad-configurations", label: "Reference configurations" },
-          { id: "pmad-teardown", label: "Tear-down" },
+          { id: "allocator-architecture", label: "Architecture" },
+          { id: "allocator-features", label: "Ideas from the literature" },
+          { id: "allocator-benchmarks", label: "Benchmarks" },
+          { id: "allocator-tuning", label: "Settings" },
         ],
       },
       {
@@ -76,6 +77,8 @@ export const nav: DocsNavGroup[] = [
         toc: [
           { id: "bench-throughput", label: "Throughput" },
           { id: "bench-latency", label: "Latency" },
+          { id: "bench-machines", label: "Two machines" },
+          { id: "bench-capacity", label: "Capacity" },
           { id: "bench-memory", label: "Memory" },
           { id: "bench-methodology", label: "Methodology" },
           { id: "bench-comparison", label: "Comparison" },
@@ -123,7 +126,7 @@ export const sectionComponents: Record<string, ComponentType> = {
   "quick-start": QuickStartSection,
   "configuration": ConfigurationSection,
   "architecture": ArchitectureSection,
-  "pmad-allocator": PmadSection,
+  "allocator": AllocatorSection,
   "binary-protocol": BinaryProtocolSection,
   "benchmarks": BenchmarksSection,
   "limitations": LimitationsSection,

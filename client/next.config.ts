@@ -15,6 +15,21 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      // 2.0 replaced PMAD with apool; the allocator page moved with it.
+      {
+        source: "/docs/pmad-allocator",
+        destination: "/docs/allocator",
+        permanent: true,
+      },
+      {
+        source: "/docs/pmad-allocator/opengraph-image",
+        destination: "/docs/allocator/opengraph-image",
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {

@@ -1,72 +1,97 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { ArchitectureFlow } from "./ArchitectureFlow";
 
 /* ─────────────────── Design tokens ─────────────────── */
 
 // Canvas
 const W = 1600;
-const H = 980;
+const H = 900;
 
 // Quicx brand
 const ORANGE = "#FF5700";
 const ORANGE_BRIGHT = "#FF7A33";
 
 // Surface
-const TILE_BG = "#0F1F28";
-const TILE_BORDER = "rgba(255,255,255,0.10)";
+const TILE_BG = "#0d1c23";
+const TILE_BORDER = "rgba(190,222,236,0.14)";
+
+// Knock-out fill for labels that sit on top of flow lines.
+const LABEL_BG = "#061015";
 
 // Message-type colors (from the legend in the source diagram),
 // tuned to the Quicx palette so they harmonise with the orange daemon.
+// One accent: the hot path (submit, dispatch) is orange; replies are ink;
+// the side channels are dimmer. Edge labels name every message, so hue is
+// never the only carrier of meaning.
+const INK = "#c3ced5";
+const DIM = "#7f909a";
+const MUTED = "#a1b0b9";
+const CLUSTER = "rgba(190,222,236,0.3)";
+// Cluster frames are solid, so they sit at the strong-hairline strength.
+const CLUSTER_FRAME = "rgba(190,222,236,0.16)";
+
 const MSG = {
-  SUBMIT: "#5EB0FF", // blue — producer → daemon
-  OK: "#34D399", // green — acknowledgment
-  TASK: ORANGE_BRIGHT, // orange — task dispatch (brand!)
-  DONE: "#D4A5FF", // purple — MSG_DONE / memory alloc
-  STATS: "#9AA3B2", // gray — MSG_STATS / MSG_WAIT
+  SUBMIT: ORANGE_BRIGHT, // producer → daemon
+  OK: INK, // acknowledgment
+  TASK: ORANGE_BRIGHT, // task dispatch
+  DONE: INK, // worker finished
+  STATS: DIM, // stats request from the CLI
+  ALLOC: MUTED, // apool alloc / free
 };
 
 /* ─────────────────── Main diagram ─────────────────── */
 
-export function ArchitectureDiagram() {
+/**
+ * The wide diagram from md up; below that (and wherever the caller asks for
+ * it) the same topology as a stacked, text-set flow.
+ */
+export function ArchitectureDiagram({ variant = "auto" }: { variant?: "auto" | "flow" }) {
+  if (variant === "flow") return <ArchitectureFlow />;
+  return (
+    <>
+      <div className="hidden md:block">
+        <ArchitectureSvg />
+      </div>
+      <div className="md:hidden">
+        <ArchitectureFlow />
+      </div>
+    </>
+  );
+}
+
+function ArchitectureSvg() {
   const svgRef = useRef<SVGSVGElement>(null);
+  // inView latches on first sight (reveal); onScreen tracks it (pause the trace).
   const [inView, setInView] = useState(false);
+  const [onScreen, setOnScreen] = useState(false);
 
   useEffect(() => {
     const el = svgRef.current;
     if (!el) return;
     const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            setInView(true);
-            io.disconnect();
-            break;
-          }
-        }
+      ([e]) => {
+        setOnScreen(e.isIntersecting);
+        if (e.isIntersecting && e.intersectionRatio >= 0.2) setInView(true);
       },
-      { threshold: 0.2 }
+      { threshold: [0, 0.2] }
     );
     io.observe(el);
     return () => io.disconnect();
   }, []);
 
   return (
-    <div className="relative">
+    <div className={onScreen ? "relative" : "relative is-paused"}>
       <svg
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
         className="relative block h-auto w-full"
         role="img"
-        aria-label="Quicx system architecture"
+        aria-label="Quicx system architecture, with one task traced: a producer submits it, the daemon acknowledges and claims one apool block for it, the dispatcher hands it to a worker and frees the block, and the worker's MSG_DONE goes back to the producer."
+        style={{ "--cycle": `${CYCLE_S}s` } as React.CSSProperties}
       >
         <defs>
-          <radialGradient id="center-grad" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor={ORANGE} stopOpacity="0.25" />
-            <stop offset="60%" stopColor={ORANGE} stopOpacity="0.06" />
-            <stop offset="100%" stopColor={ORANGE} stopOpacity="0" />
-          </radialGradient>
 
           {/* Arrowhead markers, one per message color. */}
           {Object.entries(MSG).map(([key, color]) => (
@@ -86,41 +111,39 @@ export function ArchitectureDiagram() {
         </defs>
 
         {/* ════════════════════════════════════════════════════════
-             1. PMAD Slab Allocator — satellite, top-left
+             1. apool allocator — satellite, top-left
             ════════════════════════════════════════════════════════ */}
         <g>
-          {/* dashed surrounding box */}
+          {/* surrounding box: a solid hairline; only message paths are dashed */}
           <rect
             x={70}
             y={70}
             width={340}
             height={210}
-            rx={14}
+            rx={3}
             fill="transparent"
-            stroke={MSG.DONE}
-            strokeOpacity={0.55}
-            strokeDasharray="5 6"
+            stroke={CLUSTER_FRAME}
           />
           <ClusterLabel
             x={100}
             y={92}
-            text="PMAD SLAB ALLOCATOR"
-            color={MSG.DONE}
+            text="APOOL ALLOCATOR"
+            color={MUTED}
           />
           <SlabGrid cx={240} cy={185} inView={inView} />
         </g>
 
-        {/* PMAD → daemon: horizontal then down */}
+        {/* apool → daemon: horizontal then down */}
         <PathEdge
           d={`M 410 175
               L 650 175
               L 650 290`}
-          color={MSG.DONE}
-          arrow="DONE"
+          color={MSG.ALLOC}
+          arrow="ALLOC"
           revealIndex={0}
           inView={inView}
         />
-        <EdgeLabel x={540} y={160} text="O(1) alloc / free" color={MSG.DONE} />
+        <EdgeLabel x={540} y={156} text="O(1) alloc / free" color={MSG.ALLOC} />
 
         {/* ════════════════════════════════════════════════════════
              2. PRODUCERS cluster — left side
@@ -131,13 +154,11 @@ export function ArchitectureDiagram() {
             y={360}
             width={340}
             height={500}
-            rx={16}
+            rx={3}
             fill="transparent"
-            stroke={MSG.SUBMIT}
-            strokeOpacity={0.6}
-            strokeDasharray="5 6"
+            stroke={CLUSTER_FRAME}
           />
-          <ClusterLabel x={100} y={385} text="PRODUCERS" color={MSG.SUBMIT} />
+          <ClusterLabel x={100} y={385} text="PRODUCERS" color={MUTED} />
 
           {/* Stats monitor — icon on top */}
           <IconTile x={240} y={470} label="Stats Monitor" variant="stats" />
@@ -156,11 +177,10 @@ export function ArchitectureDiagram() {
             y={290}
             width={700}
             height={550}
-            rx={18}
+            rx={3}
             fill="rgba(255,87,0,0.04)"
             stroke={ORANGE}
-            strokeOpacity={0.55}
-            strokeDasharray="5 6"
+            strokeOpacity={0.45}
           />
           <ClusterLabel
             x={550}
@@ -171,7 +191,7 @@ export function ArchitectureDiagram() {
           />
 
           {/* Connection Router — entry on left inside daemon */}
-          <Pill x={640} y={620} label="Connection Router" />
+          <Pill x={640} y={620} label="Connection Router" hitAt={inView ? HIT.router : undefined} />
 
           {/* Processing sub-group */}
           <g>
@@ -180,7 +200,7 @@ export function ArchitectureDiagram() {
               y={420}
               width={260}
               height={310}
-              rx={14}
+              rx={3}
               fill="rgba(255,255,255,0.02)"
               stroke={TILE_BORDER}
             />
@@ -188,11 +208,11 @@ export function ArchitectureDiagram() {
               x={820}
               y={445}
               text="PROCESSING"
-              color="#9AA3B2"
-              size={11}
+              color={MUTED}
+              size={16}
             />
-            <Pill x={930} y={510} label="Task Queue" small />
-            <Pill x={930} y={600} label="Dispatcher" small />
+            <Pill x={930} y={510} label="Task Queue" small hitAt={inView ? HIT.queue : undefined} />
+            <Pill x={930} y={600} label="Dispatcher" small hitAt={inView ? HIT.dispatcher : undefined} />
             {/* internal flow: queue → dispatcher */}
             <PathEdge
               d={`M 930 530 L 930 580`}
@@ -202,7 +222,7 @@ export function ArchitectureDiagram() {
           </g>
 
           {/* Worker Pool — exit on right inside daemon */}
-          <Pill x={1130} y={620} label="Worker Pool" />
+          <Pill x={1130} y={620} label="Worker Pool" hitAt={inView ? HIT.pool : undefined} />
 
           {/* Internal flows: Router → Task Queue; Dispatcher → Worker Pool */}
           <PathEdge
@@ -226,15 +246,13 @@ export function ArchitectureDiagram() {
             y={360}
             width={210}
             height={500}
-            rx={16}
+            rx={3}
             fill="transparent"
-            stroke="#34D399"
-            strokeOpacity={0.55}
-            strokeDasharray="5 6"
+            stroke={CLUSTER_FRAME}
           />
-          <ClusterLabel x={1348} y={385} text="WORKERS" color="#34D399" />
+          <ClusterLabel x={1348} y={385} text="WORKERS" color={MUTED} />
 
-          <WorkerTile x={1425} y={470} label="Worker 1" />
+          <WorkerTile x={1425} y={470} label="Worker 1" hitAt={inView ? HIT.worker : undefined} />
           <WorkerTile x={1425} y={600} label="Worker 2" />
           <WorkerTile x={1425} y={730} label="Worker N" />
         </g>
@@ -304,38 +322,41 @@ export function ArchitectureDiagram() {
           revealIndex={7}
           inView={inView}
         />
-        <EdgeLabel x={1275} y={545} text="MSG_TASK" color={MSG.TASK} />
+        <EdgeLabel x={1270} y={690} text="MSG_TASK" color={MSG.TASK} />
 
         {/* MSG_DONE : Workers → Worker Pool */}
         <PathEdge
-          d={`M 1492 490 L 1570 490 L 1570 580 L 1192 580`}
+          d={`M 1492 490 L 1570 490 L 1570 535 L 1230 535 L 1230 580 L 1192 580`}
           color={MSG.DONE}
           arrow="DONE"
           opacity={0.85}
           revealIndex={8}
           inView={inView}
         />
-        <EdgeLabel x={1415} y={570} text="MSG_DONE" color={MSG.DONE} />
+        <EdgeLabel x={1425} y={535} text="MSG_DONE" color={MSG.DONE} />
 
         {/* ════════════════════════════════════════════════════════
-             6. Legend — bottom right, mirrors source diagram
+             6. The trace: one task's messages, lit in order
             ════════════════════════════════════════════════════════ */}
-        <Legend x={W - 300} y={90} />
+        {inView && <Trace />}
+        <g>
+          <circle cx={78} cy={34} r={4} fill={ORANGE} className="node-pulse" />
+          <text
+            x={92}
+            y={39}
+            fill={MUTED}
+            fontFamily="var(--font-jetbrains-mono), monospace"
+            fontSize={16}
+          >
+            one task, traced, slowed down from 49 µs
+          </text>
+        </g>
+
+        {/* ════════════════════════════════════════════════════════
+             7. Legend — top right
+            ════════════════════════════════════════════════════════ */}
+        <Legend x={W - 470} y={40} />
       </svg>
-
-
-      <div className="mt-10 flex items-center justify-center gap-3 text-[12px] text-quicx-dim">
-        <Image
-          src="/quicx-logo.svg"
-          alt="Quicx"
-          width={80}
-          height={20}
-          className="h-5 w-auto opacity-70"
-        />
-        <span className="font-[family-name:var(--font-barlow-condensed)] uppercase tracking-[0.3em]">
-          One daemon · zero moving parts
-        </span>
-      </div>
     </div>
   );
 }
@@ -349,7 +370,7 @@ function ClusterLabel({
   text,
   color,
   accent,
-  size = 12,
+  size = 16,
 }: {
   x: number;
   y: number;
@@ -362,11 +383,11 @@ function ClusterLabel({
     <g>
       <rect
         x={x - 8}
-        y={y - 13}
-        width={text.length * (size * 0.65) + 32}
-        height={22}
-        rx={6}
-        fill="#0a1a22"
+        y={y - 15}
+        width={text.length * (size * 0.66) + 34}
+        height={26}
+        rx={3}
+        fill={LABEL_BG}
         stroke={color}
         strokeOpacity={accent ? 0.6 : 0.4}
         strokeWidth={1}
@@ -376,10 +397,11 @@ function ClusterLabel({
         x={x + 14}
         y={y + 3}
         fill={color}
-        fontFamily="var(--font-barlow-condensed), sans-serif"
+        fontFamily="var(--font-archivo), sans-serif"
         fontSize={size}
-        fontWeight={600}
-        letterSpacing={2}
+        fontWeight={620}
+        letterSpacing={1.4}
+        style={{ fontStretch: "78%" }}
       >
         {text}
       </text>
@@ -392,35 +414,35 @@ function EdgeLabel({
   x,
   y,
   text,
-  color = "#cbd1dc",
+  color = "#c3ced5",
 }: {
   x: number;
   y: number;
   text: string;
   color?: string;
 }) {
-  const w = text.length * 6.8 + 16;
+  const w = text.length * 9.8 + 22;
   return (
     <g>
       <rect
         x={x - w / 2}
-        y={y - 11}
+        y={y - 14}
         width={w}
-        height={22}
-        rx={6}
-        fill="#0a1a22"
+        height={28}
+        rx={3}
+        fill={LABEL_BG}
         stroke={color}
         strokeOpacity={0.45}
         strokeWidth={1}
       />
       <text
         x={x}
-        y={y + 4}
+        y={y + 5}
         textAnchor="middle"
         fill={color}
         fontFamily="var(--font-jetbrains-mono), monospace"
-        fontSize={10}
-        letterSpacing={0.6}
+        fontSize={16}
+        letterSpacing={0}
       >
         {text}
       </text>
@@ -434,16 +456,18 @@ function Pill({
   y,
   label,
   small,
+  hitAt,
 }: {
   x: number;
   y: number;
   label: string;
   small?: boolean;
+  hitAt?: number;
 }) {
-  const padX = 22;
-  const charW = small ? 7.2 : 8;
-  const w = Math.max(label.length * charW + padX * 2, small ? 120 : 140);
-  const h = small ? 40 : 46;
+  const padX = 24;
+  const charW = small ? 9.2 : 9.6;
+  const w = Math.max(label.length * charW + padX * 2, small ? 140 : 160);
+  const h = small ? 46 : 52;
   return (
     <g>
       <rect
@@ -451,12 +475,13 @@ function Pill({
         y={y - h / 2}
         width={w}
         height={h}
-        rx={10}
+        rx={4}
         fill={TILE_BG}
         stroke={ORANGE}
         strokeOpacity={0.45}
         strokeWidth={1}
       />
+      {hitAt !== undefined && <NodeHit x={x - w / 2} y={y - h / 2} w={w} h={h} at={hitAt} />}
       <circle
         cx={x - w / 2 + 14}
         cy={y}
@@ -466,11 +491,11 @@ function Pill({
       />
       <text
         x={x + 6}
-        y={y + (small ? 4 : 5)}
+        y={y + (small ? 5 : 6)}
         textAnchor="middle"
-        fill="#e9edf3"
+        fill="#edf2f5"
         fontFamily="var(--font-archivo), sans-serif"
-        fontSize={small ? 13 : 14}
+        fontSize={small ? 16 : 17}
         fontWeight={500}
       >
         {label}
@@ -493,7 +518,7 @@ function IconTile({
 }) {
   const w = 135;
   const h = 100;
-  const color = variant === "stats" ? MSG.STATS : MSG.SUBMIT;
+  const color = variant === "stats" ? DIM : INK;
   return (
     <g>
       <rect
@@ -501,7 +526,7 @@ function IconTile({
         y={y - h / 2}
         width={w}
         height={h}
-        rx={12}
+        rx={4}
         fill={TILE_BG}
         stroke={color}
         strokeOpacity={0.5}
@@ -518,7 +543,7 @@ function IconTile({
               width={36}
               height={28}
               rx={4}
-              fill="#0a1a22"
+              fill={LABEL_BG}
               stroke={color}
               strokeOpacity={0.9}
               strokeWidth={1.2}
@@ -529,7 +554,7 @@ function IconTile({
               width={36}
               height={20}
               rx={4}
-              fill="#0a1a22"
+              fill={LABEL_BG}
               stroke={color}
               strokeOpacity={0.9}
               strokeWidth={1.2}
@@ -555,9 +580,9 @@ function IconTile({
         x={x}
         y={y + 28}
         textAnchor="middle"
-        fill="#e9edf3"
+        fill="#edf2f5"
         fontFamily="var(--font-archivo), sans-serif"
-        fontSize={13}
+        fontSize={16}
         fontWeight={500}
       >
         {label}
@@ -571,14 +596,16 @@ function WorkerTile({
   x,
   y,
   label,
+  hitAt,
 }: {
   x: number;
   y: number;
   label: string;
+  hitAt?: number;
 }) {
   const w = 135;
   const h = 100;
-  const color = "#34D399";
+  const color = INK;
   return (
     <g>
       <rect
@@ -586,12 +613,13 @@ function WorkerTile({
         y={y - h / 2}
         width={w}
         height={h}
-        rx={12}
+        rx={4}
         fill={TILE_BG}
         stroke={color}
         strokeOpacity={0.5}
         strokeWidth={1}
       />
+      {hitAt !== undefined && <NodeHit x={x - w / 2} y={y - h / 2} w={w} h={h} at={hitAt} />}
       {/* CPU chip icon */}
       <g transform={`translate(${x - 18}, ${y - 30})`}>
         <rect
@@ -600,7 +628,7 @@ function WorkerTile({
           width={28}
           height={28}
           rx={4}
-          fill="#0a1a22"
+          fill={LABEL_BG}
           stroke={color}
           strokeOpacity={0.9}
           strokeWidth={1.4}
@@ -634,9 +662,9 @@ function WorkerTile({
         x={x}
         y={y + 28}
         textAnchor="middle"
-        fill="#e9edf3"
+        fill="#edf2f5"
         fontFamily="var(--font-archivo), sans-serif"
-        fontSize={13}
+        fontSize={16}
         fontWeight={500}
       >
         {label}
@@ -645,7 +673,7 @@ function WorkerTile({
   );
 }
 
-/** 3×2 grid of memory slabs inside the PMAD box. */
+/** 3×2 grid of pages inside the apool box. */
 function SlabGrid({
   cx,
   cy,
@@ -665,8 +693,8 @@ function SlabGrid({
   const y0 = cy - gridH / 2;
   // which cells have slab contents (emulates the real allocator's occupied vs free)
   const filled = [true, true, false, true, true, false, true, true];
-  // cells that flip once when the diagram scrolls into view
-  const flipCells = new Set([1, 6]);
+  // The free cell the traced task claims.
+  const traced = 2;
 
   return (
     <g>
@@ -677,42 +705,47 @@ function SlabGrid({
           const y = y0 + r * (size + gap);
           if (!filled[i]) {
             return (
-              <rect
-                key={i}
-                x={x}
-                y={y}
-                width={size}
-                height={size}
-                rx={7}
-                fill="transparent"
-                stroke={MSG.DONE}
-                strokeOpacity={0.4}
-                strokeDasharray="3 4"
-              />
+              <g key={i}>
+                <rect
+                  x={x}
+                  y={y}
+                  width={size}
+                  height={size}
+                  rx={3}
+                  fill="transparent"
+                  stroke={CLUSTER}
+                  strokeDasharray="3 4"
+                />
+                {inView && i === traced && (
+                  <g className="slot-hold">
+                    <rect
+                      x={x}
+                      y={y}
+                      width={size}
+                      height={size}
+                      rx={3}
+                      fill="rgba(255,87,0,0.16)"
+                      stroke={ORANGE}
+                      strokeWidth={1.5}
+                    />
+                    <rect x={x + 7} y={y + 11} width={size - 14} height={3} rx={1.5} fill={ORANGE} />
+                    <rect x={x + 7} y={y + 19} width={size - 18} height={3} rx={1.5} fill={ORANGE_BRIGHT} />
+                    <rect x={x + 7} y={y + 27} width={size - 12} height={3} rx={1.5} fill={ORANGE_BRIGHT} fillOpacity={0.6} />
+                  </g>
+                )}
+              </g>
             );
           }
-          const flipping = inView && flipCells.has(i);
-          // stagger: first flip at 0.6s, second at 1.1s
-          const flipDelay = i === 1 ? "0.6s" : "1.1s";
           return (
-            <g
-              key={i}
-              className={flipping ? "slab-flip" : undefined}
-              style={
-                flipping
-                  ? ({ animationDelay: flipDelay } as React.CSSProperties)
-                  : undefined
-              }
-            >
+            <g key={i}>
               <rect
                 x={x}
                 y={y}
                 width={size}
                 height={size}
-                rx={7}
-                fill="#0a1a22"
-                stroke={MSG.DONE}
-                strokeOpacity={0.55}
+                rx={3}
+                fill={LABEL_BG}
+                stroke={CLUSTER}
               />
               {/* 3 slab bars */}
               <rect
@@ -739,8 +772,8 @@ function SlabGrid({
                 width={size - 12}
                 height={3}
                 rx={1.5}
-                fill={MSG.DONE}
-                fillOpacity={0.65}
+                fill={INK}
+                fillOpacity={0.5}
               />
             </g>
           );
@@ -753,25 +786,26 @@ function SlabGrid({
 /** Legend box — bottom/right like the source diagram. */
 function Legend({ x, y }: { x: number; y: number }) {
   const items: { key: keyof typeof MSG; label: string }[] = [
-    { key: "SUBMIT", label: "MSG_SUBMIT  (producer → daemon)" },
-    { key: "OK", label: "MSG_OK  (acknowledgment)" },
-    { key: "TASK", label: "MSG_TASK  (task dispatch)" },
-    { key: "DONE", label: "MSG_DONE  / memory alloc" },
-    { key: "STATS", label: "MSG_STATS  / MSG_WAIT" },
+    { key: "SUBMIT", label: "MSG_SUBMIT  producer → daemon" },
+    { key: "OK", label: "MSG_OK      acknowledgment" },
+    { key: "TASK", label: "MSG_TASK    daemon → worker" },
+    { key: "DONE", label: "MSG_DONE    worker finished" },
+    { key: "STATS", label: "MSG_STATS   stats request" },
+    { key: "ALLOC", label: "O(1) alloc / free from apool" },
   ];
   return (
     <g>
       <rect
         x={x}
         y={y}
-        width={280}
-        height={items.length * 26 + 24}
-        rx={10}
-        fill="#0a1a22"
+        width={440}
+        height={items.length * 32 + 22}
+        rx={4}
+        fill={LABEL_BG}
         stroke={TILE_BORDER}
       />
       {items.map((it, i) => {
-        const ly = y + 26 + i * 26;
+        const ly = y + 30 + i * 32;
         return (
           <g key={it.key}>
             <line
@@ -785,11 +819,12 @@ function Legend({ x, y }: { x: number; y: number }) {
               markerEnd={`url(#arrow-${it.key})`}
             />
             <text
-              x={x + 68}
-              y={ly + 4}
-              fill="#cbd1dc"
+              x={x + 72}
+              y={ly + 5}
+              fill="#c3ced5"
               fontFamily="var(--font-jetbrains-mono), monospace"
-              fontSize={11}
+              fontSize={16}
+              style={{ whiteSpace: "pre" }}
             >
               {it.label}
             </text>
@@ -809,6 +844,7 @@ const FLOW_DURATION: Record<keyof typeof MSG, string> = {
   TASK: "1.0s",
   DONE: "1.6s",
   STATS: "2.4s",
+  ALLOC: "2s",
 };
 
 /** Colored dotted path with arrowhead + animated dash-flow. Every message
@@ -821,7 +857,7 @@ function PathEdge({
   color,
   arrow,
   opacity = 1,
-  animated = true,
+  animated = false,
   revealIndex,
   inView,
 }: {
@@ -866,6 +902,91 @@ function PathEdge({
             : undefined),
         } as React.CSSProperties
       }
+    />
+  );
+}
+
+/* ─────────────────── The trace ─────────────────── */
+
+/** One full lap of the trace, in seconds. Each hop takes 10 % of it. */
+const CYCLE_S = 7;
+
+/** When the traced packet reaches each node (seconds into the lap). */
+const HIT = {
+  router: 0.7,
+  queue: 1.45,
+  dispatcher: 2.2,
+  pool: 2.95,
+  worker: 3.7,
+};
+
+/**
+ * The traced task's hops, in order. Routes repeat the drawn wires exactly;
+ * `at` is when the packet leaves (each hop takes 10 % of the lap). The apool block is claimed at 0.35 s and
+ * returned when MSG_DONE lands (the slot-hold keyframes in globals.css).
+ */
+const TRACE: { d: string; at: number; tail: string; head: string }[] = [
+  // MSG_SUBMIT, Producer A → Connection Router
+  { d: "M 307 770 L 470 770 L 470 640 L 571 640", at: 0, tail: ORANGE_BRIGHT, head: "#ffd9c4" },
+  // apool block claimed
+  { d: "M 410 175 L 650 175 L 650 290", at: 0.35, tail: MUTED, head: "#edf2f5" },
+  // MSG_OK back to the producer
+  { d: "M 571 660 L 450 660 L 450 830 L 307 830", at: 0.75, tail: INK, head: "#ffffff" },
+  // Router → Task Queue → Dispatcher → Worker Pool
+  { d: "M 710 620 L 760 620 L 760 510 L 862 510", at: 0.75, tail: ORANGE_BRIGHT, head: "#ffd9c4" },
+  { d: "M 930 530 L 930 580", at: 1.5, tail: ORANGE_BRIGHT, head: "#ffd9c4" },
+  { d: "M 998 600 L 1040 600 L 1040 620 L 1068 620", at: 2.25, tail: ORANGE_BRIGHT, head: "#ffd9c4" },
+  // MSG_TASK to Worker 1
+  { d: "M 1192 600 L 1270 600 L 1270 470 L 1358 470", at: 3.0, tail: ORANGE_BRIGHT, head: "#ffd9c4" },
+  // MSG_DONE back to the pool
+  { d: "M 1492 490 L 1570 490 L 1570 535 L 1230 535 L 1230 580 L 1192 580", at: 3.85, tail: INK, head: "#ffffff" },
+  // Meanwhile, the CLI asks for stats
+  { d: "M 307 470 L 470 470 L 470 600 L 571 600", at: 5.3, tail: DIM, head: INK },
+];
+
+/** Length of an M/L polyline, in viewBox units. */
+function polylineLength(d: string) {
+  const n = d.match(/-?\d+(\.\d+)?/g)?.map(Number) ?? [];
+  let len = 0;
+  for (let i = 2; i + 1 < n.length; i += 2) {
+    len += Math.hypot(n[i] - n[i - 2], n[i + 1] - n[i - 1]);
+  }
+  return len;
+}
+
+function Trace() {
+  return (
+    <g aria-hidden>
+      {TRACE.map((t, i) => {
+        const style = {
+          "--at": `${t.at}s`,
+          "--len": `${polylineLength(t.d)}px`,
+        } as React.CSSProperties;
+        return (
+          <g key={i} style={style}>
+            <path d={t.d} className="packet-tail" stroke={t.tail} strokeWidth={4.5} strokeLinejoin="round" />
+            <path d={t.d} className="packet-head" stroke={t.head} strokeWidth={7} strokeLinejoin="round" />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** A node's outline lights for a beat when the trace reaches it. */
+function NodeHit({ x, y, w, h, at }: { x: number; y: number; w: number; h: number; at: number }) {
+  return (
+    <rect
+      x={x}
+      y={y}
+      width={w}
+      height={h}
+      rx={4}
+      fill="rgba(255,87,0,0.1)"
+      stroke={ORANGE_BRIGHT}
+      strokeWidth={2}
+      className="node-hit"
+      style={{ "--at": `${at}s` } as React.CSSProperties}
     />
   );
 }

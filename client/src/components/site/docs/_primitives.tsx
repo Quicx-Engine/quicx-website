@@ -15,6 +15,11 @@ export function SectionHeaderFor({ slug }: { slug: string }) {
   );
 }
 
+/**
+ * The page title block: where the reader stands (section group and its manual
+ * number), the title in the display voice, and the lede that answers what the
+ * page is for.
+ */
 export function SectionHeader({
   num,
   kicker,
@@ -29,19 +34,20 @@ export function SectionHeader({
   lede?: string;
 }) {
   return (
-    <header className="scroll-mt-24 border-b border-quicx-line pb-6" id={id}>
-      <div className="flex items-center gap-3 font-[family-name:var(--font-jetbrains-mono)] text-[11px] uppercase tracking-[0.3em]">
-        <span className="text-quicx-dim">{num}</span>
-        <span className="h-px w-8 bg-gradient-to-r from-quicx-orange/70 to-transparent" />
-        <span className="text-quicx-orange-bright">{kicker}</span>
-      </div>
-      <h1 className="mt-3 font-[family-name:var(--font-archivo)] text-[clamp(1.75rem,3.6vw,2.4rem)] font-semibold leading-[1.1] text-quicx-text">
-        {title}
-      </h1>
+    <header className="scroll-mt-24 border-b border-quicx-line pb-9" id={id}>
+      <nav aria-label="Breadcrumb">
+        <ol className="flex flex-wrap items-center gap-x-2 text-[13px] text-quicx-dim">
+          <li>Docs</li>
+          <li aria-hidden>/</li>
+          <li>{kicker}</li>
+          <li aria-hidden className="ml-auto font-mono text-[12px] text-quicx-dim">
+            {num}
+          </li>
+        </ol>
+      </nav>
+      <h1 className="display mt-5 text-[clamp(2.5rem,5.2vw,3.75rem)] text-quicx-text">{title}</h1>
       {lede && (
-        <p className="mt-4 max-w-3xl text-[15px] leading-relaxed text-quicx-muted">
-          {lede}
-        </p>
+        <p className="mt-6 max-w-[64ch] text-[18px] leading-[1.6] text-quicx-body">{lede}</p>
       )}
     </header>
   );
@@ -49,7 +55,7 @@ export function SectionHeader({
 
 export function Prose({ children }: { children: React.ReactNode }) {
   return (
-    <div className="space-y-5 text-[14.5px] leading-relaxed text-quicx-muted [&_strong]:font-semibold [&_strong]:text-quicx-text [&_a]:text-quicx-orange-bright [&_a]:underline [&_a]:decoration-quicx-orange/40 [&_a]:underline-offset-4 [&_a:hover]:decoration-quicx-orange">
+    <div className="max-w-[70ch] space-y-5 text-[16px] leading-[1.75] text-quicx-body [&_a]:text-quicx-orange-bright [&_a]:underline [&_a]:decoration-quicx-orange/40 [&_a]:underline-offset-4 [&_a:hover]:decoration-quicx-orange [&_em]:text-quicx-text [&_strong]:font-semibold [&_strong]:text-quicx-text">
       {children}
     </div>
   );
@@ -57,7 +63,7 @@ export function Prose({ children }: { children: React.ReactNode }) {
 
 export function InlineCode({ children }: { children: React.ReactNode }) {
   return (
-    <code className="rounded bg-white/[0.06] px-1.5 py-0.5 font-[family-name:var(--font-jetbrains-mono)] text-[12.5px] text-quicx-text">
+    <code className="rounded-[3px] border border-quicx-line bg-white/[0.045] px-[0.35em] py-[0.1em] font-mono text-[0.86em] text-quicx-text [overflow-wrap:anywhere]">
       {children}
     </code>
   );
@@ -73,9 +79,18 @@ export function SubHeading({
   return (
     <h3
       id={id}
-      className="scroll-mt-24 font-[family-name:var(--font-archivo)] text-[20px] font-semibold text-quicx-text"
+      className="group scroll-mt-24 pt-6 text-[24px] font-semibold leading-tight tracking-[-0.015em] text-quicx-text"
     >
       {children}
+      {id && (
+        <a
+          href={`#${id}`}
+          aria-label="Link to this section"
+          className="ml-2 font-mono text-[0.7em] text-quicx-dim opacity-0 transition-opacity hover:text-quicx-orange-bright focus-visible:opacity-100 group-hover:opacity-100"
+        >
+          #
+        </a>
+      )}
     </h3>
   );
 }
@@ -86,18 +101,16 @@ export function KeyList({
   items: { term: string; def: React.ReactNode }[];
 }) {
   return (
-    <dl className="divide-y divide-quicx-line overflow-hidden rounded-lg border border-quicx-line bg-[#0a1a22]">
+    <dl className="divide-y divide-quicx-line border-y border-quicx-line">
       {items.map((it) => (
         <div
           key={it.term}
-          className="grid grid-cols-1 gap-2 px-4 py-3.5 md:grid-cols-[200px_1fr] md:gap-6"
+          className="grid grid-cols-1 gap-1.5 py-4 md:grid-cols-[13rem_minmax(0,1fr)] md:gap-6"
         >
-          <dt className="font-[family-name:var(--font-jetbrains-mono)] text-[12.5px] text-quicx-orange-bright">
+          <dt className="font-mono text-[13.5px] leading-[1.7] text-quicx-orange-bright [overflow-wrap:anywhere]">
             {it.term}
           </dt>
-          <dd className="text-[13.5px] leading-relaxed text-quicx-muted">
-            {it.def}
-          </dd>
+          <dd className="text-[15px] leading-[1.7] text-quicx-body">{it.def}</dd>
         </div>
       ))}
     </dl>
@@ -114,41 +127,42 @@ export function Table({
   highlight?: number;
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-quicx-line bg-[#0a1a22]">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-[13px]">
-          <thead>
-            <tr className="border-b border-quicx-line bg-white/[0.02]">
-              {headers.map((h, i) => (
-                <th
-                  key={i}
-                  className="px-4 py-3 font-[family-name:var(--font-barlow-condensed)] text-[11.5px] font-semibold uppercase tracking-[0.22em] text-quicx-dim"
+    <div className="overflow-x-auto border-y border-quicx-line">
+      <table className="w-full text-left text-[14px]">
+        <thead>
+          <tr className="border-b border-quicx-line-strong">
+            {headers.map((h, i) => (
+              <th
+                key={i}
+                scope="col"
+                className="whitespace-nowrap py-3 pr-5 caps-label font-normal text-quicx-dim last:pr-0"
+              >
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="tabular">
+          {rows.map((r, i) => (
+            <tr key={i} className="border-b border-quicx-line last:border-b-0">
+              {r.map((c, j) => (
+                <td
+                  key={j}
+                  className={
+                    j === highlight
+                      ? "py-3 pr-5 align-top text-quicx-orange-bright last:pr-0"
+                      : j === 0
+                        ? "py-3 pr-5 align-top text-quicx-text last:pr-0"
+                        : "py-3 pr-5 align-top text-quicx-body last:pr-0"
+                  }
                 >
-                  {h}
-                </th>
+                  {c}
+                </td>
               ))}
             </tr>
-          </thead>
-          <tbody>
-            {rows.map((r, i) => (
-              <tr key={i} className="border-b border-quicx-line/70 last:border-b-0">
-                {r.map((c, j) => (
-                  <td
-                    key={j}
-                    className={
-                      j === highlight
-                        ? "px-4 py-3 text-quicx-orange-bright"
-                        : "px-4 py-3 text-quicx-muted"
-                    }
-                  >
-                    {c}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

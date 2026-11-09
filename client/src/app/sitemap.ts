@@ -15,7 +15,7 @@ const docEntryMeta: Record<string, DocEntry> = {
   "quick-start":     { priority: 0.9, changeFrequency: "monthly" },
   "configuration":   { priority: 0.8, changeFrequency: "monthly" },
   "architecture":    { priority: 0.7, changeFrequency: "monthly" },
-  "pmad-allocator":  { priority: 0.7, changeFrequency: "monthly" },
+  "allocator":       { priority: 0.7, changeFrequency: "monthly" },
   "binary-protocol": { priority: 0.7, changeFrequency: "monthly" },
   "benchmarks":      { priority: 0.9, changeFrequency: "monthly" },
   "limitations":     { priority: 0.8, changeFrequency: "monthly" },
@@ -30,7 +30,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: SITE_URL,
-      lastModified: new Date("2026-08-15"),
+      lastModified: new Date("2026-11-09"),
       changeFrequency: "weekly",
       priority: 1,
       images: [`${SITE_URL}/opengraph-image`],

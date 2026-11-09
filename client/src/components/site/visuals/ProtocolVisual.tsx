@@ -1,445 +1,283 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { useStageReveal } from "../motion";
+import { Panel } from "./Panel";
 
-type Frame = {
-  name: string;
-  hex: string;
-  label: string;
-  color: string;
-  payload: string;
-  payloadBytes: number; // sample byte-count for the visual
-};
+/**
+ * One task, traced across the wire exactly as the Binary Protocol page lays it
+ * out: submit, ack, ready, dispatch, done, and done forwarded to the producer
+ * (since v1.0.3). The frame panel shows the real bytes of each message for a
+ * `send_email` task with id 0x0A42.
+ */
 
-const frames: Frame[] = [
-  {
-    name: "MSG_SUBMIT",
-    hex: "01",
-    label: "producer → daemon",
-    color: "#60a5fa",
-    payload: "[type_len:1][type:N][data:…]",
-    payloadBytes: 28,
-  },
-  {
-    name: "MSG_OK",
-    hex: "02",
-    label: "daemon acknowledges",
-    color: "#4ade80",
-    payload: "[task_id:4]",
-    payloadBytes: 4,
-  },
-  {
-    name: "MSG_ERROR",
-    hex: "03",
-    label: "daemon rejects",
-    color: "#f87171",
-    payload: "[code:1][message:…]",
-    payloadBytes: 14,
-  },
-  {
-    name: "MSG_READY",
-    hex: "04",
-    label: "worker ready",
-    color: "#5eead4",
-    payload: "(empty)",
-    payloadBytes: 0,
-  },
-  {
-    name: "MSG_DONE",
-    hex: "05",
-    label: "worker finished",
-    color: "#a78bfa",
-    payload: "[task_id:4]",
-    payloadBytes: 4,
-  },
-  {
-    name: "MSG_FAILED",
-    hex: "06",
-    label: "worker failed",
-    color: "#fb7185",
-    payload: "[task_id:4][reason:…]",
-    payloadBytes: 18,
-  },
-  {
-    name: "MSG_TASK",
-    hex: "07",
-    label: "daemon → worker",
-    color: "#f59e0b",
-    payload: "[task_id:4][type_len:1][type:N][data:…]",
-    payloadBytes: 32,
-  },
-  {
-    name: "MSG_WAIT",
-    hex: "08",
-    label: "no tasks",
-    color: "#94a3b8",
-    payload: "(empty)",
-    payloadBytes: 0,
-  },
-  {
-    name: "MSG_HEARTBEAT",
-    hex: "09",
-    label: "liveness probe",
-    color: "#fbbf24",
-    payload: "(empty)",
-    payloadBytes: 0,
-  },
-  {
-    name: "MSG_PONG",
-    hex: "0A",
-    label: "heartbeat reply",
-    color: "#fcd34d",
-    payload: "(empty)",
-    payloadBytes: 0,
-  },
-  {
-    name: "MSG_STATS",
-    hex: "0B",
-    label: "stats request",
-    color: "#9ca3af",
-    payload: "(empty)",
-    payloadBytes: 0,
-  },
-  {
-    name: "MSG_STATS_RESPONSE",
-    hex: "0C",
-    label: "stats reply",
-    color: "#d4d4d8",
-    payload: "[stats:…]",
-    payloadBytes: 40,
-  },
+const LANES = ["producer", "daemon", "worker"] as const;
+const LANE_X = [1 / 6, 3 / 6, 5 / 6];
+
+type Tone = "id" | "len" | "type" | "data";
+type Field = { label: string; tone: Tone; bytes: number[] };
+type Step = { name: string; type: number; from: number; to: number; fields: Field[]; note?: string };
+
+const ascii = (s: string) => Array.from(s, (c) => c.charCodeAt(0));
+const TASK_ID: Field = { label: "task_id", tone: "id", bytes: [0x00, 0x00, 0x0a, 0x42] };
+const TYPE = ascii("send_email");
+const SUBMIT_FIELDS: Field[] = [
+  { label: "type_len", tone: "len", bytes: [TYPE.length] },
+  { label: "type", tone: "type", bytes: TYPE },
+  { label: "data", tone: "data", bytes: ascii('{"id":42}') },
 ];
 
-type LogEntry = {
-  id: number;
-  frame: Frame;
+const TRACE: Step[] = [
+  { name: "MSG_SUBMIT", type: 0x01, from: 0, to: 1, fields: SUBMIT_FIELDS },
+  { name: "MSG_OK", type: 0x02, from: 1, to: 0, fields: [TASK_ID] },
+  { name: "MSG_READY", type: 0x04, from: 2, to: 1, fields: [] },
+  { name: "MSG_TASK", type: 0x07, from: 1, to: 2, fields: [TASK_ID, ...SUBMIT_FIELDS] },
+  { name: "MSG_DONE", type: 0x05, from: 2, to: 1, fields: [TASK_ID] },
+  { name: "MSG_DONE", type: 0x05, from: 1, to: 0, fields: [TASK_ID], note: "forwarded" },
+];
+
+const TONE: Record<Tone, string> = {
+  id: "text-quicx-orange-bright",
+  len: "text-quicx-text",
+  type: "text-quicx-body",
+  data: "text-quicx-muted",
 };
 
-// How many log rows fit in the card's opcode panel
-const VISIBLE_MAX = 5;
-// Per-row geometry — must match LogRow's rendered height exactly
-const SLOT_H = 30;
-const SLOT_GAP = 4;
-const SLOT_OFFSET = SLOT_H + SLOT_GAP;
-// Animation timing
-const SHIFT_MS = 520;
-const TICK_MS = 1400;
+const STEP_MS = 1150;
+const HOLD_MS = 2400;
 
-function formatLen(len: number) {
-  return [
-    ((len >>> 24) & 0xff).toString(16).padStart(2, "0"),
-    ((len >>> 16) & 0xff).toString(16).padStart(2, "0"),
-    ((len >>> 8) & 0xff).toString(16).padStart(2, "0"),
-    (len & 0xff).toString(16).padStart(2, "0"),
-  ]
-    .join(" ")
-    .toUpperCase();
-}
+const hex = (n: number) => n.toString(16).padStart(2, "0").toUpperCase();
+const lengthBytes = (n: number) => [(n >>> 24) & 0xff, (n >>> 16) & 0xff, (n >>> 8) & 0xff, n & 0xff];
 
-export function ProtocolVisual({
-  active,
-  expanded,
-}: {
-  active: boolean;
-  expanded?: boolean;
-}) {
-  if (expanded) {
-    return <ProtocolVisualExpanded active={active} />;
-  }
-  return <ProtocolVisualCard active={active} />;
-}
-
-/* ─────────── Card view: animated opcode log ─────────── */
-
-function ProtocolVisualCard({ active }: { active: boolean }) {
-  const [entries, setEntries] = useState<LogEntry[]>(() => {
-    const seed: LogEntry[] = [];
-    let tempId = 0;
-    let tempIdx = 0;
-    for (let k = 0; k < VISIBLE_MAX; k++) {
-      const frame = frames[tempIdx % frames.length];
-      tempIdx += 1;
-      seed.unshift({ id: ++tempId, frame });
-    }
-    return seed;
-  });
-  const [animState, setAnimState] = useState<"idle" | "primed" | "shifting">("idle");
-  const idRef = useRef(VISIBLE_MAX);
-  const frameIdxRef = useRef(VISIBLE_MAX);
+export function ProtocolVisual({ active }: { active: boolean }) {
+  const reveal = useStageReveal(active);
+  // Messages sent so far across every replay; -1 = nothing on the wire yet.
+  const [sentRun, setSent] = useState(-1);
 
   useEffect(() => {
-    if (!active) return;
-
-    let shiftTimeoutId: number;
-    let pruneTimeoutId: number;
-
-    const tick = () => {
-      const frame = frames[frameIdxRef.current % frames.length];
-      frameIdxRef.current += 1;
-      const newId = ++idRef.current;
-
-      // Transition 1: Primed
-      setAnimState("primed");
-      setEntries((prev) => [{ id: newId, frame }, ...prev].slice(0, VISIBLE_MAX + 1));
-
-      // Transition 2: Shifting
-      shiftTimeoutId = window.setTimeout(() => {
-        setAnimState("shifting");
-      }, 30);
-
-      // Transition 3: Idle + Prune
-      pruneTimeoutId = window.setTimeout(() => {
-        setAnimState("idle");
-        setEntries((curr) => curr.slice(0, VISIBLE_MAX));
-      }, SHIFT_MS + 30);
+    if (reveal !== "run") return;
+    let n = -1;
+    let t = 0;
+    const schedule = () => {
+      const s = n < 0 ? -1 : n % TRACE.length;
+      const wait = s === -1 ? 350 : s === TRACE.length - 1 ? HOLD_MS : STEP_MS;
+      t = window.setTimeout(() => {
+        n += 1;
+        setSent(n);
+        schedule();
+      }, wait);
     };
-
-    // Delay the first tick slightly so it doesn't instantly shift on hover
-    const initialId = window.setTimeout(tick, TICK_MS / 2);
-    const intervalId = window.setInterval(tick, TICK_MS);
+    schedule();
     return () => {
-      window.clearTimeout(initialId);
-      window.clearTimeout(shiftTimeoutId);
-      window.clearTimeout(pruneTimeoutId);
-      window.clearInterval(intervalId);
-      setAnimState("idle");
-      setEntries((curr) => curr.slice(0, VISIBLE_MAX));
+      window.clearTimeout(t);
+      setSent(-1);
     };
-  }, [active]);
+  }, [reveal]);
 
-  const headFrame = entries[0]?.frame ?? frames[0];
-  const len = headFrame.payloadBytes;
+  const sent = reveal === "static" ? TRACE.length - 1 : sentRun;
+  const step = sent < 0 ? -1 : sent % TRACE.length;
+  const cycle = sent < 0 ? 0 : Math.floor(sent / TRACE.length);
+  const animated = reveal === "run";
+  const current = TRACE[Math.max(0, step)];
+  const payload = current.fields.flatMap((f) => f.bytes.map((b) => ({ b, tone: f.tone })));
 
   return (
-    <div className="flex h-full flex-col gap-3 p-4">
-      {/* Frame bytes */}
-      <div className="flex flex-col overflow-hidden rounded-lg border border-white/10 bg-[#061219] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-        <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-3 py-2">
-          <span className="text-[10px] tracking-wide text-quicx-dim">
-            binary frame · 6-byte header + payload
-          </span>
-          <span className="text-[10px] text-quicx-orange-bright">
-            zero-copy
-          </span>
-        </div>
-        <div className="flex flex-1 flex-col gap-2 px-4 py-4 font-[family-name:var(--font-jetbrains-mono)] text-[11px]">
-          <div className="flex items-stretch gap-1.5">
-            <ByteCell label="version" value="01" sublabel="1 B" />
-            <ByteCell
-              label="type"
-              value={headFrame.hex}
-              sublabel="1 B"
-              highlight
-            />
-            <ByteCell
-              label="length"
-              value={formatLen(len)}
-              sublabel="4 B"
-              span={3}
-            />
-            <ByteCell
-              label="payload"
-              value={headFrame.payload}
-              sublabel={len === 0 ? "0 B" : `${len} B`}
-              span={6}
-              dim
-              grow
-            />
+    <div className="grid h-full grid-rows-[auto_minmax(0,1fr)] divide-y divide-quicx-line">
+      <Panel title="frame on the wire" meta={step < 0 ? "idle" : current.name}>
+        <div className="px-4 py-4 sm:px-5">
+          <div className="flex items-stretch gap-1 font-mono">
+            <ByteCell label="version" size="1 B" k={`v${cycle}`} animated={false}>
+              01
+            </ByteCell>
+            <ByteCell label="type" size="1 B" k={`t${step}-${cycle}`} animated={animated} highlight>
+              {step < 0 ? "··" : hex(current.type)}
+            </ByteCell>
+            <ByteCell label="length" size="4 B" k={`l${step}-${cycle}`} animated={animated} wide>
+              {step < 0 ? "·· ·· ·· ··" : lengthBytes(payload.length).map(hex).join(" ")}
+            </ByteCell>
+            <div className="hidden min-w-0 flex-1 flex-col justify-center pl-3 text-[11px] leading-[1.5] text-quicx-dim sm:flex">
+              <span>6-byte header, fixed</span>
+              <span>
+                then <span className="text-quicx-text">{step < 0 ? 0 : payload.length}</span> bytes
+                of payload
+              </span>
+            </div>
           </div>
-          <div className="flex items-center justify-between text-[10px] text-quicx-dim">
-            <span>total header = 6 bytes fixed</span>
-            <span>total message = 6 + length bytes</span>
-          </div>
-        </div>
-      </div>
 
-      {/* Animated opcode log — fills remaining card space (byte frame above
-          has a locked height so this area is constant too) */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-white/10 bg-[#061219] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-        <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-3 py-2">
-          <span className="text-[10px] tracking-wide text-quicx-dim">
-            wire log · live
-          </span>
-          <span className="text-[10px] text-quicx-dim">
-            {frames.length} opcodes total
-          </span>
+          <div className="mt-3 min-h-[3.25rem] rounded-[2px] border border-dashed border-quicx-line-strong px-3 py-2">
+            {step < 0 || payload.length === 0 ? (
+              <p className="font-mono text-[12px] leading-[1.6] text-quicx-dim">
+                {step < 0 ? "waiting for the first frame" : "no payload: length is zero"}
+              </p>
+            ) : (
+              <>
+                <p
+                  key={`${step}-${cycle}`}
+                  className="flex flex-wrap gap-x-[0.45em] font-mono text-[12px] leading-[1.6]"
+                >
+                  {payload.map(({ b, tone }, i) => (
+                    <span
+                      key={i}
+                      className={cn(TONE[tone], animated && "byte-in")}
+                      style={{ animationDelay: `${i * 22}ms` }}
+                    >
+                      {hex(b)}
+                    </span>
+                  ))}
+                </p>
+                <p className="mt-1 flex flex-wrap gap-x-3 font-mono text-[11px] text-quicx-dim">
+                  {current.fields.map((f) => (
+                    <span key={f.label} className="flex items-center gap-1.5">
+                      <span aria-hidden className={cn("size-1.5 bg-current", TONE[f.tone])} />
+                      {f.label}
+                    </span>
+                  ))}
+                </p>
+              </>
+            )}
+          </div>
         </div>
-        {/* overflow-hidden with a fixed height ensures enter/exit animations 
-            never leak height out to the outer layout */}
-        <div className="relative h-[182px] shrink-0 overflow-hidden px-3 py-2 font-[family-name:var(--font-jetbrains-mono)] text-[11px]">
-          <div 
-            className={cn("flex flex-col gap-1 w-full", `protocol-log-${animState}`)}
-            style={{ "--log-shift": `-${SLOT_OFFSET}px` } as React.CSSProperties}
-          >
-            {entries.map((e, idx) => (
-              <div key={e.id}>
-                <LogRow frame={e.frame} active={idx === 0} />
-              </div>
+      </Panel>
+
+      <Panel title="one task, traced" meta="12 opcodes in all" className="min-h-0">
+        <div className="relative flex h-full flex-col px-2 pb-3 pt-3 sm:px-4">
+          {/* lifelines */}
+          <div aria-hidden className="pointer-events-none absolute inset-x-2 bottom-3 top-10 sm:inset-x-4">
+            {LANE_X.map((x) => (
+              <span
+                key={x}
+                className="absolute inset-y-0 border-l border-dashed border-quicx-line-strong"
+                style={{ left: `${x * 100}%` }}
+              />
             ))}
           </div>
+
+          <div className="relative h-7 font-mono text-[11px] uppercase tracking-[0.04em] sm:tracking-[0.06em]">
+            {LANES.map((lane, i) => (
+              <span
+                key={lane}
+                className={cn(
+                  "absolute top-0 -translate-x-1/2 rounded-[2px] border bg-quicx-well px-1.5 py-0.5 transition-colors duration-300",
+                  step >= 0 && (current.from === i || current.to === i)
+                    ? "border-quicx-orange/70 text-quicx-text"
+                    : "border-quicx-line-strong text-quicx-dim"
+                )}
+                style={{ left: `${LANE_X[i] * 100}%` }}
+              >
+                {lane}
+              </span>
+            ))}
+          </div>
+
+          <ol className="relative mt-3 flex flex-1 flex-col justify-around">
+            {TRACE.map((m, i) => (
+              <Message
+                key={`${i}-${cycle}`}
+                m={m}
+                state={i < step ? "past" : i === step ? "current" : "future"}
+                animated={animated}
+              />
+            ))}
+          </ol>
         </div>
-      </div>
+      </Panel>
     </div>
   );
 }
 
-function LogRow({ frame, active }: { frame: Frame; active: boolean }) {
+function Message({
+  m,
+  state,
+  animated,
+}: {
+  m: Step;
+  state: "past" | "current" | "future";
+  animated: boolean;
+}) {
+  const rightward = m.to > m.from;
+  const lo = Math.min(m.from, m.to);
+  const hi = Math.max(m.from, m.to);
+  const live = state === "current";
   return (
-    <div
+    <li
       className={cn(
-        "flex h-[30px] items-center gap-3 rounded border px-2 transition-all duration-300",
-        active
-          ? "border-quicx-orange/50 bg-quicx-orange/15 text-quicx-text shadow-[0_0_14px_rgba(255,87,0,0.22)]"
-          : "border-white/5 bg-white/[0.02] text-quicx-text opacity-55"
+        "relative h-7 transition-opacity duration-300",
+        state === "future" ? "opacity-0" : "opacity-100"
       )}
     >
       <span
-        className={cn(
-          "inline-block size-1.5 rounded-full transition-shadow",
-          active && "shadow-[0_0_6px_currentColor]"
-        )}
-        style={{ background: frame.color, color: frame.color }}
-      />
-      <span className="w-40 shrink-0 truncate">{frame.name}</span>
-      <span className="text-quicx-dim">0x{frame.hex}</span>
-      <span className="ml-auto truncate text-quicx-dim">{frame.label}</span>
-    </div>
+        className="absolute inset-y-0"
+        style={{ left: `${LANE_X[lo] * 100}%`, right: `${(1 - LANE_X[hi]) * 100}%` }}
+      >
+        <span
+          className={cn(
+            "absolute inset-x-0 top-0 truncate text-center font-mono text-[11px] leading-none transition-colors duration-300",
+            live ? "text-quicx-orange-bright" : "text-quicx-muted"
+          )}
+        >
+          {m.name}
+          {m.note && <span className="hidden text-quicx-dim sm:inline"> · {m.note}</span>}
+        </span>
+        <span
+          className={cn(
+            "absolute inset-x-1.5 top-[18px] h-px transition-colors duration-300",
+            live ? "text-quicx-orange" : "text-quicx-body/45",
+            live && animated && (rightward ? "wire-lr" : "wire-rl")
+          )}
+        >
+          <span className="absolute inset-0 bg-current" />
+          <span
+            aria-hidden
+            className={cn(
+              "absolute top-1/2 size-0 -translate-y-1/2 border-y-[4px] border-y-transparent",
+              rightward ? "right-0 border-l-[6px] border-l-current" : "left-0 border-r-[6px] border-r-current"
+            )}
+          />
+          {live && animated && (
+            <span
+              aria-hidden
+              className={cn("absolute top-1/2 h-[3px] w-2.5 -translate-y-1/2 bg-[#ffd9c4]", rightward ? "pkt-lr" : "pkt-rl")}
+            />
+          )}
+        </span>
+      </span>
+    </li>
   );
 }
-
-/* ─────────── Expanded (modal) view: full opcode table ─────────── */
-
-function ProtocolVisualExpanded({ active }: { active: boolean }) {
-  const [i, setI] = useState(0);
-
-  useEffect(() => {
-    if (!active) return;
-    const id = setInterval(() => setI((v) => (v + 1) % frames.length), 1200);
-    return () => clearInterval(id);
-  }, [active]);
-
-  const f = frames[i];
-  const len = f.payloadBytes;
-
-  return (
-    <div className="flex h-full flex-col gap-3 p-4">
-      {/* Frame bytes */}
-      <div className="flex flex-col overflow-hidden rounded-lg border border-white/10 bg-[#061219] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-        <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-3 py-2">
-          <span className="text-[10px] tracking-wide text-quicx-dim">
-            binary frame · 6-byte header + payload
-          </span>
-          <span className="text-[10px] text-quicx-orange-bright">
-            zero-copy
-          </span>
-        </div>
-        <div className="flex flex-1 flex-col gap-2 px-4 py-4 font-[family-name:var(--font-jetbrains-mono)] text-[11px]">
-          <div className="flex items-stretch gap-1.5">
-            <ByteCell label="version" value="01" sublabel="1 B" />
-            <ByteCell label="type" value={f.hex} sublabel="1 B" highlight />
-            <ByteCell
-              label="length"
-              value={formatLen(len)}
-              sublabel="4 B"
-              span={3}
-            />
-            <ByteCell
-              label="payload"
-              value={f.payload}
-              sublabel={len === 0 ? "0 B" : `${len} B`}
-              span={6}
-              dim
-              grow
-            />
-          </div>
-          <div className="flex items-center justify-between text-[10px] text-quicx-dim">
-            <span>total header = 6 bytes fixed</span>
-            <span>total message = 6 + length bytes</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Legend — full list */}
-      <div className="flex flex-col overflow-hidden rounded-lg border border-white/10 bg-[#061219] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-        <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.02] px-3 py-2">
-          <span className="text-[10px] tracking-wide text-quicx-dim">
-            opcodes · {frames.length} message types
-          </span>
-        </div>
-        <div className="grid flex-1 grid-cols-1 gap-1 px-4 py-3 font-[family-name:var(--font-jetbrains-mono)] text-[11px]">
-          {frames.map((frame, idx) => (
-            <div
-              key={frame.name}
-              className={cn(
-                "flex items-center gap-3 rounded px-2 py-1.5 transition-all duration-300",
-                active && i === idx
-                  ? "scale-[1.02] border border-quicx-orange/20 bg-quicx-orange/10 shadow-[0_0_12px_rgba(255,87,0,0.15)]"
-                  : "border border-transparent opacity-60"
-              )}
-            >
-              <span
-                className="inline-block size-1.5 rounded-full"
-                style={{ background: frame.color }}
-              />
-              <span className="w-40 shrink-0 text-quicx-text">
-                {frame.name}
-              </span>
-              <span className="text-quicx-dim">0x{frame.hex}</span>
-              <span className="ml-auto truncate text-quicx-dim">
-                {frame.label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────── shared byte cell ─────────── */
 
 function ByteCell({
   label,
-  value,
-  sublabel,
-  span = 1,
+  size,
+  k,
+  animated,
   highlight,
-  dim,
-  grow,
+  wide,
+  children,
 }: {
   label: string;
-  value: string;
-  sublabel?: string;
-  span?: number;
+  size: string;
+  k: string;
+  animated: boolean;
   highlight?: boolean;
-  dim?: boolean;
-  grow?: boolean;
+  wide?: boolean;
+  children: React.ReactNode;
 }) {
   return (
     <div
       className={cn(
-        "flex h-[60px] flex-col items-center justify-center overflow-hidden rounded border px-2 py-1",
-        grow && "min-w-0 flex-1",
+        "flex h-[58px] shrink-0 flex-col items-center justify-center gap-1 overflow-hidden rounded-[2px] border px-2 [perspective:200px]",
+        wide ? "w-[7.25rem]" : "w-[3.75rem]",
         highlight
-          ? "border-quicx-orange/60 bg-quicx-orange/10 text-quicx-orange-bright"
-          : dim
-            ? "border-white/5 bg-white/[0.02] text-quicx-dim"
-            : "border-white/10 bg-white/[0.03] text-quicx-text"
+          ? "border-quicx-orange bg-quicx-orange/[0.1] text-quicx-orange-bright"
+          : "border-quicx-line-strong text-quicx-text"
       )}
-      style={{ minWidth: grow ? 0 : span * 28 }}
     >
-      <span className="block w-full truncate text-center text-[9px] uppercase leading-tight tracking-wider opacity-70">
-        {label}
+      <span className="text-[11px] uppercase tracking-[0.04em] opacity-75">{label}</span>
+      <span key={k} className={cn("text-[12px] font-medium", animated && "flip-in")}>
+        {children}
       </span>
-      <span className="block w-full truncate text-center font-semibold leading-tight">
-        {value}
-      </span>
-      {sublabel && (
-        <span className="block w-full truncate text-center text-[8.5px] uppercase leading-tight tracking-wider opacity-50">
-          {sublabel}
-        </span>
-      )}
+      <span className="text-[11px] opacity-60">{size}</span>
     </div>
   );
 }

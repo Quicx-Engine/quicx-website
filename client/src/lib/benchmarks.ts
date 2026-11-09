@@ -12,57 +12,88 @@ export const REFERENCE_RUN = {
   machine: "Apple M4 Pro (12 cores), 24 GB",
   os: "macOS 26.5.1, arm64",
   build: "Apple clang 17, quicxd built -O2",
-  allocator: "Default 8 MB PMAD pool",
+  allocator: "Default 8 MiB budget, apool v2",
   transport: "Loopback TCP, no network hop",
   load: "8 worker processes, 8 producer connections, C clients",
 } as const;
 
+/** The second machine: same scripts, same build flags, its own compiler. */
+export const SECOND_RUN = {
+  machine: "Intel Core i3-2100 (2011), 2 cores / 4 threads, 8 GB",
+  os: "Ubuntu 24.04, Linux 6.8, x86-64",
+  build: "gcc 13.3, quicxd built -O2",
+} as const;
+
 export const HEADLINE = {
-  throughput: "74,300",
+  throughput: "81,900",
   throughputUnit: "tasks/sec",
   throughputNote: "end to end, single thread",
-  latency: "51 µs",
+  latency: "49 µs",
+  latencyUs: "49",
   latencyNote: "p50 submit → done",
-  memoryDelta: "0 KB",
-  memoryNote: "growth over 443,912 tasks",
-  binary: "54 KB",
+  capacity: "46,593",
+  capacityNote: "tasks of 100 B in 8 MiB",
+  capacityBefore: "655",
+  memoryAfterBurst: "2,080 KB",
+  memoryNote: "held after a burst drains",
+  binary: "55 KB",
   binaryNote: "no runtime dependencies",
 } as const;
 
-/** Open loop, 40,000 tasks/sec offered. Latency is submit → done. */
+/** Open loop, 40,000 tasks/sec offered on the Mac. Latency is submit → done. Median of 5 runs. */
 export const LATENCY_PERCENTILES = [
-  { label: "p50", value: "51 µs", us: 51 },
-  { label: "p90", value: "67 µs", us: 67 },
-  { label: "p99", value: "111 µs", us: 111 },
-  { label: "p99.9", value: "174 µs", us: 174 },
+  { label: "p50", value: "49 µs", us: 49 },
+  { label: "p90", value: "64 µs", us: 64 },
+  { label: "p99", value: "98 µs", us: 98 },
+  { label: "p99.9", value: "143 µs", us: 143 },
 ] as const;
 
-/** Same open-loop harness, three offered rates. p50 is flat across all three. */
-export const LATENCY_BY_LOAD = [
-  { offered: "10k/s", p50: "52 µs", p99: "116 µs", p999: "157 µs", p50us: 52 },
-  { offered: "20k/s", p50: "52 µs", p99: "99 µs", p999: "163 µs", p50us: 52 },
-  { offered: "40k/s", p50: "51 µs", p99: "111 µs", p999: "174 µs", p50us: 51 },
+/**
+ * Both machines, median of 5 interleaved runs per version. Each machine is
+ * offered a fixed rate it handles comfortably: 40k/s on the Mac, 9k/s on the
+ * i3, whose closed-loop ceiling is 19k/s.
+ */
+export const LATENCY_BY_MACHINE = [
+  { machine: "Apple M4 Pro", short: "M4 Pro", offered: "40k/s", p50us: 49, p50: "49 µs", p99: "98 µs", p999: "143 µs", throughput: "81.9k/s" },
+  { machine: "Intel i3-2100", short: "i3-2100", offered: "9k/s", p50us: 123, p50: "123 µs", p99: "198 µs", p999: "208 µs", throughput: "19.0k/s" },
 ] as const;
 
 export const THROUGHPUT_RUN = {
-  tasks: "443,912",
-  window: "Closed loop, 8 connections × 32 in flight, 8 workers",
+  window: "Closed loop, 8 connections × 32 in flight, 8 workers, 10 s",
   errors: "0 errors, 0 dropped connections",
-  spread: "Repeat runs land between 74k and 75k.",
+  spread: "Five runs landed between 77.8k and 85.4k; v1.0.4 measured 82.4k the same way.",
 } as const;
 
+/** Physical memory of the daemon, KB (macOS phys_footprint), median of 3 runs. */
 export const MEMORY_RUN = {
-  idleRss: "9,584 KB",
-  finalRss: "9,584 KB",
-  delta: "0 KB",
-  poolPeakPct: 10.7,
-  poolSize: "8 MB",
+  idle: "1,056 KB",
+  full: "9,088 KB",
+  afterBurst: "2,080 KB",
+  v104: "9,200 KB",
+  poolPeakPct: 2.8,
+  poolSize: "8 MiB",
 } as const;
+
+/** Tasks the daemon accepts before it answers ERROR 0x01, the same on both machines. */
+export const CAPACITY = [
+  { payload: "100 B", v104: "655", v2: "46,593" },
+  { payload: "900 B", v104: "180", v2: "8,016" },
+  { payload: "40 B", v104: "1,310", v2: "73,146" },
+  { payload: "300 B", v104: "262", v2: "22,044" },
+  { payload: "nginx lines, avg 188 B", v104: "1,433", v2: "30,947" },
+] as const;
+
+/** Physical memory in KB: macOS phys_footprint, Linux resident set size. Median of 3 runs. */
+export const MEMORY_BY_MACHINE = [
+  { stage: "idle, just started", macV104: "9,200", macV2: "1,056", linuxV104: "9,928", linuxV2: "1,796" },
+  { stage: "queue full", macV104: "9,200", macV2: "9,088", linuxV104: "9,928", linuxV2: "9,816" },
+  { stage: "after the burst drains", macV104: "9,200", macV2: "2,080", linuxV104: "9,928", linuxV2: "2,736" },
+] as const;
 
 export const FOOTPRINT = [
-  { label: "binary", value: "54.4 KB", note: "-O2, stripped of nothing" },
+  { label: "binary", value: "54.9 KB", note: "-O2, stripped of nothing" },
   { label: "runtime dependencies", value: "none", note: "" },
-  { label: "source", value: "~2,480 lines", note: "of C" },
+  { label: "source", value: "~2,800 lines", note: "of C" },
   { label: "threads", value: "1", note: "" },
 ] as const;
 
@@ -84,12 +115,12 @@ export const METHODOLOGY = [
     body: "nginx combined-format access-log lines, 120–260 bytes. Workers parse them — IP, method, path hash, status, bytes — and report per-status totals, so a run can be verified rather than trusted.",
   },
   {
-    title: "One machine, loopback TCP",
-    body: "No network hop. Real deployments will be slower.",
+    title: "Two machines, loopback TCP",
+    body: "An Apple M4 Pro on macOS and a 2011 Intel Core i3 on Linux, same scripts, same -O2 build. Clients and daemon share each machine over loopback, so there is no network hop. Real deployments will be slower.",
   },
   {
     title: "The harness checks itself",
-    body: "256 outstanding requests ÷ 74.3k/s = 3.4 ms, and measured closed-loop p50 was 3.6 ms. Little's Law agrees, so the instrument is measuring queueing and not itself.",
+    body: "256 outstanding requests ÷ 81.9k/s = 3.1 ms, and the measured closed-loop p50 was 3.3 ms (median of 5 runs). Little's Law agrees, so the instrument is measuring queueing and not itself.",
   },
 ] as const;
 
@@ -117,7 +148,7 @@ export const LIMITATIONS = [
   },
   {
     title: "Payloads above 1 KB",
-    body: "PROTOCOL_MAX_PAYLOAD is 1024 bytes, matching the largest PMAD size class. Oversized frames get a clean MSG_ERROR.",
+    body: "PROTOCOL_MAX_PAYLOAD is 1,024 bytes: a task is one block of a 64 B record plus its payload, at most 1,088 B. Oversized frames get a clean MSG_ERROR.",
   },
   {
     title: "Multiple cores",
@@ -130,8 +161,8 @@ export const LIMITATIONS = [
 export const COMPARISON = [
   {
     system: "Quicx",
-    throughput: "74.3k tasks/s (1 thread)",
-    latency: "51 µs p50 end-to-end",
+    throughput: "81.9k tasks/s (1 thread)",
+    latency: "49 µs p50 end-to-end",
     provenance: "measured here",
     measured: true,
   },
@@ -169,7 +200,7 @@ export const FEATURE_MATRIX = {
   columns: ["Quicx", "beanstalkd", "Redis Streams", "RabbitMQ"],
   rows: [
     { label: "memory bound", values: ["exact, configured", "none", "cap + eviction", "none"] },
-    { label: "binary size", values: ["54 KB", "~", "~1 MB+", "large"] },
+    { label: "binary size", values: ["55 KB", "~", "~1 MB+", "large"] },
     { label: "dependencies", values: ["none", "libevent", "none", "Erlang/OTP"] },
     {
       label: "delivery",

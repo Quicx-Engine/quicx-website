@@ -54,7 +54,7 @@ export function JavaClientSection() {
       <Prose>
         <p>
           <InlineCode>QuicxClient</InlineCode> is stateless at the connection level: every
-          call to <InlineCode>submit()</InlineCode> opens a fresh TCP connection, performs
+          call to <InlineCode>submit()</InlineCode>{" "}opens a fresh TCP connection, performs
           the submit request-reply, and closes. Keep the object around for the lifetime of
           the producer — it&rsquo;s safe to reuse and share across threads.
         </p>
@@ -175,7 +175,7 @@ public class Worker {
       <Prose>
         <p>
           An unchecked <InlineCode>RuntimeException</InlineCode> thrown by{" "}
-          <InlineCode>QuicxClient#submit</InlineCode> on rejection or protocol error. It wraps
+          <InlineCode>QuicxClient#submit</InlineCode>{" "}on rejection or protocol error. It wraps
           the daemon&rsquo;s <InlineCode>MSG_ERROR</InlineCode> message string so the cause is
           visible without decoding bytes by hand.
         </p>

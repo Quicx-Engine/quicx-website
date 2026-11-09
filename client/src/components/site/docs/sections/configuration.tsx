@@ -7,7 +7,6 @@ import {
   InlineCode,
   SubHeading,
   KeyList,
-  Table,
 } from "@/components/site/docs/_primitives";
 
 export function ConfigurationSection() {
@@ -18,31 +17,42 @@ export function ConfigurationSection() {
       <CodeBlock
         filename="quicx.conf"
         language="conf"
-        code={`# Quicx config — built-in default (no --config needed)
+        code={`# quicx.conf — every key is optional; these ARE the built-in defaults
 [server]
-port = 16381
+port = 16381            # TCP port for producers and workers
+
+[memory]
+pool_size = 8M          # the whole budget, never exceeded (K, M, G)
 
 [allocator]
-pool_size = 8388608
-class = 16,2     # Connection — bounded by MAX_CONNECTIONS
-class = 32,2     # Worker — bounded by MAX_CONNECTIONS
-class = 48,1
-class = 64,12    # Task — queue depth is uncapped, so this class IS the queue depth
-class = 80,1
-class = 96,1
-# ... every other class up to 1024B keeps a 1% floor ...
-# ... leftover percentage points are folded into the widest classes ...
-class = 1008,1
-class = 1024,1`}
+reserve       = on      # last free pages only for sizes that own none
+hardening     = on      # encoded free lists; double frees caught
+purge         = on      # empty pages give memory back after a burst
+fullest_first = off     # Hoard's idea; no gain on queue traffic
+warm_pages    = auto    # empty pages kept before purging (1/8)
+reserve_pages = auto    # pages the reserve holds back (1/64)`}
       />
 
       <Callout variant="note" title="Default configuration">
-        This is the built-in default as of v1.0.3. When you run{" "}
-        <InlineCode>quicx start</InlineCode> without a{" "}
-        <InlineCode>--config</InlineCode> flag, the daemon uses these exact values — no file
-        needed to get started: an 8 MiB pool split into all 64 exact-fit size classes from 16
-        bytes to 1024 bytes, in 16-byte steps.
+        Running <InlineCode>quicx start</InlineCode> without <InlineCode>--config</InlineCode>{" "}
+        gives exactly the file above. Order of precedence: the built-in defaults, then the
+        file, then the command line — <InlineCode>--port</InlineCode> always wins.
       </Callout>
+
+      <Prose>
+        <p>On start, the daemon prints what it is running with:</p>
+      </Prose>
+
+      <CodeBlock
+        filename="quicx start"
+        language="text"
+        code={`config loaded: /etc/quicx/quicx.conf
+quicx v2.0.0 starting
+  port:    16381
+  pool:    8388608 bytes, 16 KiB pages given to block sizes on demand
+  apool:   reserve, hardening, purge
+  pages:   508 for tasks (63 kept warm, 7 reserved), 3 for connections and workers`}
+      />
 
       <SubHeading id="server-block">[server]</SubHeading>
 
@@ -52,10 +62,31 @@ class = 1024,1`}
             term: "port",
             def: (
               <>
-                TCP port the daemon binds to. Producers and workers both dial the same port —
-                routing is decided by the first message they send (
+                TCP port the daemon binds to, 1–65535. Producers and workers both dial the same
+                port — routing is decided by the first message they send (
                 <InlineCode>MSG_SUBMIT</InlineCode> vs <InlineCode>MSG_READY</InlineCode>).
                 Default: <InlineCode>16381</InlineCode>.
+              </>
+            ),
+          },
+        ]}
+      />
+
+      <SubHeading id="memory-block">[memory]</SubHeading>
+
+      <KeyList
+        items={[
+          {
+            term: "pool_size",
+            def: (
+              <>
+                The whole memory budget, mapped once with <InlineCode>mmap</InlineCode> at
+                startup and never grown. Bytes, or with a <InlineCode>K</InlineCode>,{" "}
+                <InlineCode>M</InlineCode> or <InlineCode>G</InlineCode> suffix (1024-based;{" "}
+                <InlineCode>8MB</InlineCode> is refused as ambiguous). Default{" "}
+                <InlineCode>8M</InlineCode>. Three pages of it hold connections and workers, the
+                rest holds tasks; when it is full, new <InlineCode>MSG_SUBMIT</InlineCode> frames
+                get <InlineCode>MSG_ERROR&nbsp;0x01&nbsp;(queue full)</InlineCode>.
               </>
             ),
           },
@@ -66,89 +97,93 @@ class = 1024,1`}
 
       <Prose>
         <p>
-          The <InlineCode>allocator</InlineCode> block is parsed directly into the{" "}
-          <Link href="/docs/pmad-allocator">PMAD</Link> initializer. You own every byte of the pool —
-          no hidden reserves, no growth. All arithmetic is performed at startup so the daemon
-          either boots with the layout you asked for or refuses to start.
+          Switches for the features of <Link href="/docs/allocator">apool v2</Link>, each taken
+          from a published allocator and measured on its own. The defaults are the measured
+          best for a task queue; change them to trade capacity, safety or memory against each
+          other.
         </p>
       </Prose>
 
       <KeyList
         items={[
           {
-            term: "pool_size",
+            term: "reserve = on | off",
             def: (
               <>
-                Total bytes reserved via a single <InlineCode>mmap</InlineCode> call. Default
-                is <InlineCode>8388608</InlineCode> (8 MiB), up from 1 MiB before v1.0.3. The
-                allocator never grows past this number — if you exhaust it, new{" "}
-                <InlineCode>MSG_SUBMIT</InlineCode> frames are rejected with{" "}
-                <InlineCode>MSG_ERROR&nbsp;0x01&nbsp;(queue full)</InlineCode>.
+                With <InlineCode>reserve_pages</InlineCode> or fewer pages free, only a size that
+                owns no page yet may take one, so a flood of one size cannot lock every other
+                size out. Costs about 1.4 % of capacity.
               </>
             ),
           },
           {
-            term: "class = SIZE,PCT",
+            term: "hardening = on | off",
             def: (
               <>
-                Declares one size class: <strong>SIZE</strong> is the block size in bytes,{" "}
-                <strong>PCT</strong> is the percentage of the pool that belongs to that class.
-                Declare the classes in ascending <strong>SIZE</strong> order. The percentages
-                must sum to <InlineCode>100</InlineCode>; if they don&rsquo;t, the daemon
-                refuses to start. <strong>SIZE</strong> may not exceed{" "}
-                <InlineCode>1024</InlineCode> bytes and at most <InlineCode>64</InlineCode>{" "}
-                classes may be declared — both hard ceilings in the allocator as of v1.0.3.
+                Free-list links are XOR-encoded with a per-pool key; an overwritten link is
+                caught before it is followed and a double free is refused and counted. About
+                1 ns per task on an Apple M4 Pro, 13 ns on a 2011 Intel i3.
+              </>
+            ),
+          },
+          {
+            term: "purge = on | off",
+            def: (
+              <>
+                Empty pages are reused newest first; beyond <InlineCode>warm_pages</InlineCode>{" "}
+                of them, the oldest gives its memory back to the OS. Off keeps the memory of the
+                biggest burst for the life of the process.
+              </>
+            ),
+          },
+          {
+            term: "fullest_first = on | off",
+            def: (
+              <>
+                Allocate from the fullest page of a size first, so emptier pages drain. Off by
+                default: queue traffic frees in arrival order, so pages drain on their own and
+                the extra bookkeeping only costs time.
+              </>
+            ),
+          },
+          {
+            term: "warm_pages = auto | N",
+            def: (
+              <>
+                Empty pages kept backed and ready before purging starts.{" "}
+                <InlineCode>auto</InlineCode> is 1/8 of the pages (63 at 8 MiB). Needs{" "}
+                <InlineCode>purge = on</InlineCode>.
+              </>
+            ),
+          },
+          {
+            term: "reserve_pages = auto | N",
+            def: (
+              <>
+                Pages the reserve holds back. <InlineCode>auto</InlineCode> is 1/64 of the pages
+                (7 at 8 MiB). Needs <InlineCode>reserve = on</InlineCode>.
               </>
             ),
           },
         ]}
       />
 
-      <Callout variant="note" title="Why the default split is weighted, not flat">
-        A percentage buys bytes, not blocks — 1% of the 8 MiB default pool is 2,620 blocks at
-        16B but only 80 at 1024B. So the split isn&rsquo;t even: <InlineCode>64B</InlineCode>{" "}
-        gets <InlineCode>12%</InlineCode> (the <strong>Task</strong> class — queue depth is
-        uncapped, so this class <em>is</em> the queue depth), <InlineCode>16B</InlineCode> and{" "}
-        <InlineCode>32B</InlineCode> get <InlineCode>2%</InlineCode> each (
-        <strong>Connection</strong> and <strong>Worker</strong>, both bounded by{" "}
-        <InlineCode>MAX_CONNECTIONS</InlineCode>), and every remaining class keeps a{" "}
-        <InlineCode>1%</InlineCode> floor — at <InlineCode>0%</InlineCode> a class would be
-        carved zero blocks and every allocation of that size would fail outright. Leftover
-        percentage points are folded into the widest classes, which lifts the worst-off class
-        the most. At the default 8 MiB pool, no payload class holds fewer than{" "}
-        <strong>124 blocks</strong> — all computed before the daemon accepts its first
-        connection.
-      </Callout>
+      <SubHeading id="upgrading">Upgrading from 1.x</SubHeading>
 
-      <SubHeading id="tuning-rules">Tuning rules of thumb</SubHeading>
-
-      <Table
-        headers={["Workload", "Recommended shape", "Why"]}
-        rows={[
-          [
-            "Short JSON payloads (webhooks, emails)",
-            <InlineCode key="a">32, 64, 128</InlineCode>,
-            "Most MSG_SUBMIT frames land between 40–120 bytes; three tight classes eat the long tail with <5 % slack.",
-          ],
-          [
-            "Mixed media (thumbnails, ML prompts)",
-            <InlineCode key="b">128, 512, 1024</InlineCode>,
-            "Wide spread within the 1024-byte ceiling — weight the biggest class heaviest.",
-          ],
-          [
-            "Uniform binary blobs",
-            <InlineCode key="c">one class at 100 %</InlineCode>,
-            "Zero internal fragmentation. Highest throughput — see the PMAD benchmarks.",
-          ],
-        ]}
-      />
+      <Prose>
+        <p>
+          A 1.x file still loads. Its <InlineCode>class = SIZE,PCT</InlineCode> lines laid out
+          the old fixed size classes; apool sizes itself, so they are ignored with a note, and{" "}
+          <InlineCode>pool_size</InlineCode> is still read under <InlineCode>[allocator]</InlineCode>.
+          Nothing about the pool needs tuning per workload any more.
+        </p>
+      </Prose>
 
       <Callout variant="warn" title="Validation is strict on purpose">
-        If <InlineCode>pool_size</InlineCode> is not a multiple of every declared class size, if
-        the percentages don&rsquo;t sum to 100, if a class exceeds 1024 bytes, or if more than
-        64 classes are declared, the daemon exits with a precise error pointing at the
-        offending line. This is deliberate — Quicx refuses to start in a
-        &ldquo;mostly-correct&rdquo; state.
+        An unknown section or key, a key in the wrong section, or a value that cannot be used
+        stops the daemon with the file and the line — for example{" "}
+        <InlineCode>quicx.conf:14: purge must be on or off, not &apos;sometimes&apos;</InlineCode>.
+        A typo never silently falls back to a default.
       </Callout>
     </section>
   );

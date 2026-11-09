@@ -1,5 +1,7 @@
 import Image from "next/image";
-import { BookOpen } from "lucide-react";
+import Link from "next/link";
+import { CURRENT_VERSION } from "@/lib/version";
+import { Container } from "./primitives";
 
 function GithubIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -17,14 +19,14 @@ function LinkedInIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-const nav: { title: string; items: { label: string; href: string }[] }[] = [
+const nav: { title: string; items: { label: string; href: string; external?: boolean }[] }[] = [
   {
     title: "Product",
     items: [
-      { label: "Features", href: "/#features" },
+      { label: "Benchmarks", href: "/#measured" },
+      { label: "Principles", href: "/#features" },
       { label: "Architecture", href: "/#architecture" },
-      { label: "Performance", href: "/#performance" },
-      { label: "Changelog", href: "/docs/changelog" },
+      { label: "Limits", href: "/#limits" },
     ],
   },
   {
@@ -36,118 +38,86 @@ const nav: { title: string; items: { label: string; href: string }[] }[] = [
       { label: "Java client", href: "/docs/java-client" },
     ],
   },
-  // {
-  //   title: "Company",
-  //   items: [
-  //     { label: "About Nefara", href: "https://www.nefara.org" },
-  //     { label: "Contact", href: "https://www.nefara.org/en#contact" },
-  //     { label: "Security", href: "#" },
-  //     { label: "License", href: "#" },
-  //   ],
-  // },
+  {
+    title: "Releases",
+    items: [
+      { label: "Changelog", href: "/docs/changelog" },
+      { label: "Binaries on GitHub", href: "https://github.com/Quicx-Engine/Quicx-Releases", external: true },
+      { label: "Maven Central", href: "https://central.sonatype.com/artifact/dev.quicx/quicx-client", external: true },
+    ],
+  },
 ];
 
 export function Footer() {
   return (
-    <footer className="relative border-t border-quicx-line bg-quicx-bg">
-      <div className="pointer-events-none absolute inset-0 bg-dots opacity-20" />
-
-      {/* Main footer */}
-      <div className="relative mx-auto grid w-full max-w-7xl grid-cols-2 gap-10 px-6 py-16 lg:grid-cols-4 lg:gap-16 lg:px-10">
-        {/* Brand column */}
-        <div className="col-span-2 lg:col-span-2">
-          <Image
-            src="/quicx-logo.svg"
-            alt="Quicx"
-            width={130}
-            height={34}
-            className="h-8 w-auto"
-          />
-          <p className="mt-5 max-w-sm text-[14px] leading-relaxed text-quicx-muted">
-            A deterministic task queue engine, built around a custom slab
-            allocator and a tight binary protocol. From developers, by
-            developers.
+    <footer className="bg-quicx-bg">
+      <Container className="grid grid-cols-2 gap-x-8 gap-y-12 py-16 md:grid-cols-12 lg:py-20">
+        <div className="col-span-2 md:col-span-5">
+          <Image src="/quicx-logo.svg" alt="Quicx" width={130} height={34} className="h-8 w-auto" />
+          <p className="mt-5 max-w-[36ch] text-[15px] leading-[1.6] text-quicx-muted">
+            A deterministic task queue engine, built around an adaptive page allocator, a fixed
+            memory budget and a tight binary protocol.
           </p>
-          <div className="mt-6 flex items-center gap-2">
+          <p className="mt-6 text-[14px] text-quicx-dim">
+            Built by{" "}
+            <a
+              href="https://www.linkedin.com/in/dimitar-anastasov-339a94310/"
+              className="text-quicx-body underline decoration-quicx-line-strong hover:text-quicx-text hover:decoration-quicx-orange"
+            >
+              Dimitar Anastasov
+            </a>
+          </p>
+          <div className="mt-4 flex items-center gap-2">
             <FooterIconLink href="https://github.com/anastassow" label="GitHub">
               <GithubIcon className="size-4" />
             </FooterIconLink>
             <FooterIconLink href="https://www.linkedin.com/in/dimitar-anastasov-339a94310/" label="LinkedIn">
               <LinkedInIcon className="size-[14px]" />
             </FooterIconLink>
-            <FooterIconLink href="/docs/installation" label="Documentation">
-              <BookOpen className="size-4" />
-            </FooterIconLink>
           </div>
         </div>
 
-        {/* Nav columns */}
         {nav.map((col) => (
-          <div key={col.title}>
-            <h3 className="font-[family-name:var(--font-barlow-condensed)] text-xs uppercase tracking-[0.28em] text-quicx-orange-bright">
-              {col.title}
-            </h3>
-            <ul className="mt-4 space-y-2.5">
+          <nav
+            key={col.title}
+            aria-label={col.title}
+            className={col.title === "Releases" ? "col-span-2 md:col-span-3" : "md:col-span-2"}
+          >
+            <h3 className="caps-label text-quicx-dim">{col.title}</h3>
+            <ul className="mt-4 space-y-3">
               {col.items.map((it) => (
                 <li key={it.label}>
-                  <a
-                    href={it.href}
-                    className="text-[14px] text-quicx-muted transition hover:text-quicx-text"
-                  >
-                    {it.label}
-                  </a>
+                  {it.external ? (
+                    <a
+                      href={it.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[14.5px] text-quicx-body transition-colors hover:text-quicx-text"
+                    >
+                      {it.label}
+                    </a>
+                  ) : (
+                    <Link
+                      href={it.href}
+                      className="text-[14.5px] text-quicx-body transition-colors hover:text-quicx-text"
+                    >
+                      {it.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
         ))}
-      </div>
+      </Container>
 
-      {/* Built-by strip — Nefara logo MUST sit on white */}
-      {/* <div className="relative border-t border-quicx-line bg-quicx-bg">
-        <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-6 px-6 py-10 lg:flex-row lg:px-10">
-          <p className="font-[family-name:var(--font-barlow-condensed)] text-sm uppercase tracking-[0.3em] text-quicx-dim">
-            <span className="text-quicx-orange-bright">“</span>
-            Never Far Away
-            <span className="text-quicx-orange-bright">”</span>
+      <div className="border-t border-quicx-line">
+        <Container className="flex flex-col gap-2 py-6 text-[13px] text-quicx-dim sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} Quicx</p>
+          <p className="font-mono text-[12px]">
+            v{CURRENT_VERSION} · Linux · macOS
           </p>
-
-          <div className="flex items-center gap-4">
-            <span className="text-[12px] uppercase tracking-[0.24em] text-quicx-dim">
-              Built by
-            </span>
-            // White surface for Nefara
-            <div className="flex items-center gap-3 rounded-full bg-white px-5 py-2.5 shadow-[0_0_0_1px_rgba(255,255,255,0.08)]">
-              <Image
-                src="/nefara-logo.svg"
-                alt="Nefara"
-                width={110}
-                height={28}
-                className="h-6 w-auto"
-              />
-            </div>
-          </div>
-        </div>
-      </div> */}
-
-      {/* Legal bar */}
-      <div className="relative border-t border-quicx-line">
-        <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-[12px] text-quicx-dim sm:flex-row lg:px-10">
-          <p>
-            © {new Date().getFullYear()} Quicx. All rights reserved.
-          </p>
-          <div className="flex items-center gap-5">
-            <a className="hover:text-quicx-text" href="#">
-              Privacy
-            </a>
-            <a className="hover:text-quicx-text" href="#">
-              Terms
-            </a>
-            <a className="hover:text-quicx-text" href="#">
-              License
-            </a>
-          </div>
-        </div>
+        </Container>
       </div>
     </footer>
   );
@@ -166,7 +136,9 @@ function FooterIconLink({
     <a
       href={href}
       aria-label={label}
-      className="inline-flex size-9 items-center justify-center rounded-md border border-quicx-line bg-white/[0.02] text-quicx-muted transition hover:border-white/20 hover:text-quicx-text"
+      target="_blank"
+      rel="noreferrer"
+      className="inline-flex size-9 items-center justify-center rounded-[3px] border border-quicx-line-strong text-quicx-muted transition-colors hover:border-quicx-text/40 hover:text-quicx-text"
     >
       {children}
     </a>

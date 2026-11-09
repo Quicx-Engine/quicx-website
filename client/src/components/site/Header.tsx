@@ -1,64 +1,62 @@
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Container, ButtonLink } from "./primitives";
+
+const links = [
+  { label: "Benchmarks", href: "/#measured" },
+  { label: "Principles", href: "/#features" },
+  { label: "Architecture", href: "/#architecture" },
+  { label: "Limits", href: "/#limits" },
+  { label: "Docs", href: "/docs/installation" },
+];
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b border-quicx-line bg-quicx-bg/70 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6 lg:px-10">
-        <a href="/" className="flex items-center" aria-label="Quicx home">
+    <header className="sticky top-0 z-50 border-b border-quicx-line bg-quicx-bg/[0.92] supports-[backdrop-filter]:bg-quicx-bg/80 supports-[backdrop-filter]:backdrop-blur-md">
+      <Container className="flex h-[var(--header-h)] items-center gap-8">
+        <Link href="/" className="flex shrink-0 items-center" aria-label="Quicx home">
           <Image
             src="/quicx-logo.svg"
             alt="Quicx"
             width={110}
             height={28}
             priority
-            className="h-7 w-auto select-none"
+            className="h-[26px] w-auto select-none"
           />
-        </a>
+        </Link>
 
-        <nav className="hidden items-center gap-8 text-[13px] font-medium text-quicx-muted md:flex">
-          <a
-            className="transition hover:text-quicx-text"
-            href="/#features"
-          >
-            Features
-          </a>
-          <a
-            className="transition hover:text-quicx-text"
-            href="/#architecture"
-          >
-            Architecture
-          </a>
-          <a
-            className="transition hover:text-quicx-text"
-            href="/#measured"
-          >
-            Benchmarks
-          </a>
-          <a
-            className="transition hover:text-quicx-text"
-            href="/#limits"
-          >
-            Limits
-          </a>
-          <a
-            className="transition hover:text-quicx-text"
-            href="/docs/installation"
-          >
-            Docs
-          </a>
+        <nav aria-label="Primary" className="hidden md:block">
+          <ul className="flex items-center gap-7 text-[14px] text-quicx-muted">
+            {links.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className="transition-colors hover:text-quicx-text">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </nav>
 
-        <a href="/docs/quick-start">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 rounded border-quicx-orange/60 bg-transparent px-4 font-[family-name:var(--font-barlow-condensed)] text-[15px] font-semibold uppercase tracking-wide text-quicx-orange hover:border-quicx-orange hover:bg-quicx-orange/10 hover:text-quicx-orange-bright"
+        <div className="ml-auto flex items-center gap-5">
+          <a
+            href="https://github.com/Quicx-Engine/Quicx-Releases"
+            target="_blank"
+            rel="noreferrer"
+            className="hidden text-[14px] text-quicx-muted transition-colors hover:text-quicx-text sm:block"
           >
-            Try Quicx
-          </Button>
-        </a>
-      </div>
+            Releases
+          </a>
+          <Link
+            href="/docs/installation"
+            className="text-[14px] text-quicx-muted transition-colors hover:text-quicx-text md:hidden"
+          >
+            Docs
+          </Link>
+          <ButtonLink href="/docs/quick-start" size="sm">
+            Get started
+          </ButtonLink>
+        </div>
+      </Container>
     </header>
   );
 }

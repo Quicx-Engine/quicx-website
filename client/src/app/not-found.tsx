@@ -14,8 +14,7 @@ export default function NotFound() {
   return (
     <>
       <Header />
-      <main className="relative flex-1">
-        <div className="pointer-events-none absolute inset-0 bg-dots opacity-20" />
+      <main className="flex-1 border-b border-quicx-line">
         <Interactive404 />
       </main>
       <Footer />

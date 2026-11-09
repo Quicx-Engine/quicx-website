@@ -170,7 +170,7 @@ export default async function Image() {
 
         {/* Stats badges */}
         <div style={{ display: "flex", gap: "14px", flexWrap: "nowrap" }}>
-          {["74,300 tasks/s", "51 µs p50 end-to-end", "0 KB growth", "54 KB binary"].map(
+          {["81,900 tasks/s", "49 µs p50 end-to-end", "46,593 tasks in 8 MiB", "55 KB binary"].map(
             (stat) => (
               <div
                 key={stat}

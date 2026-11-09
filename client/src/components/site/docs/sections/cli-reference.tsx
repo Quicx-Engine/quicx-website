@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 import { CURRENT_VERSION } from "@/lib/version";
 import { Terminal as TerminalIcon } from "lucide-react";
@@ -19,21 +20,15 @@ function CliCommand({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-lg border border-quicx-line bg-[#0a1a22] p-5">
-      <div className="flex items-start gap-3">
-        <span className="mt-1 inline-flex size-7 items-center justify-center rounded border border-quicx-orange/40 bg-quicx-orange/10 text-quicx-orange-bright">
-          <TerminalIcon className="size-3.5" />
-        </span>
-        <div className="min-w-0 flex-1 space-y-2">
-          <code className="block font-[family-name:var(--font-jetbrains-mono)] text-[13.5px] text-quicx-text">
-            {cmd}
-          </code>
-          <div className="font-[family-name:var(--font-barlow-condensed)] text-[11px] uppercase tracking-[0.24em] text-quicx-dim">
-            {title}
-          </div>
-        </div>
+    <div className="border-t border-quicx-line pt-7 first:border-t-0 first:pt-0">
+      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1.5">
+        <code className="flex items-center gap-2.5 font-mono text-[16px] text-quicx-text">
+          <TerminalIcon aria-hidden className="size-4 shrink-0 translate-y-px text-quicx-orange" />
+          {cmd}
+        </code>
+        <span className="text-[14px] text-quicx-dim">{title}</span>
       </div>
-      <div className="mt-3">{children}</div>
+      <div className="mt-5 space-y-5">{children}</div>
     </div>
   );
 }
@@ -50,27 +45,27 @@ export function CliReferenceSection() {
         code={`quicx v${CURRENT_VERSION} — lightweight task queue daemon
 
 usage:
-  quicx start --config FILE
+  quicx start [--config FILE] [--port N]
   quicx stop
   quicx status
   quicx version`}
       />
 
-      <div className="space-y-6">
-        <CliCommand cmd="quicx start --config FILE" title="start the daemon in the foreground">
+      <div className="space-y-12">
+        <CliCommand cmd="quicx start [--config FILE] [--port N]" title="start the daemon in the foreground">
           <Prose>
             <p>
-              Binds the port declared in <InlineCode>[server]</InlineCode>, maps the PMAD
-              pool, and begins accepting connections. Runs in the foreground — the calling
+              Binds the port, maps the memory budget once, and begins accepting connections. Runs in the foreground — the calling
               shell owns the process. Pair with systemd, <InlineCode>tmux</InlineCode>,{" "}
               <InlineCode>launchd</InlineCode> or your container supervisor for lifecycle
               management.
             </p>
             <p>
               <InlineCode>--config</InlineCode> is optional. When omitted, the daemon starts
-              with the built-in default configuration (port <InlineCode>16381</InlineCode>,
-              8 MiB pool, 64 exact-fit size classes from 16 to 1024 bytes). Pass a path to
-              override any or all values.
+              with the built-in defaults (port <InlineCode>16381</InlineCode>, an 8 MiB budget,
+              apool with reserve, hardening and purge on). Pass a{" "}
+              <Link href="/docs/configuration">quicx.conf</Link> to override any or all values;{" "}
+              <InlineCode>--port</InlineCode> overrides the file&rsquo;s port.
             </p>
           </Prose>
         </CliCommand>
@@ -79,8 +74,9 @@ usage:
           <Prose>
             <p>
               Sends <InlineCode>SIGTERM</InlineCode> to the pid recorded in{" "}
-              <InlineCode>/var/run/quicx.pid</InlineCode>. The daemon drains in-flight tasks,{" "}
-              <InlineCode>munmap</InlineCode>s the PMAD pool and exits cleanly.
+              <InlineCode>/tmp/quicx.pid</InlineCode>. The daemon exits and the OS takes its
+              memory back. Tasks still in the queue are lost, as on any restart (see{" "}
+              <Link href="/docs/limitations">Limitations</Link>).
             </p>
           </Prose>
         </CliCommand>
@@ -94,8 +90,9 @@ usage:
               <InlineCode>MSG_STATS_RESPONSE</InlineCode> as a human-readable table. Shows{" "}
               <strong>uptime</strong>, <strong>task counters</strong> (including{" "}
               <strong>in-flight</strong>, derived as submitted − completed − failed),{" "}
-              <strong>memory usage</strong> against your configured pool, and a{" "}
-              <strong>per-size-class utilization</strong> breakdown. Safe to script — exits
+              <strong>pages in use</strong> out of the pool, and every{" "}
+              <strong>block size that holds pages</strong> with its live blocks, capacity and
+              page count. Safe to script — exits
               non-zero if the daemon is unreachable.
             </p>
           </Prose>
@@ -106,25 +103,33 @@ usage:
             language="sh"
             code={`user@host ~ $ quicx status
 
-  quicx v${CURRENT_VERSION}  ·  pid 3709  ·  up 0h 0m 02s
+  quicx v${CURRENT_VERSION}  ·  pid 8278  ·  up 0h 0m 00s
 
-  tasks     submitted           0
+  tasks     submitted       1,500
             completed           0   ░░░░░░░░░░░░░░░░░░░░     0.0%
-            in flight           0   = 0 queued + 0 running
+            failed              0                            0.0%
+            in flight       1,500   = 1500 queued + 0 running
+            queued          1,500
 
-  memory    592.8 KiB / 8.00 MiB    █░░░░░░░░░░░░░░░░░░░     7.2%
-            usable 8.00 MiB · 64 size classes
+  workers   busy                0   ░░░░░░░░░░░░░░░░░░░░     0.0%
+            idle                0
+            total               0   · 0 registered since start
 
-            16B        1 /   5,241  ░░░░░░░░░░░░░░░░░░░░     0.0%
-            64B        0 /  12,580  ░░░░░░░░░░░░░░░░░░░░     0.0%
-            ...        (62 more size classes)
+  memory    32 / 508 pages          █░░░░░░░░░░░░░░░░░░░     6.3%
+            pool 7.95 MiB, 16 KiB pages · 2 sizes in use
+
+           176B    1,200 /   1,209  ███████████████████░    99.3%    13 pages
+           976B      300 /     304  ███████████████████░    98.7%    19 pages
 
 user@host ~ $`}
           />
 
           <p className="mt-3 text-[13.5px] leading-relaxed text-quicx-muted">
-            Redesigned in v1.0.3 — bar charts, thousands separators and human-readable byte
-            sizes replace the raw counters from earlier releases. New fields exposed on the
+            Above: 1,200 tasks of 100 B and 300 of 900 B waiting, no worker connected. Since
+            2.0 the memory block counts pages — a size appears only while it holds some, and
+            its capacity grows and shrinks with the pages it owns. Redesigned in v1.0.3 — bar
+            charts, thousands separators and human-readable byte sizes replace the raw counters
+            from earlier releases. New fields exposed on the
             wire: <InlineCode>workers_registered</InlineCode> (ever registered, not just
             currently live), <InlineCode>pool_size</InlineCode> (bytes requested from the OS),{" "}
             <InlineCode>usable_bytes</InlineCode> (after the metadata carve-out) and{" "}
@@ -133,18 +138,18 @@ user@host ~ $`}
 
           <Callout variant="warn" title="CLI and daemon must match versions">
             The stats wire format grew in v1.0.3 (<InlineCode>StatsHeader</InlineCode>: 48 → 73
-            bytes). If <InlineCode>quicx status</InlineCode> and the daemon it&rsquo;s talking to
+            bytes). If <InlineCode>quicx status</InlineCode>{" "}and the daemon it&rsquo;s talking to
             are different releases, it detects the length mismatch and prints{" "}
             <InlineCode>daemon speaks a different stats format — restart the daemon to match</InlineCode>{" "}
             instead of misparsing the response.
           </Callout>
         </CliCommand>
 
-        <CliCommand cmd="quicx version" title="print the binary version + build metadata">
+        <CliCommand cmd="quicx version" title="print the binary version">
           <Prose>
             <p>
-              Prints the semver, build date and target triple. Machine-parsable if you pipe
-              it — one line, space-separated.
+              Prints the version on one line, for example{" "}
+              <InlineCode>quicx v{CURRENT_VERSION}</InlineCode>.
             </p>
           </Prose>
         </CliCommand>

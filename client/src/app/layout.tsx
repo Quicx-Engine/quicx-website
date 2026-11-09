@@ -1,35 +1,22 @@
 import type { Metadata } from "next";
 import { CURRENT_VERSION } from "@/lib/version";
 import { SITE_URL, baseOpenGraph } from "@/lib/seo";
-import { Anton, Archivo, Barlow_Condensed, JetBrains_Mono } from "next/font/google";
+import { Archivo, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
-const anton = Anton({
-  variable: "--font-anton",
-  subsets: ["latin"],
-  weight: ["400"],
-  display: "swap",
-});
-
+// One family across three widths: the wdth axis carries the condensed display
+// voice, the reading text and the controls, so they share every proportion.
 const archivo = Archivo({
   variable: "--font-archivo",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  display: "swap",
-});
-
-const barlowCondensed = Barlow_Condensed({
-  variable: "--font-barlow-condensed",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  axes: ["wdth"],
   display: "swap",
 });
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -39,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s | Quicx",
   },
   description:
-    "Quicx is a deterministic-memory task queue daemon written in C. Fixed PMAD pool, exact accounting, no allocator surprises — 74,300 tasks/sec at 51 µs median end-to-end, 54 KB binary, zero dependencies.",
+    "Quicx is a deterministic-memory task queue daemon written in C: one fixed budget, the adaptive apool allocator, 81,900 tasks/sec at 49 µs median, 55 KB binary.",
   metadataBase: new URL(SITE_URL),
   keywords: [
     "task queue",
@@ -48,8 +35,8 @@ export const metadata: Metadata = {
     "job queue",
     "message queue",
     "message broker",
-    "PMAD allocator",
-    "slab allocator",
+    "memory-bounded task queue",
+    "adaptive memory allocator",
     "binary protocol",
     "lightweight task queue",
     "open source task queue",
@@ -76,7 +63,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Quicx — Deterministic Task Queue Engine",
     description:
-      "A task queue that never asks the OS for another byte. 74,300 tasks/sec end to end at 51 µs median, 0 KB memory growth, 54 KB binary — every figure measured with bench/run.sh.",
+      "A task queue that never asks the OS for another byte. 46,593 tasks in 8 MiB, 81,900 tasks/sec at 49 µs median end to end, 55 KB binary — measured on macOS and Linux.",
     type: "website",
     url: SITE_URL,
     ...baseOpenGraph,
@@ -85,7 +72,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Quicx — Deterministic Task Queue Engine",
     description:
-      "A task queue that never asks the OS for another byte. 74,300 tasks/sec at 51 µs median end-to-end, 0 KB memory growth, 54 KB binary — all measured.",
+      "A task queue with a hard memory limit: 46,593 tasks in 8 MiB, 81,900 tasks/sec at 49 µs median end to end, 55 KB binary — all measured.",
   },
 };
 
@@ -102,7 +89,7 @@ export default function RootLayout({
         "@id": "https://quicx.dev/#website",
         "name": "Quicx",
         "url": "https://quicx.dev",
-        "description": "Deterministic task queue engine with PMAD slab allocator and binary protocol.",
+        "description": "Deterministic task queue engine with a fixed memory budget, the apool adaptive allocator and a binary protocol.",
         "inLanguage": "en-US",
         "publisher": { "@id": "https://quicx.dev/#organization" },
       },
@@ -130,14 +117,14 @@ export default function RootLayout({
         "softwareVersion": CURRENT_VERSION,
         "releaseNotes": "https://quicx.dev/docs/changelog",
         "description":
-          "Quicx is a deterministic-memory task queue daemon written in C, built on the PMAD slab allocator. You declare a memory budget at startup; the daemon uses exactly that and never grows. Measured at 74,300 tasks/sec end to end with a 51 µs median, in a 54 KB binary with no runtime dependencies.",
+          "Quicx is a deterministic-memory task queue daemon written in C, built on apool, an adaptive page allocator. You declare a memory budget at startup; the daemon never uses more, and gives back what a burst used once the queue drains. The default 8 MiB holds 46,593 tasks of 100 B. Measured at 81,900 tasks/sec end to end with a 49 µs median, in a 55 KB binary with no runtime dependencies.",
         "featureList": [
-          "Fixed memory pool — 0 KB RSS growth measured over 443,912 tasks",
-          "O(1) deterministic allocation via PMAD slab allocator",
-          "Zero fragmentation — pre-sized size classes",
-          "74,300 tasks/sec end to end on one thread (measured)",
-          "51 µs median submit-to-done latency (measured)",
-          "54 KB binary — no runtime dependencies",
+          "Fixed memory budget, mapped once and never exceeded",
+          "Adaptive apool allocator — 46,593 tasks of 100 B in 8 MiB (measured)",
+          "Memory returned to the OS after a burst — 2,080 KB held once drained (measured)",
+          "81,900 tasks/sec end to end on one thread (measured)",
+          "49 µs median submit-to-done latency (measured)",
+          "55 KB binary — no runtime dependencies",
           "Compact binary protocol with 12 message types",
           "Java client published to Maven Central",
           "Real-time CLI observability with quicx status",
@@ -168,7 +155,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${anton.variable} ${archivo.variable} ${barlowCondensed.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${archivo.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <head>
         <script

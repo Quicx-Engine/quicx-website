@@ -12,14 +12,14 @@ import { SITE_URL, baseOpenGraph } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "Quicx - Deterministic Task Queue Engine",
   description:
-    "Quicx is a task queue daemon with a fixed memory pool: 74,300 tasks/sec at 51 µs median, zero memory growth, 54 KB binary, no dependencies. All measured.",
+    "Quicx is a task queue daemon with a hard memory limit: 46,593 tasks in 8 MiB, 81,900 tasks/sec at 49 µs median, a 55 KB binary, no dependencies. All measured.",
   alternates: {
     canonical: SITE_URL,
   },
   openGraph: {
     title: "Quicx - Deterministic Task Queue Engine",
     description:
-      "Fixed memory pool, exact accounting, no allocator surprises. 74,300 tasks/sec at 51 µs median end-to-end latency, 54 KB binary, zero dependencies — all measured, all reproducible.",
+      "A task queue that never asks the OS for another byte. 46,593 tasks in 8 MiB, 81,900 tasks/sec at 49 µs median end to end, 55 KB binary — measured on macOS and Linux.",
     url: SITE_URL,
     type: "website",
     ...baseOpenGraph,
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Quicx - Deterministic Task Queue Engine",
     description:
-      "Fixed memory pool, exact accounting, no allocator surprises. 74,300 tasks/sec at 51 µs median end-to-end, 54 KB binary, zero dependencies.",
+      "A task queue with a hard memory limit: 46,593 tasks in 8 MiB, 81,900 tasks/sec at 49 µs median end to end, 55 KB binary — all measured.",
   },
 };
 

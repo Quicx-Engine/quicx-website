@@ -13,19 +13,23 @@ export function ArchitectureSection() {
     <section className="space-y-8">
       <SectionHeaderFor slug="architecture" />
 
-      <div className="relative overflow-hidden rounded-2xl border border-quicx-line bg-[#0a1a22] p-6 sm:p-10">
-        <div className="pointer-events-none absolute inset-0 bg-dots opacity-40" />
-        <ArchitectureDiagram />
-      </div>
+      <figure className="overflow-hidden rounded-[3px] border border-quicx-line-strong bg-quicx-well">
+        <div className="px-4 py-5 sm:px-6">
+          <ArchitectureDiagram variant="flow" />
+        </div>
+        <figcaption className="border-t border-quicx-line px-4 py-3 text-[13px] text-quicx-dim">
+          The daemon, its three role-based endpoints and the allocator behind them.
+        </figcaption>
+      </figure>
 
       <Prose>
         <p>
-          Quicx is deliberately flat. A single <strong>daemon</strong> process owns the task
-          queue, the worker pool and the PMAD allocator. Producers and workers are plain TCP
+          Quicx is deliberately flat. A single <strong>daemon</strong>{" "}process owns the task
+          queue, the worker pool and the <Link href="/docs/allocator">apool allocator</Link>. Producers and workers are plain TCP
           clients that speak the same binary protocol — the first frame they send tells the
           daemon which role they&rsquo;re playing.
         </p>
-        <p>There are four horizontal message paths:</p>
+        <p>There are four message paths, one in each direction across the two hops in the diagram:</p>
       </Prose>
 
       <KeyList
@@ -71,7 +75,7 @@ export function ArchitectureSection() {
                 As of v1.0.3, the daemon forwards the worker&rsquo;s outcome back over the
                 producer&rsquo;s original connection —{" "}
                 <InlineCode>MSG_DONE&nbsp;{"{task_id}"}</InlineCode> or{" "}
-                <InlineCode>MSG_FAILED&nbsp;{"{task_id, reason}"}</InlineCode> with the
+                <InlineCode>MSG_FAILED&nbsp;{"{task_id, reason}"}</InlineCode>{" "}with the
                 worker&rsquo;s real reason. A producer&rsquo;s socket now spans the task&rsquo;s
                 full lifetime, not just the initial submit.
               </>
@@ -88,10 +92,10 @@ export function ArchitectureSection() {
           consistent hashing. Quicx is optimised for the much more common case where your
           queue lives on the <strong>same host</strong> (or at worst, the same availability
           zone) as your producers and workers. One daemon measured{" "}
-          <strong>74,300 tasks/sec end to end</strong> on a single thread over loopback, at a
-          51 µs median — see <Link href="/docs/benchmarks">Benchmarks</Link> for the harness and the
-          caveats. Because of PMAD it does that with <strong>zero allocation jitter</strong>{" "}
-          and no memory growth under sustained load.
+          <strong>81,900 tasks/sec end to end</strong> on a single thread over loopback, at a
+          49 µs median — see <Link href="/docs/benchmarks">Benchmarks</Link> for the harness and the
+          caveats. It does that inside one fixed memory budget: allocation is O(1), and memory a
+          burst used goes back to the OS once the queue drains.
         </p>
         <p>
           Scaling horizontally means running multiple independent Quicx daemons behind a

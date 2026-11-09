@@ -1,152 +1,105 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { ChevronRight, Home, Book } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { CURRENT_VERSION } from "@/lib/version";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { ArrowRight } from "lucide-react";
+import { Container } from "./primitives";
+import { Panel } from "./visuals/Panel";
+
+const destinations = [
+  { href: "/", label: "Home", note: "What Quicx is and what it measured" },
+  { href: "/docs/quick-start", label: "Quick start", note: "From install to a first task" },
+  { href: "/docs/installation", label: "Documentation", note: "Every section, from the top" },
+];
 
 export function Interactive404() {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [typedText, setTypedText] = useState("");
-  const [showError, setShowError] = useState(false);
-  const [showOptions, setShowOptions] = useState(false);
-  const targetText = 'quicx get task "route_404"';
-  
-  const containerRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname() || "/";
+  const command = `curl -sI https://quicx.dev${pathname}`;
+  const [typed, setTyped] = useState("");
+  const [answered, setAnswered] = useState(false);
 
-  // Handle Parallax
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current) return;
-      const { clientX, clientY } = e;
-      const { innerWidth, innerHeight } = window;
-      
-      // Calculate normalized mouse position (-1 to 1)
-      const x = (clientX / innerWidth - 0.5) * 2;
-      const y = (clientY / innerHeight - 0.5) * 2;
-      
-      setMousePos({ x, y });
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const t = setTimeout(() => {
+        setTyped(command);
+        setAnswered(true);
+      }, 0);
+      return () => clearTimeout(t);
+    }
+    let i = 0;
+    let answerTimer: ReturnType<typeof setTimeout> | undefined;
+    const typer = setInterval(() => {
+      i += 1;
+      setTyped(command.slice(0, i));
+      if (i >= command.length) {
+        clearInterval(typer);
+        answerTimer = setTimeout(() => setAnswered(true), 350);
+      }
+    }, 28);
+    return () => {
+      clearInterval(typer);
+      if (answerTimer) clearTimeout(answerTimer);
     };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
-  // Handle Typing Animation
-  useEffect(() => {
-    let currentText = "";
-    let currentIndex = 0;
-    
-    // Initial delay before typing starts
-    const startDelay = setTimeout(() => {
-      const typingInterval = setInterval(() => {
-        if (currentIndex < targetText.length) {
-          currentText += targetText[currentIndex];
-          setTypedText(currentText);
-          currentIndex++;
-        } else {
-          clearInterval(typingInterval);
-          // Show error shortly after typing finishes
-          setTimeout(() => setShowError(true), 400);
-          // Show options after error
-          setTimeout(() => setShowOptions(true), 1200);
-        }
-      }, 50); // Typing speed
-      
-      return () => clearInterval(typingInterval);
-    }, 500);
-    
-    return () => clearTimeout(startDelay);
-  }, [targetText]);
+  }, [command]);
 
   return (
-    <div 
-      ref={containerRef}
-      className="relative flex min-h-[75vh] w-full flex-col items-center justify-center overflow-hidden"
-    >
-      {/* Deep Background Glow */}
-      <div className="pointer-events-none absolute inset-x-0 top-1/2 h-[600px] -translate-y-1/2 bg-[radial-gradient(ellipse_40%_40%_at_50%_50%,rgba(255,87,0,0.1),transparent_70%)]" />
+    <Container className="py-20 lg:py-28">
+      <div className="grid grid-cols-1 gap-x-12 gap-y-12 lg:grid-cols-12 lg:items-end">
+        <div className="lg:col-span-6">
+          <h1 className="display text-[clamp(3.5rem,9vw,7.5rem)] text-quicx-text">
+            No such route.
+          </h1>
+          <p className="mt-6 max-w-[40ch] text-[18px] leading-[1.6] text-quicx-body">
+            Nothing is queued at this address. It may have moved, or the link that brought you
+            here was wrong.
+          </p>
+        </div>
 
-      {/* Massive 404 Background (Parallax) */}
-      <div 
-        className="pointer-events-none absolute select-none text-center font-[family-name:var(--font-anton)] text-[30vw] leading-none text-white/[0.03] sm:text-[250px]"
-        style={{
-          transform: `translate(${mousePos.x * -20}px, ${mousePos.y * -20}px)`,
-          transition: 'transform 0.1s ease-out'
-        }}
-      >
-        404
-      </div>
-
-      {/* Interactive Terminal Block */}
-      <div 
-        className="relative z-10 w-full max-w-2xl px-6"
-        style={{
-          transform: `translate(${mousePos.x * 10}px, ${mousePos.y * 10}px)`,
-          transition: 'transform 0.1s ease-out'
-        }}
-      >
-        <div className="overflow-hidden rounded-xl border border-quicx-line bg-[#061219]/80 shadow-2xl backdrop-blur-md">
-          {/* Terminal Header */}
-          <div className="flex items-center gap-2 border-b border-quicx-line bg-white/[0.02] px-4 py-3">
-            <div className="size-3 rounded-full bg-red-500/80" />
-            <div className="size-3 rounded-full bg-yellow-500/80" />
-            <div className="size-3 rounded-full bg-green-500/80" />
-            <span className="ml-2 font-[family-name:var(--font-jetbrains-mono)] text-[11px] text-quicx-dim">
-              quicx-engine — v{CURRENT_VERSION}
-            </span>
-          </div>
-          
-          {/* Terminal Body */}
-          <div className="flex min-h-[220px] flex-col p-5 font-[family-name:var(--font-jetbrains-mono)] text-[14px]">
-            <div className="flex items-center text-quicx-text">
-              <span className="mr-3 text-quicx-orange">user@host:~$</span>
-              <span>{typedText}</span>
-              {!showOptions && (
-                <span className="ml-1 inline-block h-4 w-2 animate-pulse bg-quicx-orange-bright" />
-              )}
-            </div>
-
-            {showError && (
-              <div className="mt-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <span className="text-red-400">[FATAL]</span> Task not found in the queue. 
-                <br />
-                <span className="text-quicx-dim">The route may have been dropped or consumed by an unknown worker.</span>
-              </div>
-            )}
-
-            {showOptions && (
-              <div className="mt-8 flex flex-col gap-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="text-[12px] text-quicx-dim">Available recovery actions:</div>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <Link 
-                    href="/"
-                    className="group flex flex-1 items-center justify-between rounded-md border border-quicx-line bg-white/[0.02] px-4 py-3 text-quicx-muted transition-all hover:border-quicx-orange/50 hover:bg-quicx-orange/10 hover:text-quicx-orange-bright"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Home className="size-4" />
-                      <span>cd /home</span>
-                    </div>
-                    <ChevronRight className="size-4 opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100" />
-                  </Link>
-
-                  <Link 
-                    href="/docs/installation"
-                    className="group flex flex-1 items-center justify-between rounded-md border border-quicx-line bg-white/[0.02] px-4 py-3 text-quicx-muted transition-all hover:border-quicx-orange/50 hover:bg-quicx-orange/10 hover:text-quicx-orange-bright"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Book className="size-4" />
-                      <span>cd /docs</span>
-                    </div>
-                    <ChevronRight className="size-4 opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100" />
-                  </Link>
+        <div className="lg:col-span-6">
+          <div className="h-[168px] overflow-hidden rounded-[3px] border border-quicx-line-strong bg-quicx-well">
+            <Panel title="~ — zsh" className="h-full">
+              <div className="px-4 py-3.5 font-mono text-[13px] leading-[1.7]">
+                <div className="break-all text-quicx-text">
+                  <span className="text-quicx-dim">user@host ~ $</span> {typed}
+                  {!answered && (
+                    <span
+                      aria-hidden
+                      className="caret-blink ml-px inline-block h-[1.1em] w-[0.55em] translate-y-[3px] bg-quicx-orange"
+                    />
+                  )}
+                </div>
+                <div className={answered ? "opacity-100" : "opacity-0"} aria-live="polite">
+                  <div className="text-quicx-orange-bright">HTTP/2 404</div>
+                  <div className="text-quicx-muted">content-type: text/html; charset=utf-8</div>
                 </div>
               </div>
-            )}
+            </Panel>
           </div>
         </div>
       </div>
-    </div>
+
+      <nav aria-label="Where to go instead" className="mt-16 border-t border-quicx-line-strong">
+        <ul className="grid grid-cols-1 md:grid-cols-3">
+          {destinations.map((d, i) => (
+            <li key={d.href} className={i > 0 ? "border-t border-quicx-line md:border-l md:border-t-0" : ""}>
+              <Link
+                href={d.href}
+                className="group flex h-full items-start justify-between gap-4 py-6 transition-colors hover:bg-white/[0.02] md:px-6 md:first:pl-0"
+              >
+                <span>
+                  <span className="block text-[18px] font-semibold text-quicx-text">{d.label}</span>
+                  <span className="mt-1 block text-[14.5px] text-quicx-muted">{d.note}</span>
+                </span>
+                <ArrowRight
+                  aria-hidden
+                  className="mt-1 size-4 shrink-0 text-quicx-orange transition-transform group-hover:translate-x-0.5"
+                />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </Container>
   );
 }

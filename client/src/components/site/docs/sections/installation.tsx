@@ -96,7 +96,7 @@ sh install-quicx.sh`}
               <>
                 Marks the binary executable and moves it into{" "}
                 <InlineCode>/usr/local/bin</InlineCode>, retrying with{" "}
-                <InlineCode>sudo</InlineCode> if that directory isn&rsquo;t writable.
+                <InlineCode>sudo</InlineCode>{" "}if that directory isn&rsquo;t writable.
               </>
             ),
           },

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { X } from "lucide-react";
 import { Callout } from "@/components/site/docs/Callout";
 import {
   SectionHeaderFor,
@@ -23,25 +24,20 @@ export function LimitationsSection() {
         </p>
       </Prose>
 
-      <ul className="space-y-3">
+      <ul className="border-t border-quicx-line-strong">
         {LIMITATIONS.map((l) => (
           <li
             key={l.title}
-            className="rounded-lg border border-quicx-line bg-[#0a1a22] px-4 py-3.5"
+            className="grid grid-cols-[1.25rem_minmax(0,1fr)] gap-x-3 gap-y-1 border-b border-quicx-line py-4"
           >
-            <div className="flex flex-wrap items-baseline gap-3">
-              <span className="font-[family-name:var(--font-jetbrains-mono)] text-[13px] text-quicx-text">
-                {l.title}
-              </span>
+            <X aria-hidden className="size-4 translate-y-[3px] text-quicx-orange" strokeWidth={2.25} />
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <span className="text-[16px] font-semibold text-quicx-text">{l.title}</span>
               {"status" in l && l.status && (
-                <span className="rounded border border-quicx-orange/40 bg-quicx-orange/10 px-2 py-0.5 font-[family-name:var(--font-barlow-condensed)] text-[10.5px] uppercase tracking-[0.26em] text-quicx-orange-bright">
-                  {l.status}
-                </span>
+                <span className="caps-label text-quicx-orange-bright">{l.status}</span>
               )}
             </div>
-            <p className="mt-1.5 text-[13.5px] leading-relaxed text-quicx-muted">
-              {l.body}
-            </p>
+            <p className="col-start-2 text-[15px] leading-[1.65] text-quicx-body">{l.body}</p>
           </li>
         ))}
       </ul>
@@ -77,9 +73,9 @@ export function LimitationsSection() {
         <p>
           Quicx is the task queue you reach for when you need to know,{" "}
           <strong>exactly</strong>, how much memory the broker will use. A fixed
-          pool declared at startup, exact per-size-class accounting, and no
-          growth under load — that is the guarantee none of the systems in the
-          table above make.
+          budget declared at startup and never exceeded, every page accounted
+          for, and the memory of a burst given back once it drains — that is the
+          guarantee none of the systems in the table above make.
         </p>
         <p>
           Speed is the supporting evidence, not the headline. If your tasks are

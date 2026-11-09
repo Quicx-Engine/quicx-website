@@ -10,10 +10,14 @@ import {
 } from "@/components/site/docs/_primitives";
 import {
   REFERENCE_RUN,
+  SECOND_RUN,
+  HEADLINE,
   LATENCY_PERCENTILES,
-  LATENCY_BY_LOAD,
+  LATENCY_BY_MACHINE,
   THROUGHPUT_RUN,
   MEMORY_RUN,
+  CAPACITY,
+  MEMORY_BY_MACHINE,
   FOOTPRINT,
   METHODOLOGY,
   COMPARISON,
@@ -25,10 +29,11 @@ export function BenchmarksSection() {
       <SectionHeaderFor slug="benchmarks" />
 
       <Callout variant="note" title="What &ldquo;measured&rdquo; means on this page">
-        Every figure below came off one machine, one build, one afternoon, and is
-        reproducible with <InlineCode>bench/run.sh</InlineCode>. Numbers that were not
-        measured here appear only in the comparison table at the bottom, and are labelled
-        with their provenance every time they appear.
+        Every figure below came off Quicx 2.0 on two machines,
+        built with the same flags and driven by the same scripts, and is reproducible with{" "}
+        <InlineCode>bench/run.sh</InlineCode>. Each one is the median of several interleaved
+        runs, next to v1.0.4 measured the same way. Numbers that were not measured here
+        appear only in the comparison table at the bottom, labelled with their provenance.
       </Callout>
 
       <SubHeading id="reference-run">Reference run</SubHeading>
@@ -44,6 +49,14 @@ export function BenchmarksSection() {
           ["load", REFERENCE_RUN.load],
         ]}
       />
+
+      <Prose>
+        <p>
+          The second machine is a 2011 desktop: {SECOND_RUN.machine}, {SECOND_RUN.os},{" "}
+          {SECOND_RUN.build}. It runs the same suite, so an effect that shows on both is not a
+          property of one CPU or one kernel.
+        </p>
+      </Prose>
 
       <Callout variant="warn" title="Earlier figures were withdrawn">
         Anything measured before the <InlineCode>send_frame_v</InlineCode> fix is
@@ -61,9 +74,10 @@ export function BenchmarksSection() {
 
       <Prose>
         <p>
-          <strong>74,300 tasks/sec</strong> — end to end, single thread.{" "}
-          {THROUGHPUT_RUN.window}. {THROUGHPUT_RUN.tasks} tasks in the measured window,{" "}
-          {THROUGHPUT_RUN.errors}. {THROUGHPUT_RUN.spread}
+          <strong>{HEADLINE.throughput} tasks/sec</strong> — end to end, single thread, median
+          of 5 runs on the M4 Pro. {THROUGHPUT_RUN.window}, {THROUGHPUT_RUN.errors}.{" "}
+          {THROUGHPUT_RUN.spread} The allocator did not change the speed: its share of a round
+          trip is about 15 ns.
         </p>
         <p>
           One Quicx task is a full lifecycle: producer submits → daemon acks → daemon
@@ -77,9 +91,10 @@ export function BenchmarksSection() {
 
       <Prose>
         <p>
-          Open loop at 40,000 tasks/sec offered. Tasks are due on a fixed schedule and
-          latency is measured from the <em>scheduled</em> time, so any stall is charged in
-          full rather than hidden by a client that slows down along with the server.
+          Open loop at 40,000 tasks/sec offered on the M4 Pro, median of 5 runs. Tasks are due
+          on a fixed schedule and latency is measured from the <em>scheduled</em> time, so any
+          stall is charged in full rather than hidden by a client that slows down along with the
+          server.
         </p>
       </Prose>
 
@@ -91,16 +106,20 @@ export function BenchmarksSection() {
         ])}
       />
 
+      <SubHeading id="bench-machines">Two machines</SubHeading>
+
       <Prose>
         <p>
-          Latency stays flat from 10k/s to 40k/s — the daemon is not straining anywhere in
-          that range.
+          Each machine is offered a rate it handles comfortably. The i3 tops out at 19.0k
+          tasks/sec in the closed loop because eleven processes — the daemon, 8 workers and 2
+          producers — share its four hardware threads. On both machines v1.0.4 and v2.0.0 are
+          inside each other&rsquo;s run-to-run range.
         </p>
       </Prose>
 
       <Table
-        headers={["offered", "p50", "p99", "p99.9"]}
-        rows={LATENCY_BY_LOAD.map((r) => [r.offered, r.p50, r.p99, r.p999])}
+        headers={["machine", "offered", "p50", "p99", "p99.9", "closed loop"]}
+        rows={LATENCY_BY_MACHINE.map((r) => [r.machine, r.offered, r.p50, r.p99, r.p999, r.throughput])}
       />
 
       <Callout variant="warn" title="submit → ack is not the number that matters">
@@ -110,20 +129,45 @@ export function BenchmarksSection() {
         the payload and reported completion.
       </Callout>
 
+      <SubHeading id="bench-capacity">Capacity</SubHeading>
+
+      <Prose>
+        <p>
+          How many tasks the daemon accepts in the default {MEMORY_RUN.poolSize} before it
+          answers <InlineCode>ERROR 0x01</InlineCode>. The sizes are sent one after another to
+          the same daemon and the queue is drained in between, so v2 has to follow each change.
+          The counts are identical on both machines.
+        </p>
+      </Prose>
+
+      <Table
+        headers={["payload", "v1.0.4", "v2.0.0"]}
+        rows={CAPACITY.map((r) => [r.payload, r.v104, <strong key={r.payload}>{r.v2}</strong>])}
+      />
+
       <SubHeading id="bench-memory">Memory</SubHeading>
 
       <Prose>
         <p>
-          Idle RSS <strong>{MEMORY_RUN.idleRss}</strong>. After {THROUGHPUT_RUN.tasks}{" "}
-          tasks: <strong>{MEMORY_RUN.finalRss}</strong>. Delta:{" "}
-          <strong>{MEMORY_RUN.delta}</strong>.
+          v2 maps the budget once and never grows it, but it only touches the pages it hands
+          out, and pages that empty after a burst give their memory back to the OS
+          (<InlineCode>MADV_FREE_REUSABLE</InlineCode> on macOS,{" "}
+          <InlineCode>MADV_DONTNEED</InlineCode> on Linux). v1.0.4 wrote a header into every
+          block at startup, so it held the whole pool from the first second.
         </p>
+      </Prose>
+
+      <Table
+        headers={["physical memory, KB", "v1.0.4 Mac", "v2.0.0 Mac", "v1.0.4 Linux", "v2.0.0 Linux"]}
+        rows={MEMORY_BY_MACHINE.map((r) => [r.stage, r.macV104, r.macV2, r.linuxV104, r.linuxV2])}
+      />
+
+      <Prose>
         <p>
-          Not &ldquo;low growth&rdquo; — no growth. The pool is mapped once at startup and
-          every allocation comes out of it. <InlineCode>quicx status</InlineCode> reports
-          live usage per size class, so you can see exactly which classes your workload
-          consumes. At the default {MEMORY_RUN.poolSize} pool under this load, peak usage was{" "}
-          {MEMORY_RUN.poolPeakPct}% of the pool.
+          macOS measures <InlineCode>phys_footprint</InlineCode> and Linux the resident set
+          size, so compare within one machine. Under the throughput load v2 used at most{" "}
+          {MEMORY_RUN.poolPeakPct}% of the pool (14 of 508 pages);{" "}
+          <InlineCode>quicx status</InlineCode> shows the pages each size holds, live.
         </p>
       </Prose>
 
@@ -169,9 +213,9 @@ export function BenchmarksSection() {
       <Callout variant="perf" title="The unit trap">
         A Quicx task is five protocol messages across two connections. A Redis{" "}
         <InlineCode>LPUSH</InlineCode> is one command — and a real Redis job queue needs{" "}
-        <InlineCode>LPUSH</InlineCode> + <InlineCode>BRPOP</InlineCode> + an ack. Normalised
+        <InlineCode>LPUSH</InlineCode> + <InlineCode>BRPOP</InlineCode>{" "}+ an ack. Normalised
         per completed job, Redis&rsquo;s ~161k commands/sec is on the order of 50k jobs/sec.
-        Putting 74.3k tasks/s next to 161k LPUSH/s directly would flatter Redis by roughly
+        Putting 81.9k tasks/s next to 161k LPUSH/s directly would flatter Redis by roughly
         3×.
       </Callout>
 
