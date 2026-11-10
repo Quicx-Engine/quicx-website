@@ -50,7 +50,7 @@ admission     = value   # when full: refuse, oldest or value`}
         filename="quicx start"
         language="text"
         code={`config loaded: /etc/quicx/quicx.conf
-quicx v2.0.0 starting
+quicx v2.1.0 starting
   port:    16381
   pool:    8388608 bytes, 16 KiB pages given to block sizes on demand
   apool:   reserve, hardening, purge

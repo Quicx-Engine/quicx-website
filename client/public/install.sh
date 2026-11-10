@@ -2,7 +2,7 @@ set -e
 
 REPO="Quicx-Engine/Quicx-Releases"
 INSTALL_DIR="/usr/local/bin"
-LATEST_VERSION="v2.0.0"
+LATEST_VERSION="v2.1.0"
 
 VERSION="${QUICX_VERSION:-latest}"
 

@@ -69,9 +69,20 @@ export function ChangelogSection() {
 
         <ul className="space-y-10">
           <Release
+            version="v2.1.0"
+            date="2026-11-10"
+            status="Current"
+            highlights={[
+              "Value-aware admission: MSG_SUBMIT_VALUED (0x0D) carries a level from 0 to 15, higher levels are dispatched first, and with admission = value a full budget evicts a waiting task of a lower level, but only when apool proves its memory fits the new task. Level 15 is never evicted. 100 % of valuable tasks done under overload, against 31.6 % for a queue that refuses.",
+              "Each port has its own CLI socket and pid file, and status and stop take --port, so several daemons run side by side; on two cores, two pinned daemons did 1.92 times the work of one.",
+              "make MAX_PAYLOAD=N builds a daemon for payloads above 1,024 bytes (up to 16,320); 1,002 tasks of 8,000 B fit in 8 MiB, exactly what the capacity formula gives.",
+              "A disconnecting producer is forgotten, so results never reach a later connection on the same descriptor; quicx status shows evicted tasks.",
+            ]}
+          />
+          <Release
             version="v2.0.0"
             date="2026-11-09"
-            status="Current"
+            status="Stable"
             highlights={[
               "New allocator, apool v2. 16 KiB pages go to the block sizes that are actually arriving and come back when they empty, instead of a split fixed at startup. The default 8 MiB now holds 46,593 tasks of 100 B instead of 655 and 30,947 nginx log lines instead of 1,433, measured the same on macOS and Linux.",
               "Memory goes back to the OS after a burst: about 2 MB held once the queue drains, where 1.0.4 held the whole 9 MB from startup. Throughput and latency are unchanged.",
