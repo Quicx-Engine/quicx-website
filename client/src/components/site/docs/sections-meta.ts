@@ -42,6 +42,7 @@ export const sectionMeta: Record<string, SectionMeta> = {
     toc: [
       { id: "server-block", label: "[server]" },
       { id: "memory-block", label: "[memory]" },
+      { id: "capacity", label: "How many tasks fit" },
       { id: "allocator-block", label: "[allocator]" },
       { id: "upgrading", label: "Upgrading from 1.x" },
     ],
@@ -98,6 +99,7 @@ export const sectionMeta: Record<string, SectionMeta> = {
       { id: "bench-capacity", label: "Capacity" },
       { id: "bench-memory", label: "Memory" },
       { id: "bench-footprint", label: "Footprint" },
+      { id: "next-to-redis", label: "Next to Redis" },
       { id: "bench-methodology", label: "Methodology" },
       { id: "bench-comparison", label: "Comparison" },
     ],
@@ -120,8 +122,8 @@ export const sectionMeta: Record<string, SectionMeta> = {
     kicker: "Reference",
     title: "CLI Reference",
     lede: "quicx is the single binary that ships with the release. It is self-documenting — running it with no arguments prints the same usage you see below.",
-    updated: "2026-11-09",
-    toc: [],
+    updated: "2026-11-10",
+    toc: [{ id: "several-daemons", label: "Several daemons on one machine" }],
   },
   "java-client": {
     num: "§ 03.02",

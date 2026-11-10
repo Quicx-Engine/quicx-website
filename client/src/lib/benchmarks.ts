@@ -74,6 +74,33 @@ export const MEMORY_RUN = {
   poolSize: "8 MiB",
 } as const;
 
+/**
+ * Quicx next to Redis 7, each in a Docker container limited to 64 MB, sent the
+ * same 100 B tasks at 40,000/s by one producer. Memory is the container's
+ * cgroup memory.peak. Scripts and raw results: docs/report/scripts/redis and
+ * docs/report/results/redis in the Quicx repository.
+ */
+export const REDIS_DEFAULTS = {
+  redisAccepted: "588,400",
+  redisKilledAt: "14.7 s",
+  quicxAccepted: "46,593",
+  quicxRefused: "583,007",
+  quicxPeak: "11.7 MiB",
+  quicxAfter: "3.4 MiB",
+} as const;
+
+export const REDIS_SAME_LIMIT = [
+  { limit: "8 MiB", redisTasks: "70,617", quicxTasks: "46,593", redisPeak: "13.9 MiB", quicxPeak: "11.2 MiB" },
+  { limit: "56 MiB", redisTasks: "553,623", quicxTasks: "327,267", redisPeak: "63.7 MiB", quicxPeak: "59.3 MiB" },
+] as const;
+
+/** Capacity predicted from the block arithmetic, then measured on the daemon. */
+export const CAPACITY_CHECK = [
+  { budget: "8 MiB", payload: "100 B", predicted: "46,593", measured: "46,593" },
+  { budget: "8 MiB", payload: "40 B", predicted: "73,146", measured: "73,146" },
+  { budget: "256 KiB", payload: "48 B", predicted: "1,752", measured: "1,752" },
+] as const;
+
 /** Tasks the daemon accepts before it answers ERROR 0x01, the same on both machines. */
 export const CAPACITY = [
   { payload: "100 B", v104: "655", v2: "46,593" },

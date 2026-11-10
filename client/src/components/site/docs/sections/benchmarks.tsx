@@ -21,6 +21,8 @@ import {
   FOOTPRINT,
   METHODOLOGY,
   COMPARISON,
+  REDIS_DEFAULTS,
+  REDIS_SAME_LIMIT,
 } from "@/lib/benchmarks";
 
 export function BenchmarksSection() {
@@ -180,6 +182,44 @@ export function BenchmarksSection() {
           f.note ? `${f.value} (${f.note})` : f.value,
         ])}
       />
+
+      <SubHeading id="next-to-redis">Next to Redis</SubHeading>
+
+      <Prose>
+        <p>
+          Redis is where most task queues live, so Quicx and Redis 7 ran side by side: each in a
+          Docker container limited to 64 MB, both sent the same 100-byte tasks at 40,000 a second
+          by one producer. Redis stored them in a list, the most compact way it can hold a queue.
+          Memory is what each container actually used.
+        </p>
+        <p>
+          With each program&rsquo;s defaults, Redis has no memory limit. It took{" "}
+          {REDIS_DEFAULTS.redisAccepted} tasks and kept growing until Linux killed it at{" "}
+          {REDIS_DEFAULTS.redisKilledAt}, and every task in the queue went with it. Quicx took{" "}
+          {REDIS_DEFAULTS.quicxAccepted}, answered <InlineCode>ERROR 0x01</InlineCode> to the next{" "}
+          {REDIS_DEFAULTS.quicxRefused}, never went past {REDIS_DEFAULTS.quicxPeak}, and was back to{" "}
+          {REDIS_DEFAULTS.quicxAfter} once eight workers had emptied it.
+        </p>
+        <p>Given the same limit, Redis holds more tasks:</p>
+      </Prose>
+
+      <Table
+        headers={["limit", "Redis tasks", "Quicx tasks", "Redis peak memory", "Quicx peak memory"]}
+        rows={REDIS_SAME_LIMIT.map((r) => [r.limit, r.redisTasks, r.quicxTasks, r.redisPeak, r.quicxPeak])}
+      />
+
+      <Prose>
+        <p>
+          A Redis list keeps a 100-byte item in about 103 bytes. Quicx keeps each task in a
+          176-byte block: the payload plus a 64-byte record with the task&rsquo;s id, its type and
+          the connection its result goes back to. Both refuse new work once full and keep
+          running; the difference is what the limit means. <InlineCode>maxmemory</InlineCode>{" "}
+          counts Redis&rsquo;s data, not the process: set to 56 MiB, Redis peaked at 63.7 MiB,
+          0.3 MiB short of being killed. Quicx&rsquo;s budget is all of its task memory. The
+          scripts and raw results are in <InlineCode>docs/report/scripts/redis</InlineCode> in the
+          repository, and one command repeats the run.
+        </p>
+      </Prose>
 
       <SubHeading id="bench-methodology">Methodology</SubHeading>
 

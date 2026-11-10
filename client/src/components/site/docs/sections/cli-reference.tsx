@@ -8,6 +8,7 @@ import {
   SectionHeaderFor,
   Prose,
   InlineCode,
+  SubHeading,
 } from "@/components/site/docs/_primitives";
 
 function CliCommand({
@@ -46,8 +47,8 @@ export function CliReferenceSection() {
 
 usage:
   quicx start [--config FILE] [--port N]
-  quicx stop
-  quicx status
+  quicx stop [--port N]
+  quicx status [--port N]
   quicx version`}
       />
 
@@ -70,22 +71,25 @@ usage:
           </Prose>
         </CliCommand>
 
-        <CliCommand cmd="quicx stop" title="gracefully stop the local daemon">
+        <CliCommand cmd="quicx stop [--port N]" title="gracefully stop the local daemon">
           <Prose>
             <p>
               Sends <InlineCode>SIGTERM</InlineCode> to the pid recorded in{" "}
-              <InlineCode>/tmp/quicx.pid</InlineCode>. The daemon exits and the OS takes its
+              <InlineCode>/tmp/quicx.pid</InlineCode>, or in{" "}
+              <InlineCode>/tmp/quicx-&lt;port&gt;.pid</InlineCode> for a daemon on another port. The daemon exits and the OS takes its
               memory back. Tasks still in the queue are lost, as on any restart (see{" "}
               <Link href="/docs/limitations">Limitations</Link>).
             </p>
           </Prose>
         </CliCommand>
 
-        <CliCommand cmd="quicx status" title="live observation of the running daemon">
+        <CliCommand cmd="quicx status [--port N]" title="live observation of the running daemon">
           <Prose>
             <p>
               Opens a short-lived control connection over the{" "}
-              <InlineCode>/tmp/quicx.sock</InlineCode> Unix socket and sends{" "}
+              <InlineCode>/tmp/quicx.sock</InlineCode> Unix socket (
+              <InlineCode>/tmp/quicx-&lt;port&gt;.sock</InlineCode> with{" "}
+              <InlineCode>--port</InlineCode>) and sends{" "}
               <InlineCode>MSG_STATS</InlineCode>, then renders the{" "}
               <InlineCode>MSG_STATS_RESPONSE</InlineCode> as a human-readable table. Shows{" "}
               <strong>uptime</strong>, <strong>task counters</strong> (including{" "}
@@ -154,6 +158,38 @@ user@host ~ $`}
           </Prose>
         </CliCommand>
       </div>
+
+      <SubHeading id="several-daemons">Several daemons on one machine</SubHeading>
+
+      <Prose>
+        <p>
+          Each daemon has its own port, memory budget, CLI socket and pid file, so one machine can
+          run a queue per application or per customer, each held to its own limit. The default
+          port keeps <InlineCode>/tmp/quicx.sock</InlineCode> and{" "}
+          <InlineCode>/tmp/quicx.pid</InlineCode>; any other port uses{" "}
+          <InlineCode>/tmp/quicx-&lt;port&gt;.sock</InlineCode> and{" "}
+          <InlineCode>/tmp/quicx-&lt;port&gt;.pid</InlineCode>.
+        </p>
+      </Prose>
+
+      <CodeBlock
+        filename="~ $ two customers, one machine"
+        language="sh"
+        code={`quicx start --port 16401 --config customer-a.conf
+quicx start --port 16402 --config customer-b.conf
+quicx status --port 16401
+quicx stop --port 16402`}
+      />
+
+      <Prose>
+        <p>
+          Measured with ten daemons of 8 MiB on one Mac: filling one to its limit (46,593 tasks,
+          then <InlineCode>ERROR 0x01</InlineCode>) left the other nine accepting every task, and
+          each <InlineCode>quicx status --port</InlineCode> reported its own daemon. An idle
+          daemon takes about 1.4 MiB. Memory is fenced per daemon; CPU and network are shared as
+          usual.
+        </p>
+      </Prose>
     </section>
   );
 }

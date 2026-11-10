@@ -7,7 +7,9 @@ import {
   InlineCode,
   SubHeading,
   KeyList,
+  Table,
 } from "@/components/site/docs/_primitives";
+import { CAPACITY_CHECK } from "@/lib/benchmarks";
 
 export function ConfigurationSection() {
   return (
@@ -92,6 +94,44 @@ quicx v2.0.0 starting
           },
         ]}
       />
+
+      <SubHeading id="capacity">How many tasks fit</SubHeading>
+
+      <Prose>
+        <p>
+          Every task takes a known amount of memory, so the capacity of a budget can be worked
+          out before the daemon starts. A task is a 64-byte record plus its payload, rounded up
+          to 16 bytes. A 16 KiB page holds as many of those blocks as fit whole. Three pages hold
+          connections and workers, each page has a 32-byte record, and 1/64 of the task pages are
+          kept for a size that has none yet.
+        </p>
+      </Prose>
+
+      <CodeBlock
+        filename="capacity"
+        language="text"
+        code={`block      = ceil((64 + payload) / 16) * 16
+per page   = floor(16384 / block)
+task pages = pool / 16 KiB - 3 - (one page of records per 512)
+tasks      = (task pages - task pages / 64) * per page`}
+      />
+
+      <Table
+        headers={["pool_size", "payload", "calculated", "measured"]}
+        rows={CAPACITY_CHECK.map((r) => [r.budget, r.payload, r.predicted, r.measured])}
+      />
+
+      <Prose>
+        <p>
+          A worked example: a camera makes 30 frames a second and a model analyses 10, so 20
+          more wait every second. Each task carries a 48-byte frame reference and takes a
+          112-byte block. If 64 MB is set aside for waiting frames of about 50 KB, about 1,300
+          frames can wait. <InlineCode>pool_size = 208K</InlineCode> holds exactly 1,314 tasks,
+          the queue itself costs 208 KB, and it fills in about 65 seconds. From then on the
+          camera gets <InlineCode>ERROR 0x01</InlineCode> and skips frames instead of the
+          device running out of memory.
+        </p>
+      </Prose>
 
       <SubHeading id="allocator-block">[allocator]</SubHeading>
 
