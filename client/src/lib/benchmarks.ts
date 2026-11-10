@@ -101,7 +101,7 @@ export const REDIS_SAME_LIMIT = [
  * burst: valuable at 1,000/s for 3 s, then ordinary at 2,000/s for 9 s.
  */
 export const ADMISSION_RUN = [
-  { config: "2.0 without values", steadyDone: "31.6 %", steadyWait: "3,506 ms", steadyEvicted: "0", burstDone: "100 %" },
+  { config: "no values, refuse", steadyDone: "31.6 %", steadyWait: "3,506 ms", steadyEvicted: "0", burstDone: "100 %" },
   { config: "values, refuse", steadyDone: "31.2 %", steadyWait: "4.1 ms", steadyEvicted: "0", burstDone: "100 %" },
   { config: "values, oldest", steadyDone: "100 %", steadyWait: "4.1 ms", steadyEvicted: "20,749", burstDone: "64.6 %" },
   { config: "values, value", steadyDone: "100 %", steadyWait: "4.1 ms", steadyEvicted: "2,056", burstDone: "100 %" },
