@@ -148,7 +148,7 @@ export default function RootLayout({
           ],
         },
         "publisher": { "@id": "https://quicx.dev/#organization" },
-        "sameAs": ["https://github.com/Quicx-Engine/Quicx-Releases"],
+        "sameAs": ["https://github.com/Quicx-Engine/Quicx-Releases", "https://github.com/anastassow/Quicx"],
         "inLanguage": "en-US"
       },
     ],

@@ -42,6 +42,7 @@ const nav: { title: string; items: { label: string; href: string; external?: boo
     title: "Releases",
     items: [
       { label: "Changelog", href: "/docs/changelog" },
+      { label: "Source on GitHub", href: "https://github.com/anastassow/Quicx", external: true },
       { label: "Binaries on GitHub", href: "https://github.com/Quicx-Engine/Quicx-Releases", external: true },
       { label: "Maven Central", href: "https://central.sonatype.com/artifact/dev.quicx/quicx-client", external: true },
     ],
