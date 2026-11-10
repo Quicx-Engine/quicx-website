@@ -94,6 +94,19 @@ export const REDIS_SAME_LIMIT = [
   { limit: "56 MiB", redisTasks: "553,623", quicxTasks: "327,267", redisPeak: "63.7 MiB", quicxPeak: "59.3 MiB" },
 ] as const;
 
+/**
+ * Value-aware admission under overload: the real daemon, 256 KiB budget, one
+ * worker at 500 tasks/s, median of 3 runs (docs/report/results/admission).
+ * steady: 2,000 tasks/s for 15 s, 10 % valuable at random.
+ * burst: valuable at 1,000/s for 3 s, then ordinary at 2,000/s for 9 s.
+ */
+export const ADMISSION_RUN = [
+  { config: "2.0 without values", steadyDone: "31.6 %", steadyWait: "3,506 ms", steadyEvicted: "0", burstDone: "100 %" },
+  { config: "values, refuse", steadyDone: "31.2 %", steadyWait: "4.1 ms", steadyEvicted: "0", burstDone: "100 %" },
+  { config: "values, oldest", steadyDone: "100 %", steadyWait: "4.1 ms", steadyEvicted: "20,749", burstDone: "64.6 %" },
+  { config: "values, value", steadyDone: "100 %", steadyWait: "4.1 ms", steadyEvicted: "2,056", burstDone: "100 %" },
+] as const;
+
 /** Capacity predicted from the block arithmetic, then measured on the daemon. */
 export const CAPACITY_CHECK = [
   { budget: "8 MiB", payload: "100 B", predicted: "46,593", measured: "46,593" },

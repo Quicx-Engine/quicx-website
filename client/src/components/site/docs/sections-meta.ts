@@ -100,6 +100,7 @@ export const sectionMeta: Record<string, SectionMeta> = {
       { id: "bench-memory", label: "Memory" },
       { id: "bench-footprint", label: "Footprint" },
       { id: "next-to-redis", label: "Next to Redis" },
+      { id: "when-full", label: "When the budget is full" },
       { id: "bench-methodology", label: "Methodology" },
       { id: "bench-comparison", label: "Comparison" },
     ],

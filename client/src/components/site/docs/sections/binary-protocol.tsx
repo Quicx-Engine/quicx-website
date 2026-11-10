@@ -91,6 +91,7 @@ function OpcodeTable() {
     ["0x0A", "MSG_PONG", "daemon → worker"],
     ["0x0B", "MSG_STATS", "CLI → daemon (unix socket)"],
     ["0x0C", "MSG_STATS_RESPONSE", "daemon → CLI (unix socket)"],
+    ["0x0D", "MSG_SUBMIT_VALUED", "producer → daemon"],
   ];
 
   return (
@@ -261,6 +262,20 @@ export function BinaryProtocolSection() {
             </p>
           }
         />
+        <Payload hex="0x0D" name="MSG_SUBMIT_VALUED" direction="producer → daemon"
+          layout={`[level : 1 byte][type_len : 1 byte][task_type : type_len bytes][payload : rest of bytes]`}
+          example={`level = 12, type = "analyse", payload = frame=000123\nbytes = [12][7][analyse][frame=000123]`}
+          extra={
+            <p className="text-[13.5px] leading-relaxed text-quicx-muted">
+              A <InlineCode>MSG_SUBMIT</InlineCode> with a value level in front, 0 to 15. A plain
+              SUBMIT gets level 8. Higher levels are dispatched first, oldest first within a level.
+              When the budget is full and <InlineCode>admission = value</InlineCode>, a waiting task
+              of a lower level is evicted if its memory fits the new one, and its producer gets{" "}
+              <InlineCode>MSG_FAILED</InlineCode> with the reason <InlineCode>evicted</InlineCode>.
+              Level 15 is critical and never evicted. A level above 15 is a parse error.
+            </p>
+          }
+        />
         <Payload hex="0x02" name="MSG_OK" direction="daemon → producer"
           layout={`[task_id : 4 bytes]`}
           example={`task_id = 0x00000A42  →  accepted task id = 2626`}
@@ -402,7 +417,7 @@ export function BinaryProtocolSection() {
           }
         />
         <Payload hex="0x0C" name="MSG_STATS_RESPONSE" direction="daemon → CLI (unix socket)"
-          layout={`[StatsHeader : 73 bytes, packed, network order][StatsClass : repeated class_count times]`}
+          layout={`[StatsHeader : 81 bytes, packed, network order][StatsClass : repeated class_count times]`}
           extra={
             <div className="space-y-3">
               <Table
@@ -410,7 +425,7 @@ export function BinaryProtocolSection() {
                 rows={[
                   [
                     "StatsHeader",
-                    "idle / busy worker counts, workers_registered (ever registered, not just live), queue depth, submitted / completed / failed task counters, uptime, pool_size, usable_bytes, used_bytes, and class_count",
+                    "idle / busy worker counts, workers_registered (ever registered, not just live), queue depth, submitted / completed / failed task counters, uptime, pool_size, usable_bytes, used_bytes, tasks_evicted and class_count",
                   ],
                   [
                     "StatsClass × class_count",
@@ -419,7 +434,7 @@ export function BinaryProtocolSection() {
                 ]}
               />
               <p className="text-[13.5px] leading-relaxed text-quicx-muted">
-                <InlineCode>_Static_assert(sizeof(StatsHeader) == 73)</InlineCode> locks the
+                <InlineCode>_Static_assert(sizeof(StatsHeader) == 81)</InlineCode> locks the
                 layout. <InlineCode>class_count</InlineCode> is a <InlineCode>uint8_t</InlineCode>{" "}
                 with no byte-swap — it used to be a <InlineCode>uint32_t</InlineCode> sent
                 through <InlineCode>htonl</InlineCode>, with the daemon and the reader each
@@ -432,8 +447,8 @@ export function BinaryProtocolSection() {
       </div>
 
       <Callout variant="warn" title="Stats wire format is incompatible with v1.0.2">
-        <code>StatsHeader</code> grew from 48 to 73 bytes in v1.0.3. A v1.0.3{" "}
-        <code>quicx status</code> talking to a v1.0.2 daemon (or the reverse) degrades
+        <code>StatsHeader</code> grew from 48 to 73 bytes in v1.0.3 and to 81 in 2.0 (the eviction
+        counter). A <code>quicx status</code> talking to a daemon of another release degrades
         gracefully — it detects the length mismatch and prints{" "}
         <code>daemon speaks a different stats format — restart the daemon to match</code> rather
         than misparsing the response. Keep the CLI and the daemon on the same release.

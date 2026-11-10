@@ -32,7 +32,8 @@ hardening     = on      # encoded free lists; double frees caught
 purge         = on      # empty pages give memory back after a burst
 fullest_first = off     # Hoard's idea; no gain on queue traffic
 warm_pages    = auto    # empty pages kept before purging (1/8)
-reserve_pages = auto    # pages the reserve holds back (1/64)`}
+reserve_pages = auto    # pages the reserve holds back (1/64)
+admission     = value   # when full: refuse, oldest or value`}
       />
 
       <Callout variant="note" title="Default configuration">
@@ -202,6 +203,22 @@ tasks      = (task pages - task pages / 64) * per page`}
               <>
                 Pages the reserve holds back. <InlineCode>auto</InlineCode> is 1/64 of the pages
                 (7 at 8 MiB). Needs <InlineCode>reserve = on</InlineCode>.
+              </>
+            ),
+          },
+          {
+            term: "admission = refuse | oldest | value",
+            def: (
+              <>
+                What a full budget does with a new task. <InlineCode>refuse</InlineCode> answers{" "}
+                <InlineCode>ERROR 0x01</InlineCode>. <InlineCode>oldest</InlineCode> evicts the
+                oldest waiting task. <InlineCode>value</InlineCode> (default) evicts the oldest task
+                of the lowest value level below the new one, and only when its memory fits the new
+                task: the same block size, or the last block of a page. Tasks sent with{" "}
+                <InlineCode>MSG_SUBMIT_VALUED</InlineCode> carry a level from 0 to 15; plain ones
+                are level 8, so with plain SUBMITs <InlineCode>value</InlineCode> behaves like{" "}
+                <InlineCode>refuse</InlineCode>. Level 15 is never evicted. Results:{" "}
+                <Link href="/docs/benchmarks#when-full">Benchmarks</Link>.
               </>
             ),
           },

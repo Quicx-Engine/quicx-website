@@ -141,8 +141,8 @@ user@host ~ $`}
           </p>
 
           <Callout variant="warn" title="CLI and daemon must match versions">
-            The stats wire format grew in v1.0.3 (<InlineCode>StatsHeader</InlineCode>: 48 → 73
-            bytes). If <InlineCode>quicx status</InlineCode>{" "}and the daemon it&rsquo;s talking to
+            The stats wire format grew in v1.0.3 (<InlineCode>StatsHeader</InlineCode>: 48 to 73
+            bytes) and in 2.0 (81 bytes, with the count of evicted tasks). If <InlineCode>quicx status</InlineCode>{" "}and the daemon it&rsquo;s talking to
             are different releases, it detects the length mismatch and prints{" "}
             <InlineCode>daemon speaks a different stats format — restart the daemon to match</InlineCode>{" "}
             instead of misparsing the response.

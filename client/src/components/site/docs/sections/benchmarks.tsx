@@ -23,6 +23,7 @@ import {
   COMPARISON,
   REDIS_DEFAULTS,
   REDIS_SAME_LIMIT,
+  ADMISSION_RUN,
 } from "@/lib/benchmarks";
 
 export function BenchmarksSection() {
@@ -218,6 +219,34 @@ export function BenchmarksSection() {
           0.3 MiB short of being killed. Quicx&rsquo;s budget is all of its task memory. The
           scripts and raw results are in <InlineCode>docs/report/scripts/redis</InlineCode> in the
           repository, and one command repeats the run.
+        </p>
+      </Prose>
+
+      <SubHeading id="when-full">When the budget is full</SubHeading>
+
+      <Prose>
+        <p>
+          With <InlineCode>admission = value</InlineCode>, producers give each task a value level
+          (<InlineCode>MSG_SUBMIT_VALUED</InlineCode>) and the queue spends its budget on the most
+          valuable work: higher levels go first, and a full budget evicts a waiting task of a lower
+          level, but only one whose memory apool proves the new task can use. The real daemon ran
+          over budget (256 KiB, one worker at 500 tasks a second). Steady: 2,000 tasks a second for
+          15 s, one in ten valuable at random. Burst: valuable tasks at 1,000 a second for 3 s, then
+          ordinary ones at 2,000 a second for 9 s. Median of 3 runs.
+        </p>
+      </Prose>
+
+      <Table
+        headers={["", "steady: valuable done", "steady: valuable wait", "steady: evicted", "burst: valuable done"]}
+        rows={ADMISSION_RUN.map((r) => [r.config, r.steadyDone, r.steadyWait, r.steadyEvicted, r.burstDone])}
+      />
+
+      <Prose>
+        <p>
+          Dropping the oldest task keeps the valuable ones in the steady run but evicts ten times as
+          many tasks, and in the burst the ordinary flood pushes out 1,062 valuable tasks still
+          waiting. Only value-aware admission keeps all of them in both. Throughput is the same in
+          every configuration.
         </p>
       </Prose>
 
