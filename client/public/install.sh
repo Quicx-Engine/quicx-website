@@ -1,7 +1,7 @@
 set -e
 
 REPO="Quicx-Engine/Quicx-Releases"
-INSTALL_DIR="/usr/local/bin"
+INSTALL_DIR="${QUICX_INSTALL_DIR:-/usr/local/bin}"
 LATEST_VERSION="v2.1.0"
 
 VERSION="${QUICX_VERSION:-latest}"
@@ -84,11 +84,43 @@ chmod +x "$DEST"
 }
 
 # -------------------------
+# Check the download against SHA256SUMS
+# -------------------------
+fetch() {   # fetch URL FILE: 0 on success
+if command -v curl >/dev/null 2>&1; then
+  curl -fsSL "$1" -o "$2" 2>/dev/null
+else
+  wget -q "$1" -O "$2" 2>/dev/null
+fi
+}
+
+verify_checksum() {
+SUMS="${TMP_DIR}/SHA256SUMS"
+if ! fetch "${BASE_URL}/SHA256SUMS" "$SUMS"; then
+  info "No SHA256SUMS for ${VERSION_DIR}; skipping the checksum"
+  return
+fi
+EXPECTED="$(awk -v f="$BINARY" '$2 == f || $2 == "*" f { print $1 }' "$SUMS")"
+[ -n "$EXPECTED" ] || error "SHA256SUMS has no line for ${BINARY}"
+if command -v sha256sum >/dev/null 2>&1; then
+  ACTUAL="$(sha256sum "$DEST" | awk '{ print $1 }')"
+elif command -v shasum >/dev/null 2>&1; then
+  ACTUAL="$(shasum -a 256 "$DEST" | awk '{ print $1 }')"
+else
+  info "No sha256sum or shasum found; skipping the checksum"
+  return
+fi
+[ "$ACTUAL" = "$EXPECTED" ] || error "Checksum mismatch for ${BINARY}: expected ${EXPECTED}, got ${ACTUAL}"
+success "Checksum OK (SHA-256 ${ACTUAL%"${ACTUAL#????????????}"}…)"
+}
+
+# -------------------------
 # Install binary
 # -------------------------
 install_binary() {
 info "Installing to ${INSTALL_DIR}/quicx..."
 
+mkdir -p "$INSTALL_DIR" 2>/dev/null || true
 if [ -w "$INSTALL_DIR" ]; then
   mv "$DEST" "${INSTALL_DIR}/quicx"
 else
@@ -105,7 +137,7 @@ fi
 # -------------------------
 verify_install() {
 if command -v quicx >/dev/null 2>&1; then
-  success "quicx installed — run ${BOLD}quicx --help${RESET}"
+  success "quicx installed — run: quicx start"
 else
   printf "\n${CYAN}Note:${RESET} not in PATH. Add:\n\n"
   printf "  export PATH=\"\$PATH:${INSTALL_DIR}\"\n\n"
@@ -124,5 +156,6 @@ trap cleanup EXIT
 # run
 detect_platform
 download_binary
+verify_checksum
 install_binary
 verify_install

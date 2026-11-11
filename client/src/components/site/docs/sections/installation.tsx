@@ -86,7 +86,8 @@ sh install-quicx.sh`}
                 version straight from{" "}
                 <InlineCode>Quicx-Engine/Quicx-Releases</InlineCode> on GitHub, over HTTPS,
                 via <InlineCode>curl</InlineCode> (falling back to{" "}
-                <InlineCode>wget</InlineCode>).
+                <InlineCode>wget</InlineCode>), then checks it against that version&rsquo;s{" "}
+                <InlineCode>SHA256SUMS</InlineCode> and stops on a mismatch.
               </>
             ),
           },
@@ -96,7 +97,9 @@ sh install-quicx.sh`}
               <>
                 Marks the binary executable and moves it into{" "}
                 <InlineCode>/usr/local/bin</InlineCode>, retrying with{" "}
-                <InlineCode>sudo</InlineCode>{" "}if that directory isn&rsquo;t writable.
+                <InlineCode>sudo</InlineCode>{" "}if that directory isn&rsquo;t writable. Set{" "}
+                <InlineCode>QUICX_INSTALL_DIR</InlineCode> to install somewhere else, for
+                example <InlineCode>~/.local/bin</InlineCode> without sudo.
               </>
             ),
           },
@@ -115,9 +118,12 @@ sh install-quicx.sh`}
 
       <CodeBlock
         window
-        filename="pin a specific version"
+        filename="pin a version or choose where it goes"
         language="sh"
-        code={`QUICX_VERSION=${CURRENT_VERSION} curl -fsSL https://quicx.dev/install.sh | sh`}
+        code={`curl -fsSL https://quicx.dev/install.sh | QUICX_VERSION=${CURRENT_VERSION} sh
+
+# into ~/.local/bin, without sudo
+curl -fsSL https://quicx.dev/install.sh | QUICX_INSTALL_DIR=~/.local/bin sh`}
       />
 
       <SubHeading id="verify-installation">Verify it worked</SubHeading>
