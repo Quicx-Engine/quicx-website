@@ -28,7 +28,7 @@ export function JavaClientSection() {
                 code={`<dependency>
   <groupId>dev.quicx</groupId>
   <artifactId>quicx-client</artifactId>
-  <version>2.0.0</version>
+  <version>2.1.0</version>
 </dependency>`}
               />
             ),
@@ -41,7 +41,7 @@ export function JavaClientSection() {
                 filename="build.gradle.kts"
                 language="kotlin"
                 code={`dependencies {
-    implementation("dev.quicx:quicx-client:2.0.0")
+    implementation("dev.quicx:quicx-client:2.1.0")
 }`}
               />
             ),
@@ -52,7 +52,8 @@ export function JavaClientSection() {
       <Prose>
         <p>
           Java 11 or later, no dependencies. The client speaks QXP and works with Quicx 1.0.3
-          and later; 2.0.0 was tested against quicxd 1.0.4 and 2.0.0.
+          and later; value levels and evictions need quicxd 2.1.0. 2.1.0 was tested against
+          quicxd 2.0.0 and 2.1.0, on Java 11, 17 and 21.
         </p>
       </Prose>
 
@@ -71,7 +72,7 @@ export function JavaClientSection() {
         items={[
           {
             term: "new QuicxClient(host, port)",
-            def: "A client with default timeouts. It connects on the first submit. QuicxClient.builder() sets the connect and response timeouts.",
+            def: "A client with default timeouts. It connects on the first submit. QuicxClient.builder() sets the connect and response timeouts, and maxBody(N) for a daemon built with make MAX_PAYLOAD=N.",
           },
           {
             term: "int submit(type, payload)",
@@ -85,13 +86,29 @@ export function JavaClientSection() {
             ),
           },
           {
+            term: "int submit(type, payload, level)",
+            def: (
+              <>
+                Sends <InlineCode>MSG_SUBMIT_VALUED</InlineCode> with a value level from 0 to 15
+                (quicxd 2.1.0 and later). Higher levels reach workers first, and when the budget is
+                full a task can push out a waiting task of a lower level.{" "}
+                <InlineCode>QuicxClient.DEFAULT_LEVEL</InlineCode> (8) is what a plain submit gets;{" "}
+                <InlineCode>QuicxClient.CRITICAL_LEVEL</InlineCode> (15) is never evicted.{" "}
+                <InlineCode>submitAsync</InlineCode> and <InlineCode>submitAndWait</InlineCode> take
+                a level the same way.
+              </>
+            ),
+          },
+          {
             term: "TaskResult submitAndWait(type, payload, timeout)",
             def: (
               <>
                 Submits and blocks until a worker reports <InlineCode>MSG_DONE</InlineCode> or{" "}
                 <InlineCode>MSG_FAILED</InlineCode>, which the daemon passes back to the producer.{" "}
                 <InlineCode>result.isFailed()</InlineCode> and{" "}
-                <InlineCode>result.failureReason()</InlineCode> tell you how it ended.
+                <InlineCode>result.failureReason()</InlineCode> tell you how it ended, and{" "}
+                <InlineCode>result.isEvicted()</InlineCode> is true when the daemon evicted the
+                task for a more valuable one before any worker ran it.
               </>
             ),
           },
@@ -113,6 +130,10 @@ import java.time.Duration;
 
 try (QuicxClient client = new QuicxClient("localhost", 16381)) {
     int id = client.submit("send_email", "{\\"to\\":\\"ana@example.com\\"}");
+
+    // quicxd 2.1+: a frame worth keeping, and a command that is never evicted
+    client.submit("frame", "/cam/0/000124.jpg", 12);
+    client.submit("stop", "", QuicxClient.CRITICAL_LEVEL);
 
     TaskResult result = client.submitAndWait("resize_image", imageBytes, Duration.ofSeconds(30));
     if (result.isFailed()) {

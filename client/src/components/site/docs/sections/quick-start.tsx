@@ -84,7 +84,7 @@ quicx cli socket: /tmp/quicx.sock`}
                     code={`<dependency>
   <groupId>dev.quicx</groupId>
   <artifactId>quicx-client</artifactId>
-  <version>2.0.0</version>
+  <version>2.1.0</version>
 </dependency>`}
                   />
                 ),
@@ -97,7 +97,7 @@ quicx cli socket: /tmp/quicx.sock`}
                     filename="build.gradle.kts"
                     language="kotlin"
                     code={`dependencies {
-    implementation("dev.quicx:quicx-client:2.0.0")
+    implementation("dev.quicx:quicx-client:2.1.0")
 }`}
                   />
                 ),
@@ -110,7 +110,7 @@ quicx cli socket: /tmp/quicx.sock`}
                     filename="build.gradle"
                     language="groovy"
                     code={`dependencies {
-    implementation 'dev.quicx:quicx-client:2.0.0'
+    implementation 'dev.quicx:quicx-client:2.1.0'
 }`}
                   />
                 ),

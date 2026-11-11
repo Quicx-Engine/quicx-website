@@ -130,8 +130,8 @@ export const sectionMeta: Record<string, SectionMeta> = {
     num: "§ 03.02",
     kicker: "Reference",
     title: "Java Client",
-    lede: "dev.quicx:quicx-client 2.0.0 is a small, dependency-free Java 11+ library. QuicxClient submits tasks and can wait for their result; QuicxWorker runs them, reconnecting and reporting on its own.",
-    description: "dev.quicx:quicx-client 2.0.0, a dependency-free Java 11+ library: QuicxClient submits tasks and waits for results, QuicxWorker runs them.",
+    lede: "dev.quicx:quicx-client 2.1.0 is a small, dependency-free Java 11+ library. QuicxClient submits tasks, with value levels if you want, and can wait for their result; QuicxWorker runs them, reconnecting and reporting on its own.",
+    description: "dev.quicx:quicx-client 2.1.0, a dependency-free Java 11+ library: QuicxClient submits tasks with value levels and waits for results, QuicxWorker runs them.",
     updated: "2026-11-10",
     toc: [
       { id: "java-build-setup", label: "Add it to your build" },
