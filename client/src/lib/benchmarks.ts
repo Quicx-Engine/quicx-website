@@ -133,7 +133,7 @@ export const MEMORY_BY_MACHINE = [
 export const FOOTPRINT = [
   { label: "binary", value: "54.9 KB", note: "-O2, stripped of nothing" },
   { label: "runtime dependencies", value: "none", note: "" },
-  { label: "source", value: "~2,800 lines", note: "of C" },
+  { label: "source", value: "~3,200 lines", note: "of C" },
   { label: "threads", value: "1", note: "" },
 ] as const;
 
@@ -179,8 +179,8 @@ export const LIMITATIONS = [
     body: "No automatic retry, no dead-lettering.",
   },
   {
-    title: "Priorities, delays, named queues",
-    body: "One global FIFO.",
+    title: "Delays, named queues",
+    body: "One queue with 16 value levels (a FIFO per level, highest first); no delayed tasks and no named queues.",
   },
   {
     title: "Client libraries beyond Java",
@@ -188,12 +188,11 @@ export const LIMITATIONS = [
   },
   {
     title: "Payloads above 1 KB",
-    body: "PROTOCOL_MAX_PAYLOAD is 1,024 bytes: a task is one block of a 64 B record plus its payload, at most 1,088 B. Oversized frames get a clean MSG_ERROR.",
+    body: "PROTOCOL_MAX_PAYLOAD is 1,024 bytes by default: a task is one block of a 64 B record plus its payload. A daemon built with make MAX_PAYLOAD=N takes up to 16,320 B, and the capacity formula still holds. Oversized frames get a clean MSG_ERROR.",
   },
   {
     title: "Multiple cores",
-    body: "Single-threaded today. Scale out by running several daemons behind a TCP load balancer.",
-    status: "In progress",
+    body: "One daemon uses one core. Run one daemon per core: on a two-core Linux machine, two pinned daemons did 1.92 times the work of one, and each part of a device can have its own budget.",
   },
 ] as const;
 

@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: "%s | Quicx",
   },
   description:
-    "Quicx is a deterministic-memory task queue daemon written in C: one fixed budget, the adaptive apool allocator, 81,900 tasks/sec at 49 µs median, 55 KB binary.",
+    "Quicx is a task queue in C with a hard memory budget that keeps the most valuable work when it is full. 46,593 tasks in 8 MiB, 81,900 tasks/s, 36 KB on a Raspberry Pi.",
   metadataBase: new URL(SITE_URL),
   keywords: [
     "task queue",
@@ -47,6 +47,14 @@ export const metadata: Metadata = {
     "quicx daemon",
     "zero GC task queue",
     "high throughput task queue",
+    "priority task queue",
+    "value-aware eviction",
+    "admission control",
+    "load shedding",
+    "embedded task queue",
+    "Raspberry Pi task queue",
+    "edge AI task queue",
+    "robotics task queue",
   ],
   authors: [{ name: "Dimitar Anastasov", url: "https://www.linkedin.com/in/dimitar-anastasov-339a94310/" }],
   creator: "Dimitar Anastasov",
@@ -65,7 +73,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Quicx — Deterministic Task Queue Engine",
     description:
-      "A task queue that never asks the OS for another byte. 46,593 tasks in 8 MiB, 81,900 tasks/sec at 49 µs median end to end, 55 KB binary — measured on macOS and Linux.",
+      "A task queue that never goes past its memory budget and keeps the most valuable work when it is full: 46,593 tasks in 8 MiB, 81,900 tasks/sec at 49 µs median, 36 KB on a Raspberry Pi. All measured.",
     type: "website",
     url: SITE_URL,
     ...baseOpenGraph,
@@ -74,7 +82,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Quicx — Deterministic Task Queue Engine",
     description:
-      "A task queue with a hard memory limit: 46,593 tasks in 8 MiB, 81,900 tasks/sec at 49 µs median end to end, 55 KB binary — all measured.",
+      "A task queue with a hard memory limit that keeps the most valuable work when full: 46,593 tasks in 8 MiB, 81,900 tasks/sec, 36 KB on a Raspberry Pi. All measured.",
   },
 };
 
@@ -91,7 +99,7 @@ export default function RootLayout({
         "@id": "https://quicx.dev/#website",
         "name": "Quicx",
         "url": "https://quicx.dev",
-        "description": "Deterministic task queue engine with a fixed memory budget, the apool adaptive allocator and its own binary protocol, QXP.",
+        "description": "Task queue engine with a fixed memory budget that keeps the most valuable work when full, built on the apool adaptive allocator and its own binary protocol, QXP.",
         "inLanguage": "en-US",
         "publisher": { "@id": "https://quicx.dev/#organization" },
       },
@@ -106,7 +114,11 @@ export default function RootLayout({
           "width": 180,
           "height": 180,
         },
-        "sameAs": ["https://github.com/Quicx-Engine"],
+        "sameAs": [
+          "https://github.com/Quicx-Engine",
+          "https://github.com/anastassow/Quicx",
+          "https://central.sonatype.com/artifact/dev.quicx/quicx-client",
+        ],
       },
       {
         "@type": "SoftwareApplication",
@@ -119,15 +131,17 @@ export default function RootLayout({
         "softwareVersion": CURRENT_VERSION,
         "releaseNotes": "https://quicx.dev/docs/changelog",
         "description":
-          "Quicx is a deterministic-memory task queue daemon written in C, built on apool, an adaptive page allocator. You declare a memory budget at startup; the daemon never uses more, and gives back what a burst used once the queue drains. The default 8 MiB holds 46,593 tasks of 100 B. Measured at 81,900 tasks/sec end to end with a 49 µs median, in a 55 KB binary with no runtime dependencies.",
+          "Quicx is a task queue daemon written in C, built on apool, an adaptive page allocator. You declare a memory budget at startup; the daemon never uses more, and gives back what a burst used once the queue drains. When the budget is full it keeps the most valuable work: a task can evict a less valuable waiting task, but only when the allocator proves the freed memory fits it. The default 8 MiB holds 46,593 tasks of 100 B. Measured at 81,900 tasks/sec end to end with a 49 µs median; 36 KB on a Raspberry Pi with no runtime dependencies.",
         "featureList": [
           "Fixed memory budget, mapped once and never exceeded",
           "Adaptive apool allocator — 46,593 tasks of 100 B in 8 MiB (measured)",
           "Memory returned to the OS after a burst — 2,080 KB held once drained (measured)",
           "81,900 tasks/sec end to end on one thread (measured)",
           "49 µs median submit-to-done latency (measured)",
-          "55 KB binary — no runtime dependencies",
-          "QXP, the Quicx Protocol — a compact binary protocol with 12 message types",
+          "Value-aware eviction: 100 % of valuable tasks done under overload, against 31.6 % for a queue that refuses (measured)",
+          "One daemon per core: two daemons on two cores did 1.92 times the work of one (measured)",
+          "36 KB on a Raspberry Pi (Linux arm64), no runtime dependencies",
+          "QXP, the Quicx Protocol — a compact binary protocol with 13 message types",
           "Java client published to Maven Central",
           "Real-time CLI observability with quicx status",
         ],
@@ -148,7 +162,11 @@ export default function RootLayout({
           ],
         },
         "publisher": { "@id": "https://quicx.dev/#organization" },
-        "sameAs": ["https://github.com/Quicx-Engine/Quicx-Releases", "https://github.com/anastassow/Quicx"],
+        "sameAs": [
+          "https://github.com/anastassow/Quicx",
+          "https://github.com/Quicx-Engine/Quicx-Releases",
+          "https://github.com/Quicx-Engine/Quicx-Java",
+        ],
         "inLanguage": "en-US"
       },
     ],

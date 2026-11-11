@@ -72,11 +72,11 @@ export const features: Feature[] = [
     title: "One binary, one memory budget.",
     modalTitle: "One binary. One memory budget. No surprises.",
     shortSummary:
-      "A single 54.9 KB binary that never goes past the memory budget you set — and gives back what a burst used. Measured: 1,056 KB idle, 2,080 KB after a full burst drains.",
+      "A single binary, 36 KB on a Raspberry Pi, that never goes past the memory budget you set — and gives back what a burst used. Measured: 1,056 KB idle, 2,080 KB after a full burst drains.",
     description:
-      "Quicx ships as a single 54.9 KB binary built at -O2, with nothing stripped and no runtime dependencies. There's no VM, no JVM, no scheduler to tune. You set a pool_size and that is the memory ceiling — enforced by the allocator, not by hope — and memory a burst touched goes back to the OS once the queue drains.",
+      "Quicx ships as a single stripped binary, 36 KB for Linux on a Raspberry Pi, with no runtime dependencies. There's no VM, no JVM, no scheduler to tune. You set a pool_size and that is the memory ceiling — enforced by the allocator, not by hope — and memory a burst touched goes back to the OS once the queue drains.",
     bullets: [
-      "54.9 KB binary, ~2,800 lines of C, no runtime dependencies",
+      "36 KB on a Raspberry Pi, ~3,200 lines of C, no runtime dependencies",
       "1,056 KB idle, 9,088 KB with the queue full, 2,080 KB after it drains",
       "v1.0.4 held 9,200 KB from the moment it started",
       "Peak use 2.8 % of the default 8 MiB budget under the throughput load",

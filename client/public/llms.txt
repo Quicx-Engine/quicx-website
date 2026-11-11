@@ -1,35 +1,45 @@
 # Quicx
 
-> Quicx is a deterministic-memory task queue daemon written in C. You give it a memory budget at startup; it never uses more, reports precisely what it is using, and gives back what a burst used once the queue drains.
+> Quicx is a task queue daemon written in C for devices and servers with little memory. You give it a memory budget at startup; it never uses more, and when the budget is full it keeps the most valuable work: a task can evict a less valuable waiting task, but only when its allocator proves the freed memory fits the new one. As far as its author found, no other task queue does this.
 
-Quicx runs a single-threaded event loop (epoll/kqueue) on top of apool, an adaptive page allocator: the budget is mapped once, and 16 KiB pages go to whichever block sizes the traffic sends and come back when they empty. A task is one block — a 64-byte record with its payload behind it. It speaks QXP, the Quicx Protocol, its own compact binary protocol (6-byte header, 12 message types). Written in C, with a Java client library (QuicxClient, QuicxWorker). Current version: 2.0.0.
+Quicx runs a single-threaded event loop (epoll/kqueue) on top of apool, an adaptive page allocator: the budget is mapped once, and 16 KiB pages go to whichever block sizes the traffic sends and come back when they empty. A task is one block, a 64-byte record with its payload behind it. Tasks carry a value level from 0 to 15; workers get the highest level first, and level 15 is never evicted. Clients speak QXP, the Quicx Protocol, its own compact binary protocol (6-byte header, 13 message types). There is a Java client, dev.quicx:quicx-client, on Maven Central. Current version: 2.1.0. Started on 2 April 2026 by Dimitar Anastasov; open source under MIT.
 
-## Measured performance (Quicx 2.0.0)
+## Measured (Quicx 2.0 and 2.1)
 
-Measured with `bench/run.sh` and the same scripts on two machines: an Apple M4 Pro (12 cores, 24 GB, macOS 26.5.1, arm64, Apple clang 17) and an Intel Core i3-2100 (2 cores / 4 threads, 8 GB, Ubuntu 24.04, gcc 13.3). quicxd built -O2, default 8 MiB budget, loopback TCP, 8 workers, 8 producer connections, C clients. Each figure is the median of several interleaved runs, next to v1.0.4 measured the same way. Nothing is estimated or extrapolated.
+Measured with scripts in the repository on an Apple M4 Pro (macOS, arm64) and an Intel Core i3-2100 (2 cores / 4 threads, Ubuntu 24.04). Every number has a script and raw output next to it (docs/README.md in the repository maps them).
 
-- Capacity: 46,593 tasks of 100 B fit in the default 8 MiB (v1.0.4: 655); 8,016 of 900 B, 73,146 of 40 B, 22,044 of 300 B, 30,947 nginx log lines. Identical on both machines.
-- Throughput: 81,900 tasks/sec end to end, single thread, on the M4 Pro (v1.0.4: 82,400 — within run-to-run noise); 19,000 on the i3. One task = five protocol messages: submit, ack, dispatch, done, notify — not a single enqueue.
-- Latency (submit → done, open loop at 40k/s offered, M4 Pro): 49 µs p50, 64 µs p90, 98 µs p99, 143 µs p99.9. On the i3 at 9k/s: 123 µs p50.
-- Memory (macOS phys_footprint): 1,056 KB idle, 9,088 KB with the queue full, 2,080 KB after the burst drains (v1.0.4 held 9,200 KB throughout). Peak 2.8 % of the budget under the throughput load.
-- Footprint: 54.9 KB binary (-O2), no runtime dependencies, ~2,800 lines of C, 1 thread.
+- Value-aware admission, real daemon, 256 KiB budget, one worker slower than the flood: 100 % of valuable tasks done under steady overload against 31.6 % for a queue that refuses new tasks; a valuable task waits 4.1 ms instead of 3.5 s. Evicting the oldest instead also keeps them in steady overload but evicts ten times as many tasks and loses 35 % of valuable ones in a burst.
+- Capacity: 46,593 tasks of 100 B in the default 8 MiB, the same on both machines and exactly what the capacity formula gives. A daemon built with make MAX_PAYLOAD=8192 holds 1,002 tasks of 8,000 B in 8 MiB, again exactly the formula.
+- Several daemons: on the i3, two daemons pinned to two cores did 35,000 tasks/s against 18,200 for one (1.92x); filling one of ten daemons left the other nine untouched.
+- Throughput and latency: 81,900 tasks/sec end to end on one thread on the M4 Pro, 49 µs median, 98 µs p99; 19,000 tasks/sec on the i3.
+- Memory: 1,056 KB idle, 9,088 KB with the queue full, 2,080 KB after the burst drains (macOS phys_footprint).
+- Size: 36 KB on a Raspberry Pi (Linux arm64 release binary), no runtime dependencies, about 3,200 lines of C.
+- Tests: 155 unit checks and 27 end-to-end checks, passing on macOS arm64 and Linux x86-64.
 
-Latency is measured submit → done, not submit → ack. Latency runs are open loop and timed from the scheduled send (coordinated-omission corrected); throughput runs are closed loop. Clients are C, because a Python client saturates before the daemon does and ends up measuring itself.
+## Research
+
+A simulation of the admission rule with ten ways of learning a task's value from worker scores (bandits, Thompson sampling, logistic regression, reinforcement learning) shows learning helps where value has a visible cause: logistic regression with regular probes analysed 2.4 times more valuable frames on a robot workload and doubled useful work on a ten-customer server; learning without exploration did worse than no learning. Learned value is the planned next step for eviction.
 
 ## Limitations
 
-Quicx is a fast in-memory broker, not a durable one. No persistence (a restart loses the queue), no redelivery if a worker dies mid-task, no retries or dead-lettering, no priorities/delays/named queues (one global FIFO), payloads capped at 1024 bytes, single core, and Java is the only client library. Delivery is at-most-once. If you need at-least-once delivery, use beanstalkd or Redis Streams.
+Quicx is an in-memory broker, not a durable one. No persistence (a restart empties the queue), no redelivery if a worker dies mid-task, no retries or dead-lettering, no delayed or named queues. Payloads are at most 1,024 bytes by default (up to 16,320 with a custom build). One daemon uses one core; run one per core. No hard real-time deadlines. Delivery is at-most-once; for at-least-once delivery, use beanstalkd or Redis Streams.
 
 ## Docs
-- [Documentation](https://quicx.dev/docs/installation): Full docs — architecture, configuration, CLI reference, Java client
-- [Allocator](https://quicx.dev/docs/allocator): apool v2, its features from the allocator literature, and their measured effect
-- [QXP Protocol](https://quicx.dev/docs/binary-protocol): QXP, the Quicx Protocol: frame header, message types, payload formats
-- [Benchmarks](https://quicx.dev/docs/benchmarks): Measured results on two machines, methodology, and comparison provenance
-- [Limitations](https://quicx.dev/docs/limitations): What Quicx does not do, and feature-for-feature comparison
-- [Changelog](https://quicx.dev/docs/changelog): What changed in 2.0.0
-- [Installer](https://quicx.dev/install.sh): One-line install script
+- [Installation](https://quicx.dev/docs/installation): one-line install, checksums, pinning a version
+- [Quick start](https://quicx.dev/docs/quick-start): first daemon, producer and worker
+- [Configuration](https://quicx.dev/docs/configuration): every setting, the admission rule, capacity planning
+- [Architecture](https://quicx.dev/docs/architecture): how a task moves through the daemon
+- [Allocator](https://quicx.dev/docs/allocator): apool, its ideas from the allocator literature, and their measured effect
+- [QXP Protocol](https://quicx.dev/docs/binary-protocol): frame header, message types, SUBMIT_VALUED
+- [Benchmarks](https://quicx.dev/docs/benchmarks): measured results on two machines, value-aware admission, several daemons
+- [CLI reference](https://quicx.dev/docs/cli-reference): start, stop, status, version, several daemons per machine
+- [Java client](https://quicx.dev/docs/java-client): dev.quicx:quicx-client
+- [Limitations](https://quicx.dev/docs/limitations): what Quicx does not do
+- [Changelog](https://quicx.dev/docs/changelog): what changed in each release
 
-## Resources
-- [Home](https://quicx.dev): Product overview and landing page
-- [Releases](https://github.com/Quicx-Engine/Quicx-Releases): Release binaries and checksums
-- [Contact](https://www.linkedin.com/in/dimitar-anastasov-339a94310/): Author, Dimitar Anastasov
+## Source and releases
+- [Quicx source](https://github.com/anastassow/Quicx): the daemon, tests, report, research
+- [Java client source](https://github.com/Quicx-Engine/Quicx-Java)
+- [Release binaries](https://github.com/Quicx-Engine/Quicx-Releases): Linux and macOS, x86-64 and arm64, with SHA256SUMS
+- [Quicx-Engine on GitHub](https://github.com/Quicx-Engine)
+- [Author](https://www.linkedin.com/in/dimitar-anastasov-339a94310/): Dimitar Anastasov

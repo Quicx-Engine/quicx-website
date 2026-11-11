@@ -18,7 +18,7 @@ export const sectionMeta: Record<string, SectionMeta> = {
     kicker: "Getting Started",
     title: "Installation",
     lede: "Quicx ships as a single static binary. One curl command detects your OS and architecture, downloads the matching release from GitHub, and drops the daemon into your PATH.",
-    updated: "2026-11-04",
+    updated: "2026-11-11",
     toc: [
       { id: "what-installer-does", label: "What the installer does" },
       { id: "verify-installation", label: "Verify it worked" },
@@ -29,7 +29,7 @@ export const sectionMeta: Record<string, SectionMeta> = {
     kicker: "Getting Started",
     title: "Quick Start",
     lede: "Start the daemon with quicx start, pull the Java client from Maven Central, and submit your first task. End-to-end in under a minute.",
-    updated: "2026-11-09",
+    updated: "2026-11-11",
     toc: [],
   },
   "configuration": {
@@ -109,9 +109,9 @@ export const sectionMeta: Record<string, SectionMeta> = {
     num: "§ 02.05",
     kicker: "Core Concepts",
     title: "Limitations",
-    lede: "Quicx is a fast in-memory broker, not a durable one. No persistence, no redelivery, no retries, one global FIFO, one core. Part of the latency advantage is work Quicx is not doing — here is exactly which work.",
-    description: "Quicx is a fast in-memory broker, not a durable one: no persistence, no redelivery, no retries, one global FIFO, one core. Exactly what it does not do.",
-    updated: "2026-11-09",
+    lede: "Quicx is a fast in-memory broker, not a durable one. No persistence, no redelivery, no retries, no delays, one core per daemon. Part of the latency advantage is work Quicx is not doing — here is exactly which work.",
+    description: "Quicx is a fast in-memory broker, not a durable one: no persistence, no redelivery, no retries, no delays, one core per daemon. Exactly what it does not do.",
+    updated: "2026-11-11",
     toc: [
       { id: "not-implemented", label: "What Quicx does not do" },
       { id: "feature-matrix", label: "Feature for feature" },
@@ -132,7 +132,7 @@ export const sectionMeta: Record<string, SectionMeta> = {
     title: "Java Client",
     lede: "dev.quicx:quicx-client 2.1.0 is a small, dependency-free Java 11+ library. QuicxClient submits tasks, with value levels if you want, and can wait for their result; QuicxWorker runs them, reconnecting and reporting on its own.",
     description: "dev.quicx:quicx-client 2.1.0, a dependency-free Java 11+ library: QuicxClient submits tasks with value levels and waits for results, QuicxWorker runs them.",
-    updated: "2026-11-10",
+    updated: "2026-11-11",
     toc: [
       { id: "java-build-setup", label: "Add it to your build" },
       { id: "QuicxClient", label: "QuicxClient — producers" },
@@ -145,7 +145,7 @@ export const sectionMeta: Record<string, SectionMeta> = {
     kicker: "Reference",
     title: "Changelog",
     lede: "Quicx follows semver. A breaking change to the wire protocol, the config file or the memory model bumps the major version; new message types are additive and bump minor. Patch releases are build-or-docs-only.",
-    updated: "2026-11-09",
+    updated: "2026-11-11",
     toc: [],
   },
 };
