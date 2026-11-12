@@ -52,7 +52,7 @@ export function PerformanceVisual({ active }: { active: boolean }) {
       data-reveal={reveal}
       className="grid h-full grid-cols-1 divide-y divide-quicx-line sm:grid-cols-2 sm:divide-x sm:divide-y-0"
     >
-      <Panel title="submit → done" meta="measured" bodyClassName="flex h-full flex-col px-4 py-4 sm:px-5 sm:py-5">
+      <Panel title="submit to done" meta="measured" bodyClassName="flex h-full flex-col px-4 py-4 sm:px-5 sm:py-5">
         <p className="flex items-baseline gap-1.5 font-mono">
           <NumberReveal
             value={HEADLINE.latencyUs}

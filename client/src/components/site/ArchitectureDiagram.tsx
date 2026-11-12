@@ -786,9 +786,9 @@ function SlabGrid({
 /** Legend box — bottom/right like the source diagram. */
 function Legend({ x, y }: { x: number; y: number }) {
   const items: { key: keyof typeof MSG; label: string }[] = [
-    { key: "SUBMIT", label: "MSG_SUBMIT  producer → daemon" },
+    { key: "SUBMIT", label: "MSG_SUBMIT  producer to daemon" },
     { key: "OK", label: "MSG_OK      acknowledgment" },
-    { key: "TASK", label: "MSG_TASK    daemon → worker" },
+    { key: "TASK", label: "MSG_TASK    daemon to worker" },
     { key: "DONE", label: "MSG_DONE    worker finished" },
     { key: "STATS", label: "MSG_STATS   stats request" },
     { key: "ALLOC", label: "O(1) alloc / free from apool" },

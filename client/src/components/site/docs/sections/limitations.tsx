@@ -74,15 +74,15 @@ export function LimitationsSection() {
           Quicx is the task queue you reach for when you need to know,{" "}
           <strong>exactly</strong>, how much memory the broker will use. A fixed
           budget declared at startup and never exceeded, every page accounted
-          for, and the memory of a burst given back once it drains — that is the
-          guarantee none of the systems in the table above make.
+          for, and the memory of a burst given back once it drains. None of the
+          systems in the table above make that guarantee.
         </p>
         <p>
-          Speed is the supporting evidence, not the headline. If your tasks are
+          If your tasks are
           cheap, local, replayable from the source of truth, and you would
           rather have a hard memory ceiling than durable delivery, Quicx fits.
-          If losing a task on a worker crash is unacceptable, it does not — and
-          no benchmark number changes that.
+          If losing a task on a worker crash is unacceptable, it does not, whatever the
+          benchmarks say.
         </p>
       </Prose>
     </section>

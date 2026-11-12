@@ -74,7 +74,7 @@ const ERROR_RGB = "242, 107, 91";
 
 const readouts = [
   { value: HEADLINE.throughput, unit: "tasks/s", note: "end to end, one thread" },
-  { value: HEADLINE.latencyUs, unit: "µs p50", note: "submit → done" },
+  { value: HEADLINE.latencyUs, unit: "µs p50", note: "submit to done" },
   { value: HEADLINE.capacity, unit: "tasks", note: `of 100 B in 8 MiB (v1.0.4: ${HEADLINE.capacityBefore})` },
   { value: "55", unit: "KB binary", note: "no dependencies" },
 ];

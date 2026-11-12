@@ -23,11 +23,11 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Quicx — Memory-Bounded Task Queue with Value-Aware Eviction",
+    default: "Quicx: Memory-Bounded Task Queue with Value-Aware Eviction",
     template: "%s | Quicx",
   },
   description:
-    "Quicx is a task queue in C with a hard memory budget that keeps the most valuable work when it is full. 46,593 tasks in 8 MiB, 81,900 tasks/s, 36 KB on a Raspberry Pi.",
+    "Quicx is a task queue in C with a hard memory budget that keeps the most valuable work when it is full. 46,593 tasks in 8 MiB, 81,900 tasks/s, about 36 KB on Linux.",
   metadataBase: new URL(SITE_URL),
   keywords: [
     "task queue",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     "admission control",
     "load shedding",
     "embedded task queue",
-    "Raspberry Pi task queue",
+    "Linux task queue",
     "edge AI task queue",
     "robotics task queue",
   ],
@@ -71,18 +71,18 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Quicx — the task queue that keeps the valuable work when memory is full",
+    title: "Quicx keeps the valuable work when memory is full",
     description:
-      "A task queue that never goes past its memory budget and keeps the most valuable work when it is full: 46,593 tasks in 8 MiB, 81,900 tasks/sec at 49 µs median, 36 KB on a Raspberry Pi. All measured.",
+      "A task queue that never goes past its memory budget and keeps the most valuable work when it is full: 46,593 tasks in 8 MiB, 81,900 tasks/sec at 49 µs median, about 36 KB on Linux. All measured.",
     type: "website",
     url: SITE_URL,
     ...baseOpenGraph,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Quicx — the task queue that keeps the valuable work when memory is full",
+    title: "Quicx keeps the valuable work when memory is full",
     description:
-      "A task queue with a hard memory limit that keeps the most valuable work when full: 46,593 tasks in 8 MiB, 81,900 tasks/sec, 36 KB on a Raspberry Pi. All measured.",
+      "A task queue with a hard memory limit that keeps the most valuable work when full: 46,593 tasks in 8 MiB, 81,900 tasks/sec, about 36 KB on Linux. All measured.",
   },
 };
 
@@ -131,17 +131,17 @@ export default function RootLayout({
         "softwareVersion": CURRENT_VERSION,
         "releaseNotes": "https://quicx.dev/docs/changelog",
         "description":
-          "Quicx is a task queue daemon written in C, built on apool, an adaptive page allocator. You declare a memory budget at startup; the daemon never uses more, and gives back what a burst used once the queue drains. When the budget is full it keeps the most valuable work: a task can evict a less valuable waiting task, but only when the allocator proves the freed memory fits it. The default 8 MiB holds 46,593 tasks of 100 B. Measured at 81,900 tasks/sec end to end with a 49 µs median; 36 KB on a Raspberry Pi with no runtime dependencies.",
+          "Quicx is a task queue daemon written in C, built on apool, an adaptive page allocator. You declare a memory budget at startup; the daemon never uses more, and gives back what a burst used once the queue drains. When the budget is full it keeps the most valuable work: a task can evict a less valuable waiting task, but only when the allocator proves the freed memory fits it. The default 8 MiB holds 46,593 tasks of 100 B. Measured at 81,900 tasks/sec end to end with a 49 µs median; about 36 KB on Linux with no runtime dependencies.",
         "featureList": [
           "Fixed memory budget, mapped once and never exceeded",
-          "Adaptive apool allocator — 46,593 tasks of 100 B in 8 MiB (measured)",
-          "Memory returned to the OS after a burst — 2,080 KB held once drained (measured)",
+          "Adaptive apool allocator: 46,593 tasks of 100 B in 8 MiB (measured)",
+          "Memory returned to the OS after a burst: 2,080 KB held once drained (measured)",
           "81,900 tasks/sec end to end on one thread (measured)",
           "49 µs median submit-to-done latency (measured)",
           "Value-aware eviction: 100 % of valuable tasks done under overload, against 31.6 % for a queue that refuses (measured)",
           "One daemon per core: two daemons on two cores did 1.92 times the work of one (measured)",
-          "36 KB on a Raspberry Pi (Linux arm64), no runtime dependencies",
-          "QXP, the Quicx Protocol — a compact binary protocol with 13 message types",
+          "About 36 KB on Linux, no runtime dependencies",
+          "QXP, the Quicx Protocol, a compact binary protocol with 13 message types",
           "Java client published to Maven Central",
           "Real-time CLI observability with quicx status",
         ],

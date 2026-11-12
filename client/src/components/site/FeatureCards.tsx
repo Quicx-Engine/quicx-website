@@ -8,12 +8,11 @@ export function FeatureCards() {
       <Container className="py-24 lg:py-32">
         <SectionHead
           id="features-title"
-          title="Six opinions."
-          continuation="So you don't have to make them."
+          title="Six design decisions."
+          continuation="Each with its evidence."
         >
           <p>
-            Six design decisions, each shown with the evidence behind it. Pick one to see it
-            working.
+            Pick one to see it working.
           </p>
         </SectionHead>
 

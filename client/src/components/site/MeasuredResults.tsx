@@ -69,7 +69,7 @@ export function MeasuredResults() {
           <p>
             Two machines, one -O2 build, every run repeatable with{" "}
             <code className="font-mono text-[14px] text-quicx-orange-bright">bench/run.sh</code>.
-            Nothing below is estimated, extrapolated, or taken from documentation.
+            Every figure below was measured on these machines.
           </p>
         </SectionHead>
 
@@ -118,7 +118,7 @@ export function MeasuredResults() {
 
           {/* Latency */}
           <article className="flex flex-col border-b border-quicx-line py-10 lg:border-b-0 lg:border-l lg:px-10">
-            <Figure label="Latency, submit → done" value={HEADLINE.latencyUs} unit="µs p50" delay={150} />
+            <Figure label="Latency, submit to done" value={HEADLINE.latencyUs} unit="µs p50" delay={150} />
             <p className="mt-6 text-[15px] leading-[1.65] text-quicx-muted">
               Open loop at 40k/s offered, timed from the scheduled send, so stalls are charged in
               full rather than hidden.
@@ -266,8 +266,7 @@ export function MeasuredResults() {
               How it was measured
             </h3>
             <p className="mt-3 max-w-[40ch] text-[15px] leading-[1.65] text-quicx-muted">
-              The methodology is the difference between a benchmark and a marketing claim, so it
-              belongs here and not in a footnote.
+              The method decides what a number means, so it is written out here.
             </p>
             <TextLink href="/docs/benchmarks" className="mt-6">
               Full benchmark write-up

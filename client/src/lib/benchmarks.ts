@@ -30,7 +30,7 @@ export const HEADLINE = {
   throughputNote: "end to end, single thread",
   latency: "49 µs",
   latencyUs: "49",
-  latencyNote: "p50 submit → done",
+  latencyNote: "p50 submit to done",
   capacity: "46,593",
   capacityNote: "tasks of 100 B in 8 MiB",
   capacityBefore: "655",
@@ -143,16 +143,16 @@ export const METHODOLOGY = [
     body: "A Python client tops out around 50–100k socket ops/sec and contends on the GIL across threads, so it saturates before the daemon does and ends up measuring itself.",
   },
   {
-    title: "Latency is submit → done",
-    body: "Not submit → ack. An ack only means the daemon received the frame; it never touches a worker. For a task queue, the number that matters is when the work is finished.",
+    title: "Latency is timed to done",
+    body: "Not to the ack. An ack only means the daemon received the frame; it never touches a worker. For a task queue, the number that matters is when the work is finished.",
   },
   {
     title: "Open loop for latency, closed loop for throughput",
-    body: "Latency runs put tasks on a fixed schedule and charge stalls against the scheduled send time — the standard correction for coordinated omission. Closed-loop latency is not quoted, because a client that backs off when the server slows cannot measure the server slowing.",
+    body: "Latency runs put tasks on a fixed schedule and charge stalls against the scheduled send time, the standard correction for coordinated omission. Closed-loop latency is not quoted, because a client that backs off when the server slows cannot measure the server slowing.",
   },
   {
-    title: "Real payloads, really parsed",
-    body: "nginx combined-format access-log lines, 120–260 bytes. Workers parse them — IP, method, path hash, status, bytes — and report per-status totals, so a run can be verified rather than trusted.",
+    title: "Real payloads, parsed by the workers",
+    body: "nginx combined-format access-log lines, 120–260 bytes. Workers parse the IP, method, path hash, status and bytes, and report per-status totals, so a run can be verified rather than trusted.",
   },
   {
     title: "Two machines, loopback TCP",
@@ -184,7 +184,7 @@ export const LIMITATIONS = [
   },
   {
     title: "Client libraries beyond Java",
-    body: "dev.quicx:quicx-client is the only one. Every other language talks QXP, the Quicx Protocol, directly — it is documented and small.",
+    body: "dev.quicx:quicx-client is the only one. Every other language talks QXP, the Quicx Protocol, directly. It is documented and small.",
   },
   {
     title: "Payloads above 1 KB",
@@ -215,7 +215,7 @@ export const COMPARISON = [
   {
     system: "RabbitMQ",
     throughput: "~40k msg/s",
-    latency: "—",
+    latency: "n/a",
     provenance: "reported",
     measured: false,
   },
@@ -228,8 +228,8 @@ export const COMPARISON = [
   },
   {
     system: "beanstalkd",
-    throughput: "—",
-    latency: "—",
+    throughput: "n/a",
+    latency: "n/a",
     provenance: "no comparable figure found",
     measured: false,
   },

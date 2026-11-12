@@ -58,7 +58,7 @@ export function Interactive404() {
 
         <div className="lg:col-span-6">
           <div className="h-[168px] overflow-hidden rounded-[3px] border border-quicx-line-strong bg-quicx-well">
-            <Panel title="~ — zsh" className="h-full">
+            <Panel title="zsh" className="h-full">
               <div className="px-4 py-3.5 font-mono text-[13px] leading-[1.7]">
                 <div className="break-all text-quicx-text">
                   <span className="text-quicx-dim">user@host ~ $</span> {typed}

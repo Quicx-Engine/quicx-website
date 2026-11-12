@@ -140,7 +140,7 @@ export function ProtocolVisual({ active }: { active: boolean }) {
         </div>
       </Panel>
 
-      <Panel title="one task, traced" meta="12 opcodes in all" className="min-h-0">
+      <Panel title="one task, traced" meta="13 message types in all" className="min-h-0">
         <div className="relative flex h-full flex-col px-2 pb-3 pt-3 sm:px-4">
           {/* lifelines */}
           <div aria-hidden className="pointer-events-none absolute inset-x-2 bottom-3 top-10 sm:inset-x-4">

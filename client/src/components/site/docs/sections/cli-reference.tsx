@@ -56,7 +56,7 @@ usage:
         <CliCommand cmd="quicx start [--config FILE] [--port N]" title="start the daemon in the foreground">
           <Prose>
             <p>
-              Binds the port, maps the memory budget once, and begins accepting connections. Runs in the foreground — the calling
+              Binds the port, maps the memory budget once, and begins accepting connections. Runs in the foreground, so the calling
               shell owns the process. Pair with systemd, <InlineCode>tmux</InlineCode>,{" "}
               <InlineCode>launchd</InlineCode> or your container supervisor for lifecycle
               management.
@@ -96,7 +96,7 @@ usage:
               <strong>in-flight</strong>, derived as submitted − completed − failed),{" "}
               <strong>pages in use</strong> out of the pool, and every{" "}
               <strong>block size that holds pages</strong> with its live blocks, capacity and
-              page count. Safe to script — exits
+              page count. Safe to script: it exits
               non-zero if the daemon is unreachable.
             </p>
           </Prose>
@@ -130,8 +130,8 @@ user@host ~ $`}
 
           <p className="mt-3 text-[13.5px] leading-relaxed text-quicx-muted">
             Above: 1,200 tasks of 100 B and 300 of 900 B waiting, no worker connected. Since
-            2.0 the memory block counts pages — a size appears only while it holds some, and
-            its capacity grows and shrinks with the pages it owns. Redesigned in v1.0.3 — bar
+            2.0 the memory block counts pages. A size appears only while it holds some, and
+            its capacity grows and shrinks with the pages it owns. Redesigned in v1.0.3: bar
             charts, thousands separators and human-readable byte sizes replace the raw counters
             from earlier releases. New fields exposed on the
             wire: <InlineCode>workers_registered</InlineCode> (ever registered, not just
@@ -144,7 +144,7 @@ user@host ~ $`}
             The stats wire format grew in v1.0.3 (<InlineCode>StatsHeader</InlineCode>: 48 to 73
             bytes) and in 2.0 (81 bytes, with the count of evicted tasks). If <InlineCode>quicx status</InlineCode>{" "}and the daemon it&rsquo;s talking to
             are different releases, it detects the length mismatch and prints{" "}
-            <InlineCode>daemon speaks a different stats format — restart the daemon to match</InlineCode>{" "}
+            <InlineCode>error: daemon speaks a different stats format</InlineCode>{" "}
             instead of misparsing the response.
           </Callout>
         </CliCommand>

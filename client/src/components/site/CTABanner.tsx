@@ -18,7 +18,7 @@ export function CTABanner() {
         <div className="mt-12 grid grid-cols-1 gap-x-10 gap-y-8 border-t border-quicx-on-orange/25 pt-10 lg:grid-cols-12">
           <p className="max-w-[44ch] text-[17px] leading-[1.6] text-quicx-on-orange/85 lg:col-span-5">
             Install the daemon, pull the Java client from Maven Central, and submit your first
-            task. No managed service, no account, no surprises.
+            task. There is nothing to sign up for.
           </p>
           <div className="flex flex-col gap-4 lg:col-span-7">
             <InstallCommand tone="onOrange" />

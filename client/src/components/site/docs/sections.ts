@@ -107,8 +107,8 @@ export const nav: DocsNavGroup[] = [
         label: "Java Client",
         toc: [
           { id: "java-build-setup", label: "Add it to your build" },
-          { id: "QuicxClient", label: "QuicxClient — producers" },
-          { id: "QuicxWorker", label: "QuicxWorker — consumers" },
+          { id: "QuicxClient", label: "QuicxClient for producers" },
+          { id: "QuicxWorker", label: "QuicxWorker for consumers" },
           { id: "QuicxException", label: "Errors and limits" },
         ],
       },

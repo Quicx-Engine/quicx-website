@@ -17,7 +17,7 @@ export function InstallationSection() {
 
       <Prose>
         <p>
-          The installer is a small POSIX <InlineCode>sh</InlineCode> script — it works on{" "}
+          The installer is a small POSIX <InlineCode>sh</InlineCode> script that works on{" "}
           <strong>Linux (x86_64 / arm64)</strong> and{" "}
           <strong>macOS (Intel / Apple Silicon)</strong> without any additional tooling. No
           runtime dependencies, no package manager, no JDK. The Java client is distributed
@@ -35,8 +35,8 @@ export function InstallationSection() {
 
       <Prose>
         <p>
-          Prefer to inspect the script first? Download it, read it, then run it — everything
-          the installer does is visible plaintext:
+          Prefer to inspect the script first? Download it, read it, then run it. Everything
+          the installer does is plain text:
         </p>
       </Prose>
 
@@ -58,7 +58,7 @@ sh install-quicx.sh`}
             def: (
               <>
                 Reads <InlineCode>uname -s</InlineCode> and <InlineCode>uname -m</InlineCode>{" "}
-                to pick the right platform string — <InlineCode>linux-x86_64</InlineCode>,{" "}
+                to pick the right platform string: <InlineCode>linux-x86_64</InlineCode>,{" "}
                 <InlineCode>linux-aarch64</InlineCode>,{" "}
                 <InlineCode>darwin-x86_64</InlineCode> or{" "}
                 <InlineCode>darwin-arm64</InlineCode>.
@@ -72,7 +72,7 @@ sh install-quicx.sh`}
                 Defaults to <InlineCode>latest</InlineCode>, which resolves to the version
                 pinned in the script itself (currently{" "}
                 <InlineCode>v{CURRENT_VERSION}</InlineCode>). Set{" "}
-                <InlineCode>QUICX_VERSION</InlineCode> to pin a specific release —{" "}
+                <InlineCode>QUICX_VERSION</InlineCode> to pin a specific release;{" "}
                 <InlineCode>{CURRENT_VERSION}</InlineCode> and{" "}
                 <InlineCode>v{CURRENT_VERSION}</InlineCode> are both accepted.
               </>
@@ -141,9 +141,9 @@ curl -fsSL https://quicx.dev/install.sh | QUICX_INSTALL_DIR=~/.local/bin sh`}
           github.com/Quicx-Engine/Quicx-Releases
         </a>
         , copy it into your image, and drop a <InlineCode>quicx.conf</InlineCode> alongside it
-        (or rely on the built-in default — see{" "}
+        (or rely on the built-in default, see{" "}
         <Link href="/docs/configuration">Configuration</Link>). No network access is required
-        at runtime — Quicx never calls home.
+        at runtime, and Quicx never calls home.
       </Callout>
     </section>
   );

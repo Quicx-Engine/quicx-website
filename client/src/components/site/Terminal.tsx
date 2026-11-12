@@ -147,7 +147,7 @@ export function Terminal({
   const done = visible.length > 0 && typingText === "" && visible.length >= afterLastClear(lines).length;
 
   return (
-    <Panel title="~ — zsh" className={cn("h-full", className)}>
+    <Panel title="zsh" className={cn("h-full", className)}>
       <div
         ref={scrollRef}
         className="terminal-scroll h-full overflow-auto px-4 py-3.5 font-mono text-[12.5px] leading-[1.65] text-quicx-muted"

@@ -137,7 +137,7 @@ export function ConfigVisual({ active }: { active: boolean }) {
       >
         <div
           role="img"
-          aria-label="One 8 MiB budget, four sizes sent one after another: each fills the same pool in its own block size — 46,593 tasks of 100 B, 8,016 of 900 B, 73,146 of 40 B and 22,044 of 300 B."
+          aria-label="One 8 MiB budget, four sizes sent one after another: each fills the same pool in its own block size: 46,593 tasks of 100 B, 8,016 of 900 B, 73,146 of 40 B and 22,044 of 300 B."
           className="flex min-h-0 flex-1 flex-col gap-3"
         >
           {/* the four phases, as a legend of what the pool held */}

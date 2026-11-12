@@ -164,7 +164,7 @@ export function BinaryProtocolSection() {
         <p>
           Producer and Worker both connect to the <strong>same TCP port</strong> (
           <InlineCode>server_start</InlineCode>, <InlineCode>server.c:265</InlineCode>). There is
-          no separate producer port or worker port — a connection starts as{" "}
+          no separate producer port or worker port. A connection starts as{" "}
           <InlineCode>CONN_UNKNOWN</InlineCode> and only becomes{" "}
           <InlineCode>CONN_PRODUCER</InlineCode> or <InlineCode>CONN_WORKER</InlineCode> once the
           daemon sees its first <InlineCode>MSG_SUBMIT</InlineCode> or{" "}
@@ -173,8 +173,8 @@ export function BinaryProtocolSection() {
         <p>
           The CLI (<InlineCode>quicx status</InlineCode>) is a different client on a different
           transport: it connects to a separate Unix socket (
-          <InlineCode>/tmp/quicx.sock</InlineCode>) and only ever does one exchange —{" "}
-          <InlineCode>MSG_STATS</InlineCode> → <InlineCode>MSG_STATS_RESPONSE</InlineCode>.
+          <InlineCode>/tmp/quicx.sock</InlineCode>) and only ever does one exchange: it sends{" "}
+          <InlineCode>MSG_STATS</InlineCode> and reads back <InlineCode>MSG_STATS_RESPONSE</InlineCode>.
         </p>
         <p>
           The daemon is the process in the middle running the event loop; every message below is
@@ -184,8 +184,8 @@ export function BinaryProtocolSection() {
         </p>
         <p>
           Connections aren&rsquo;t only producer or worker, either. As of v1.0.3 the TCP
-          listener and the Unix listener get their own roles —{" "}
-          <InlineCode>CONN_SERVER</InlineCode> and <InlineCode>CONN_CLI</InlineCode> — instead
+          listener and the Unix listener get their own roles,{" "}
+          <InlineCode>CONN_SERVER</InlineCode> and <InlineCode>CONN_CLI</InlineCode>, instead
           of being lumped under <InlineCode>CONN_UNKNOWN</InlineCode> like every other
           not-yet-registered socket.
         </p>
@@ -210,7 +210,7 @@ export function BinaryProtocolSection() {
           },
           {
             term: "type",
-            def: "Message opcode — one of the 12 types below. The daemon routes on type alone; producers and workers speak the same header shape.",
+            def: "Message opcode, one of the 13 types below. The daemon routes on type alone; producers and workers speak the same header shape.",
           },
           {
             term: "length",
@@ -220,10 +220,10 @@ export function BinaryProtocolSection() {
             term: "payload",
             def: (
               <>
-                Exactly length bytes, capped at <InlineCode>PROTOCOL_MAX_PAYLOAD</InlineCode> —{" "}
+                Exactly length bytes, capped at <InlineCode>PROTOCOL_MAX_PAYLOAD</InlineCode>:{" "}
                 <strong>1024 bytes</strong>{" "}as of v1.0.3 (previously 1 MiB). Since 2.0 a task
-                is one allocator block — the 64-byte <InlineCode>Task</InlineCode> record with the
-                payload right behind it — and 1,088 bytes is apool&rsquo;s largest size, so every
+                is one allocator block, the 64-byte <InlineCode>Task</InlineCode> record with the
+                payload right behind it, and 1,088 bytes is apool&rsquo;s largest size, so every
                 accepted payload fits. Oversized frames get a clean{" "}
                 <InlineCode>MSG_ERROR</InlineCode> (<InlineCode>ERR_PAYLOAD_TOO_BIG</InlineCode>
                 ) instead of being truncated or read past the buffer.
@@ -254,7 +254,7 @@ export function BinaryProtocolSection() {
           example={`type = "send_email"\npayload = {"to":"user@gmail.com"}\nbytes   = [10][send_email][{"to":"user@gmail.com"}]`}
           extra={
             <p className="text-[13.5px] leading-relaxed text-quicx-muted">
-              Parsed specially in <InlineCode>server.c</InlineCode> — the daemon needs the
+              Parsed specially in <InlineCode>server.c</InlineCode>, because the daemon needs the
               length-prefix byte before it knows how much more to read. On accept, the daemon
               queues a <InlineCode>Task</InlineCode>, tags the connection{" "}
               <InlineCode>CONN_PRODUCER</InlineCode>, replies <InlineCode>MSG_OK</InlineCode>, and
@@ -278,10 +278,10 @@ export function BinaryProtocolSection() {
         />
         <Payload hex="0x02" name="MSG_OK" direction="daemon → producer"
           layout={`[task_id : 4 bytes]`}
-          example={`task_id = 0x00000A42  →  accepted task id = 2626`}
+          example={`task_id = 0x00000A42  (accepted task id 2626)`}
           extra={
             <p className="text-[13.5px] leading-relaxed text-quicx-muted">
-              Acknowledges that the task was accepted into the queue — not that it ran. Outbound
+              Acknowledges that the task was accepted into the queue, not that it ran. Outbound
               only: the daemon never parses an inbound <InlineCode>MSG_OK</InlineCode>.
             </p>
           }
@@ -293,14 +293,14 @@ export function BinaryProtocolSection() {
               <Table
                 headers={["Code", "Meaning"]}
                 rows={[
-                  [<InlineCode key="1">0x01</InlineCode>, "queue full — the memory budget is used up"],
+                  [<InlineCode key="1">0x01</InlineCode>, "queue full: the memory budget is used up"],
                   [<InlineCode key="2">0x02</InlineCode>, "invalid message (bad version / length / type)"],
                   [<InlineCode key="3">0x03</InlineCode>, "payload larger than 1,024 bytes"],
                   [<InlineCode key="4">0x04</InlineCode>, "unknown task type"],
                 ]}
               />
               <p className="text-[13.5px] leading-relaxed text-quicx-muted">
-                Generic failure reply, sent to whichever peer tripped it. Outbound only — if a
+                Generic failure reply, sent to whichever peer tripped it. Outbound only: if a
                 peer ever sent <InlineCode>MSG_ERROR</InlineCode>{" "}to the daemon it&rsquo;d fail
                 parsing (not a recognized inbound case) and the connection gets closed.
               </p>
@@ -308,13 +308,13 @@ export function BinaryProtocolSection() {
           }
         />
         <Payload hex="0x04" name="MSG_READY" direction="worker → daemon"
-          layout={`(no payload — length = 0)`}
+          layout={`(no payload, length = 0)`}
           example={`Sent once per connection, immediately after connect, to register\nthe socket as an idle worker.`}
           extra={
             <p className="text-[13.5px] leading-relaxed text-quicx-muted">
               Registers the connection (<InlineCode>worker_add</InlineCode>) and tags it{" "}
               <InlineCode>CONN_WORKER</InlineCode>, then calls{" "}
-              <InlineCode>try_dispach</InlineCode> in case work is already queued — if a task is
+              <InlineCode>try_dispach</InlineCode> in case work is already queued. If a task is
               waiting, <InlineCode>MSG_TASK</InlineCode>{" "}follows immediately. There&rsquo;s no ack
               on success; if nothing is queued, the worker just stays blocked reading until a
               task arrives later.
@@ -329,15 +329,15 @@ export function BinaryProtocolSection() {
               The daemon marks the worker idle, clears <InlineCode>current_fd</InlineCode>, bumps{" "}
               <InlineCode>stats_task_completed</InlineCode>, redispatches, and forwards{" "}
               <InlineCode>protocol_send_done(producer_fd, task_id)</InlineCode> to the producer
-              that submitted the task. Parsing is now strict — exactly 4 bytes, or the frame is
+              that submitted the task. Parsing is now strict: exactly 4 bytes, or the frame is
               rejected.
             </p>
           }
         />
 
-        <Callout variant="tip" title="Fixed in v1.0.3 — producers now hear about success">
+        <Callout variant="tip" title="Fixed in v1.0.3: producers now hear about success">
           Until this release, <code>MSG_DONE</code>{" "}only updated the daemon&rsquo;s internal
-          state — the producer was never told and got silence on a completed task. It now
+          state. The producer was never told and got silence on a completed task. It now
           receives the same completion signal a failure would have gotten all along.
         </Callout>
 
@@ -367,8 +367,8 @@ export function BinaryProtocolSection() {
           }
         />
         <Payload hex="0x08" name="MSG_WAIT" direction="reserved, unused"
-          layout={`(no payload — length = 0)`}
-          example={`Defined and accepted by server.c's parser, but daemon_handle_message\nhas no case for it — falls through to default → ERR_UNKNOWN_TYPE.`}
+          layout={`(no payload, length = 0)`}
+          example={`Defined and accepted by server.c's parser, but daemon_handle_message\nhas no case for it, so it falls through to default and ERR_UNKNOWN_TYPE.`}
           extra={
             <p className="text-[13.5px] leading-relaxed text-quicx-muted">
               Nothing in production code calls <InlineCode>protocol_send_wait</InlineCode> either.
@@ -380,37 +380,37 @@ export function BinaryProtocolSection() {
         <Callout variant="warn" title="MSG_WAIT was never wired up">
           This looks like a planned &ldquo;no work right now, hold on&rdquo; signal that was
           never finished. A worker that registers with no task queued doesn&rsquo;t get an
-          explicit wait reply — it just stays blocked until <code>MSG_TASK</code> arrives later.
+          explicit wait reply. It just stays blocked until <code>MSG_TASK</code> arrives later.
         </Callout>
 
         <Payload hex="0x09" name="MSG_HEARTBEAT" direction="worker → daemon"
-          layout={`(no payload — length = 0)`}
+          layout={`(no payload, length = 0)`}
           example={`Liveness probe sent by the worker. The daemon immediately replies\nMSG_PONG on the same fd.`}
           extra={
             <p className="text-[13.5px] leading-relaxed text-quicx-muted">
               <InlineCode>PROTOCOL_TIMEOUT_MS</InlineCode> and{" "}
               <InlineCode>PROTOCOL_HEARTBEAT_MS</InlineCode>{" "}are defined, but nothing actually
-              tracks last-heartbeat time to drop stale connections — the daemon only responds to
+              tracks last-heartbeat time to drop stale connections. The daemon only responds to
               heartbeats, it doesn&rsquo;t enforce the timeout itself.
             </p>
           }
         />
         <Payload hex="0x0A" name="MSG_PONG" direction="daemon → worker"
-          layout={`(no payload — length = 0)`}
+          layout={`(no payload, length = 0)`}
           example={`The only valid reply to MSG_HEARTBEAT.`}
           extra={
             <p className="text-[13.5px] leading-relaxed text-quicx-muted">
               Outbound only, like <InlineCode>MSG_OK</InlineCode> /{" "}
-              <InlineCode>MSG_ERROR</InlineCode> — the daemon has no inbound case for it.
+              <InlineCode>MSG_ERROR</InlineCode>: the daemon has no inbound case for it.
             </p>
           }
         />
         <Payload hex="0x0B" name="MSG_STATS" direction="CLI → daemon (unix socket)"
-          layout={`(no payload — length = 0)`}
+          layout={`(no payload, length = 0)`}
           example={`Request for pool, queue and worker stats.`}
           extra={
             <p className="text-[13.5px] leading-relaxed text-quicx-muted">
-              Sent over the Unix socket at <InlineCode>/tmp/quicx.sock</InlineCode> — not the TCP
+              Sent over the Unix socket at <InlineCode>/tmp/quicx.sock</InlineCode>, not the TCP
               port producers and workers use. <InlineCode>quicx status</InlineCode> is the only
               sender.
             </p>
@@ -429,14 +429,14 @@ export function BinaryProtocolSection() {
                   ],
                   [
                     "StatsClass × class_count",
-                    "one entry per block size that holds pages right now — its block size, capacity and live blocks",
+                    "one entry per block size that holds pages right now: its block size, capacity and live blocks",
                   ],
                 ]}
               />
               <p className="text-[13.5px] leading-relaxed text-quicx-muted">
                 <InlineCode>_Static_assert(sizeof(StatsHeader) == 81)</InlineCode> locks the
                 layout. <InlineCode>class_count</InlineCode> is a <InlineCode>uint8_t</InlineCode>{" "}
-                with no byte-swap — it used to be a <InlineCode>uint32_t</InlineCode> sent
+                with no byte-swap. It used to be a <InlineCode>uint32_t</InlineCode> sent
                 through <InlineCode>htonl</InlineCode>, with the daemon and the reader each
                 hardcoding a different, mismatched cap (32 and 16) on how many classes they&rsquo;d
                 parse.
@@ -449,8 +449,8 @@ export function BinaryProtocolSection() {
       <Callout variant="warn" title="Stats wire format is incompatible with v1.0.2">
         <code>StatsHeader</code> grew from 48 to 73 bytes in v1.0.3 and to 81 in 2.0 (the eviction
         counter). A <code>quicx status</code> talking to a daemon of another release degrades
-        gracefully — it detects the length mismatch and prints{" "}
-        <code>daemon speaks a different stats format — restart the daemon to match</code> rather
+        gracefully. It detects the length mismatch and prints{" "}
+        <code>error: daemon speaks a different stats format</code> rather
         than misparsing the response. Keep the CLI and the daemon on the same release.
       </Callout>
 

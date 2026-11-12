@@ -57,7 +57,7 @@ export function JavaClientSection() {
         </p>
       </Prose>
 
-      <SubHeading id="QuicxClient">QuicxClient — producers</SubHeading>
+      <SubHeading id="QuicxClient">QuicxClient for producers</SubHeading>
 
       <Prose>
         <p>
@@ -146,7 +146,7 @@ try (QuicxClient client = new QuicxClient("localhost", 16381)) {
 }`}
       />
 
-      <SubHeading id="QuicxWorker">QuicxWorker — consumers</SubHeading>
+      <SubHeading id="QuicxWorker">QuicxWorker for consumers</SubHeading>
 
       <Prose>
         <p>

@@ -44,8 +44,8 @@ export function QuickStartSection() {
         <Step index="01" title="Start the daemon">
           <Prose>
             <p>
-              <InlineCode>quicx start</InlineCode> runs with sensible defaults — port 16381 and an
-              8 MiB memory budget — so a config file is optional. To change them, start from the
+              <InlineCode>quicx start</InlineCode> runs with defaults (port 16381 and an
+              8 MiB memory budget), so a config file is optional. To change them, start from the
               reference file in <Link href="/docs/configuration">Configuration</Link>; this example
               keeps it at <InlineCode>/etc/quicx/quicx.conf</InlineCode>.
             </p>
@@ -169,7 +169,7 @@ public class EmailWorker {
                 System.out.println("delivering: " + body);
                 // ... do the work ...
             })
-            .start();   // blocks — runs until the process is killed
+            .start();   // blocks until the process is killed
     }
 }`}
           />
@@ -180,8 +180,8 @@ public class EmailWorker {
         The producer opened a short-lived TCP connection, framed a{" "}
         <InlineCode>MSG_SUBMIT</InlineCode> with a 6‑byte header and a typed payload, then
         waited for a 4‑byte <InlineCode>task_id</InlineCode>. The daemon put the task into
-        one block of its fixed budget — no <InlineCode>malloc</InlineCode>, no GC pause — and
-        handed it to an idle worker. One daemon. No moving parts.
+        one block of its fixed budget, without <InlineCode>malloc</InlineCode> or a GC pause, and
+        handed it to an idle worker.
       </Callout>
     </section>
   );

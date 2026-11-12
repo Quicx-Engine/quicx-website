@@ -17,7 +17,7 @@ export function AllocatorSection() {
 
       <Prose>
         <p>
-          Quicx 2.0 keeps its promise — one budget, mapped once, never exceeded — and changes
+          Quicx 2.0 keeps its promise (one budget, mapped once, never exceeded) and changes
           what happens inside it. Up to 1.0.4 the budget was split between block sizes by fixed
           percentages (PMAD), decided before the first task arrived. apool lets the traffic
           decide instead: the diagram below follows one page, page 4, through every part of it.
@@ -84,7 +84,7 @@ export function AllocatorSection() {
             def: (
               <>
                 A task is the 64 B <InlineCode>Task</InlineCode> record with its payload right
-                behind it — one allocation, one free, freed the moment{" "}
+                behind it: one allocation, one free, freed the moment{" "}
                 <InlineCode>MSG_TASK</InlineCode> is sent. Connections and workers come from a
                 separate 3-page control pool, so a full task pool can never lock a worker out.
               </>
@@ -111,7 +111,7 @@ export function AllocatorSection() {
           ["Reserve", "Linux zone watermarks, memcached", "after a flood of one size, a new size still gets room (16 tasks of 900 B instead of 0); costs 1.4 % of capacity", "on"],
           ["Hardening", "mimalloc secure mode", "free-list links XOR-encoded with a per-pool key; double frees and overwritten links are caught; about 1 ns per task (M4 Pro)", "on"],
           ["Purge with a warm list", "jemalloc, mimalloc", "beyond 63 empty pages the oldest gives its memory back to the OS; 1,104 KB held after a drain instead of 8,096 KB", "on"],
-          ["Lifetime classes", "LLAMA (Maas et al. 2020)", "long-lived blocks get their own pages; 7,648 instead of 16 tasks fit after a pinning pattern — when a caller passes a hint", "available, unused"],
+          ["Lifetime classes", "LLAMA (Maas et al. 2020)", "long-lived blocks get their own pages; 7,648 instead of 16 tasks fit after a pinning pattern, when a caller passes a hint", "available, unused"],
           ["Fullest page first", "Hoard (Berger et al. 2000)", "measured: no gain on queue traffic, 5 ns slower per task", "off"],
         ]}
       />

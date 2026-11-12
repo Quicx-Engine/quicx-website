@@ -65,7 +65,7 @@ export function BenchmarksSection() {
         Anything measured before the <InlineCode>send_frame_v</InlineCode> fix is
         unverifiable and has been removed from this site.{" "}
         <InlineCode>protocol.c</InlineCode> wrote one <InlineCode>struct iovec</InlineCode>{" "}
-        past the end of a stack array on every task dispatch that carried a payload —
+        past the end of a stack array on every task dispatch that carried a payload, which is
         undefined behaviour. One build aborted on the first task; another silently corrupted
         adjacent stack slots and kept running. A measurement taken before the fix may be fine
         or may be garbage, and there is no way to tell retroactively, so everything was
@@ -77,16 +77,16 @@ export function BenchmarksSection() {
 
       <Prose>
         <p>
-          <strong>{HEADLINE.throughput} tasks/sec</strong> — end to end, single thread, median
+          <strong>{HEADLINE.throughput} tasks/sec</strong> end to end, single thread, median
           of 5 runs on the M4 Pro. {THROUGHPUT_RUN.window}, {THROUGHPUT_RUN.errors}.{" "}
           {THROUGHPUT_RUN.spread} The allocator did not change the speed: its share of a round
           trip is about 15 ns.
         </p>
         <p>
-          One Quicx task is a full lifecycle: producer submits → daemon acks → daemon
-          dispatches → worker parses the payload → worker reports done → producer is
-          notified. <strong>Five protocol messages.</strong> This is not a single enqueue
-          operation, and it should not be compared against one.
+          One Quicx task is a full lifecycle. The producer submits, the daemon acks and
+          dispatches, the worker parses the payload and reports done, and the producer is
+          notified. That is <strong>five protocol messages</strong>, so it should not be
+          compared against a single enqueue.
         </p>
       </Prose>
 
@@ -102,7 +102,7 @@ export function BenchmarksSection() {
       </Prose>
 
       <Table
-        headers={["Percentile", "submit → done"]}
+        headers={["Percentile", "submit to done"]}
         rows={LATENCY_PERCENTILES.map((p) => [
           p.label,
           p.label === "p50" ? <strong key={p.label}>{p.value}</strong> : p.value,
@@ -114,8 +114,8 @@ export function BenchmarksSection() {
       <Prose>
         <p>
           Each machine is offered a rate it handles comfortably. The i3 tops out at 19.0k
-          tasks/sec in the closed loop because eleven processes — the daemon, 8 workers and 2
-          producers — share its four hardware threads. On both machines v1.0.4 and v2.0.0 are
+          tasks/sec in the closed loop because eleven processes (the daemon, 8 workers and 2
+          producers) share its four hardware threads. On both machines v1.0.4 and v2.0.0 are
           inside each other&rsquo;s run-to-run range.
         </p>
       </Prose>
@@ -125,10 +125,10 @@ export function BenchmarksSection() {
         rows={LATENCY_BY_MACHINE.map((r) => [r.machine, r.offered, r.p50, r.p99, r.p999, r.throughput])}
       />
 
-      <Callout variant="warn" title="submit → ack is not the number that matters">
-        A submit → ack measurement times how long the daemon takes to say
+      <Callout variant="warn" title="Time to the ack is not the number that matters">
+        A submit-to-ack measurement times how long the daemon takes to say
         &ldquo;received&rdquo;. It never touches a worker. Every latency figure on this page
-        is submit → done: the producer is notified only after a worker has actually parsed
+        is timed from submit to done: the producer is notified only after a worker has actually parsed
         the payload and reported completion.
       </Callout>
 
@@ -255,7 +255,7 @@ export function BenchmarksSection() {
       <Prose>
         <p>
           The harness lives in <InlineCode>bench/</InlineCode> and you can run it yourself.
-          The choices below are the difference between a benchmark and a marketing claim.
+          These are the choices behind every number on this page.
         </p>
       </Prose>
 
@@ -281,7 +281,7 @@ export function BenchmarksSection() {
 
       <Callout variant="perf" title="The unit trap">
         A Quicx task is five protocol messages across two connections. A Redis{" "}
-        <InlineCode>LPUSH</InlineCode> is one command — and a real Redis job queue needs{" "}
+        <InlineCode>LPUSH</InlineCode> is one command, and a real Redis job queue needs{" "}
         <InlineCode>LPUSH</InlineCode> + <InlineCode>BRPOP</InlineCode>{" "}+ an ack. Normalised
         per completed job, Redis&rsquo;s ~161k commands/sec is on the order of 50k jobs/sec.
         Putting 81.9k tasks/s next to 161k LPUSH/s directly would flatter Redis by roughly
@@ -292,7 +292,7 @@ export function BenchmarksSection() {
         <p>
           Part of Quicx&rsquo;s latency advantage is work it is not doing. Before you take
           these numbers as a reason to switch, read{" "}
-          <Link href="/docs/limitations">Limitations</Link> — it lists exactly which work that is.
+          <Link href="/docs/limitations">Limitations</Link>, which lists that work.
         </p>
       </Prose>
     </section>

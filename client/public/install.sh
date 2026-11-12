@@ -137,7 +137,7 @@ fi
 # -------------------------
 verify_install() {
 if command -v quicx >/dev/null 2>&1; then
-  success "quicx installed — run: quicx start"
+  success "quicx installed. Run: quicx start"
 else
   printf "\n${CYAN}Note:${RESET} not in PATH. Add:\n\n"
   printf "  export PATH=\"\$PATH:${INSTALL_DIR}\"\n\n"

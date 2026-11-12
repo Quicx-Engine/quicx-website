@@ -19,7 +19,7 @@ export function ConfigurationSection() {
       <CodeBlock
         filename="quicx.conf"
         language="conf"
-        code={`# quicx.conf — every key is optional; these ARE the built-in defaults
+        code={`# quicx.conf: every key is optional; these are the built-in defaults
 [server]
 port = 16381            # TCP port for producers and workers
 
@@ -39,7 +39,7 @@ admission     = value   # when full: refuse, oldest or value`}
       <Callout variant="note" title="Default configuration">
         Running <InlineCode>quicx start</InlineCode> without <InlineCode>--config</InlineCode>{" "}
         gives exactly the file above. Order of precedence: the built-in defaults, then the
-        file, then the command line — <InlineCode>--port</InlineCode> always wins.
+        file, then the command line. <InlineCode>--port</InlineCode> always wins.
       </Callout>
 
       <Prose>
@@ -66,7 +66,7 @@ quicx v2.1.0 starting
             def: (
               <>
                 TCP port the daemon binds to, 1–65535. Producers and workers both dial the same
-                port — routing is decided by the first message they send (
+                port, and the first message they send decides the routing (
                 <InlineCode>MSG_SUBMIT</InlineCode> vs <InlineCode>MSG_READY</InlineCode>).
                 Default: <InlineCode>16381</InlineCode>.
               </>
@@ -238,7 +238,7 @@ tasks      = (task pages - task pages / 64) * per page`}
 
       <Callout variant="warn" title="Validation is strict on purpose">
         An unknown section or key, a key in the wrong section, or a value that cannot be used
-        stops the daemon with the file and the line — for example{" "}
+        stops the daemon with the file and the line, for example{" "}
         <InlineCode>quicx.conf:14: purge must be on or off, not &apos;sometimes&apos;</InlineCode>.
         A typo never silently falls back to a default.
       </Callout>
