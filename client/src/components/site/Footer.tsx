@@ -56,8 +56,8 @@ export function Footer() {
         <div className="col-span-2 md:col-span-5">
           <Image src="/quicx-logo.svg" alt="Quicx" width={130} height={34} className="h-8 w-auto" />
           <p className="mt-5 max-w-[36ch] text-[15px] leading-[1.6] text-quicx-muted">
-            A deterministic task queue engine, built around an adaptive page allocator, a fixed
-            memory budget and QXP, its own binary protocol.
+            A task queue with a fixed memory budget that keeps the valuable work when it is full,
+            built around an adaptive page allocator and QXP, its own binary protocol.
           </p>
           <p className="mt-6 text-[14px] text-quicx-dim">
             Built by{" "}

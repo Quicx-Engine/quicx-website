@@ -1,235 +1,186 @@
 import { ImageResponse } from "next/og";
+import { LOGO_RATIO, OG, OG_SIZE, loadOgFonts, loadOgLogo } from "@/lib/og";
 
-export const alt = "Quicx — Deterministic task queue engine";
-export const size = { width: 1200, height: 630 };
+// Measured: docs/report "value admission", steady overload (2,000 tasks/s for
+// 15 s, 10 % valuable). Same rows as VALUE_ROWS in src/lib/benchmarks.ts.
+export const alt =
+  "Quicx, the open-source task queue in C: when memory is full, Quicx keeps the valuable work. Under overload it finished 100 % of valuable tasks; a queue that refuses when full finished 31.6 %.";
+export const size = OG_SIZE;
 export const contentType = "image/png";
 
-async function loadGoogleFont(family: string, weight: number) {
-  const url = `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}:wght@${weight}&display=swap`;
-  const css = await (
-    await fetch(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      },
-    })
-  ).text();
-  const match = css.match(
-    /src: url\((https:\/\/[^)]+\.(?:ttf|otf))\) format/
+const LOGO_H = 56;
+
+// Fixed widths: Satori sizes a flex-grow track by its content, so a 100 % fill
+// would push the label and the figure out of the row.
+const LABEL_W = 250;
+const VALUE_W = 140;
+const TRACK_W = 1200 - 2 * 64 - 2 - 2 * 22 - LABEL_W - VALUE_W; // 636
+
+function Bar({
+  label,
+  value,
+  fill,
+  color,
+  labelColor,
+}: {
+  label: string;
+  value: string;
+  fill: number;
+  color: string;
+  labelColor: string;
+}) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", height: "44px" }}>
+      <div
+        style={{
+          display: "flex",
+          width: `${LABEL_W}px`,
+          fontFamily: "Archivo",
+          fontWeight: 500,
+          fontSize: "21px",
+          color: labelColor,
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          width: `${TRACK_W}px`,
+          height: "14px",
+          background: OG.hairline,
+          borderRadius: "2px",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            width: `${Math.round((TRACK_W * fill) / 100)}px`,
+            height: "14px",
+            background: color,
+            borderRadius: "2px",
+          }}
+        />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          width: `${VALUE_W}px`,
+          fontFamily: "JetBrains Mono",
+          fontWeight: 500,
+          fontSize: "26px",
+          letterSpacing: "-0.5px",
+          color: labelColor,
+        }}
+      >
+        {value}
+      </div>
+    </div>
   );
-  if (!match) throw new Error(`Could not extract font URL for ${family}`);
-  return await (await fetch(match[1])).arrayBuffer();
 }
 
 export default async function Image() {
-  const [archivo400, archivo600, jetbrains500] = await Promise.all([
-    loadGoogleFont("Archivo", 400),
-    loadGoogleFont("Archivo", 600),
-    loadGoogleFont("JetBrains Mono", 500),
-  ]);
+  const [fonts, logo] = await Promise.all([loadOgFonts(), loadOgLogo()]);
+
   return new ImageResponse(
     (
       <div
         style={{
-          background: "#0b1920",
-          width: "100%",
-          height: "100%",
           display: "flex",
           flexDirection: "column",
-          alignItems: "flex-start",
-          justifyContent: "center",
-          padding: "64px",
-          position: "relative",
-          overflow: "hidden",
+          width: "100%",
+          height: "100%",
+          background: OG.ground,
+          padding: "50px 64px 52px",
+          fontFamily: "Archivo",
         }}
       >
-        {/* bg-grid (opacity 0.5) */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "1200px",
-            height: "630px",
-            opacity: 0.5,
-            backgroundImage:
-              "linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)",
-            backgroundSize: "56px 56px",
-            display: "flex",
-          }}
-        />
-        {/* radial-hero-glow — top ellipse */}
-        <div
-          style={{
-            position: "absolute",
-            top: "0px",
-            left: "0px",
-            width: "1200px",
-            height: "600px",
-            transform: "translateY(-50%)",
-            backgroundImage:
-              "radial-gradient(ellipse at center, rgba(255,87,0,0.12) 0%, transparent 60%)",
-            display: "flex",
-          }}
-        />
-        {/* radial-hero-glow — bottom ellipse */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: "0",
-            left: "0px",
-            width: "1200px",
-            height: "550px",
-            transform: "translateY(50%)",
-            backgroundImage:
-              "radial-gradient(ellipse at center, rgba(255,87,0,0.05) 0%, transparent 60%)",
-            display: "flex",
-          }}
-        />
-        {/* Top hairline — via-quicx-line-strong */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "1200px",
-            height: "1px",
-            backgroundImage:
-              "linear-gradient(to right, transparent, rgba(255,255,255,0.14), transparent)",
-            display: "flex",
-          }}
-        />
-        {/* Bottom hairline — via-quicx-orange/30 */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            width: "1200px",
-            height: "2px",
-            backgroundImage:
-              "linear-gradient(to right, transparent, rgba(255,87,0,0.3), transparent)",
-            display: "flex",
-          }}
-        />
-        {/* Docs-style kicker: num — gradient line — label */}
+        {/* Header: wordmark, and what it is */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "12px",
-            marginBottom: "28px",
-            fontFamily: "JetBrains Mono, monospace",
-            fontSize: "16px",
-            fontWeight: 500,
-            textTransform: "uppercase",
-            letterSpacing: "4.8px",
+            justifyContent: "space-between",
           }}
         >
-          <span style={{ color: "#6a7487" }}>Quicx</span>
+          <img src={logo} width={Math.round(LOGO_H * LOGO_RATIO)} height={LOGO_H} alt="" />
           <div
             style={{
               display: "flex",
-              width: "48px",
-              height: "2px",
-              flexShrink: 0,
-              backgroundImage:
-                "linear-gradient(to right, rgba(255,87,0,0.7), transparent)",
+              fontFamily: "JetBrains Mono",
+              fontWeight: 500,
+              fontSize: "17px",
+              letterSpacing: "3px",
+              textTransform: "uppercase",
+              color: OG.muted,
             }}
-          />
-          <span style={{ color: "#ff7a33" }}>Configure it once. Run it forever.</span>
+          >
+            Open-source task queue in C
+          </div>
         </div>
 
-        {/* Main headline */}
+        {/* Headline, in the site's condensed display voice */}
         <div
           style={{
-            fontSize: "72px",
-            fontWeight: 600,
-            color: "#f4f6fb",
-            lineHeight: 1.1,
-            fontFamily: "Archivo, Arial, sans-serif",
-            marginBottom: "20px",
+            display: "flex",
+            flexDirection: "column",
+            marginTop: "30px",
+            fontFamily: "Archivo",
+            fontWeight: 900,
+            fontSize: "100px",
+            lineHeight: 0.9,
+            letterSpacing: "-0.5px",
+            textTransform: "uppercase",
+            color: OG.text,
           }}
         >
-          Quicx - Deterministic Task Queue Engine
+          <div style={{ display: "flex" }}>When memory is full,</div>
+          <div style={{ display: "flex" }}>Quicx keeps the</div>
+          <div style={{ display: "flex" }}>valuable work.</div>
         </div>
 
-        {/* Tagline */}
+        {/* The proof: one instrument well, a mono title strip, two rows */}
         <div
           style={{
-            fontSize: "28px",
-            color: "#8a9ba8",
-            fontFamily: "Archivo, Arial, sans-serif",
-            marginBottom: "44px",
-            maxWidth: "760px",
-            lineHeight: 1.45,
+            display: "flex",
+            flexDirection: "column",
+            marginTop: "auto",
+            background: OG.well,
+            border: `1px solid ${OG.hairlineStrong}`,
+            borderRadius: "3px",
           }}
         >
-          Fixed memory pool. Exact accounting. Measured, not asserted.
-        </div>
-
-        {/* Stats badges */}
-        <div style={{ display: "flex", gap: "14px", flexWrap: "nowrap" }}>
-          {["81,900 tasks/s", "49 µs p50 end-to-end", "46,593 tasks in 8 MiB", "36 KB on a Pi"].map(
-            (stat) => (
-              <div
-                key={stat}
-                style={{
-                  fontSize: "13px",
-                  color: "#FF7A33",
-                  border: "1px solid rgba(255,87,0,0.38)",
-                  background: "rgba(255,87,0,0.07)",
-                  padding: "8px 16px",
-                  borderRadius: "4px",
-                  fontFamily: "monospace",
-                  letterSpacing: "0.6px",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {stat}
-              </div>
-            )
-          )}
-        </div>
-
-        {/* URL watermark */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: "52px",
-            right: "64px",
-            fontSize: "16px",
-            color: "rgba(138,155,168,0.5)",
-            fontFamily: "Arial, sans-serif",
-            letterSpacing: "2px",
-          }}
-        >
-          quicx.dev
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              padding: "12px 22px",
+              borderBottom: `1px solid ${OG.hairline}`,
+              fontFamily: "JetBrains Mono",
+              fontWeight: 500,
+              fontSize: "14px",
+              letterSpacing: "2px",
+              textTransform: "uppercase",
+              color: OG.dim,
+            }}
+          >
+            <div style={{ display: "flex" }}>Valuable tasks done under overload</div>
+            <div style={{ display: "flex" }}>Measured</div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", padding: "8px 22px 10px" }}>
+            <Bar label="Quicx" value={"100\u00a0%"} fill={100} color={OG.orange} labelColor={OG.text} />
+            <Bar
+              label="Queue that refuses"
+              value={"31.6\u00a0%"}
+              fill={31.6}
+              color={OG.dim}
+              labelColor={OG.muted}
+            />
+          </div>
         </div>
       </div>
     ),
-    {
-      ...size,
-      fonts: [
-        {
-          name: "Archivo",
-          data: archivo400,
-          weight: 400,
-          style: "normal",
-        },
-        {
-          name: "Archivo",
-          data: archivo600,
-          weight: 600,
-          style: "normal",
-        },
-        {
-          name: "JetBrains Mono",
-          data: jetbrains500,
-          weight: 500,
-          style: "normal",
-        },
-      ],
-    }
+    { ...size, fonts }
   );
 }

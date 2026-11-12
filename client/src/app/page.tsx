@@ -10,14 +10,14 @@ import type { Metadata } from "next";
 import { SITE_URL, baseOpenGraph } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Quicx - Deterministic Task Queue Engine",
+  title: "Quicx — Memory-Bounded Task Queue with Value-Aware Eviction",
   description:
     "Quicx is a task queue in C with a hard memory budget that keeps the most valuable work when it is full. 46,593 tasks in 8 MiB, 81,900 tasks/s, 36 KB on a Raspberry Pi.",
   alternates: {
     canonical: SITE_URL,
   },
   openGraph: {
-    title: "Quicx - Deterministic Task Queue Engine",
+    title: "Quicx — the task queue that keeps the valuable work when memory is full",
     description:
       "A task queue that never goes past its memory budget and keeps the most valuable work when it is full: 46,593 tasks in 8 MiB, 81,900 tasks/sec at 49 µs median, 36 KB on a Raspberry Pi. All measured.",
     url: SITE_URL,
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Quicx - Deterministic Task Queue Engine",
+    title: "Quicx — the task queue that keeps the valuable work when memory is full",
     description:
       "A task queue with a hard memory limit that keeps the most valuable work when full: 46,593 tasks in 8 MiB, 81,900 tasks/sec, 36 KB on a Raspberry Pi. All measured.",
   },
