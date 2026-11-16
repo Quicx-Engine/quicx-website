@@ -57,21 +57,25 @@ export default async function DocsSectionPage({
   const meta = sectionMeta[slug];
   if (!Section || !meta) notFound();
 
+  // /docs is a 308 to installation, so the "Documentation" crumb points
+  // straight at the destination. On the installation page itself that crumb
+  // and the page crumb would be the same URL twice, so it is left out there.
+  const docsHome = `${SITE_URL}/docs/installation`;
+  const pageUrl = `${SITE_URL}/docs/${slug}`;
+  const crumbs = [
+    { name: "Home", item: SITE_URL },
+    ...(pageUrl === docsHome ? [] : [{ name: "Documentation", item: docsHome }]),
+    { name: meta.title, item: pageUrl },
+  ];
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quicx.dev" },
-      // /docs is a 308 to installation — point straight at the destination so
-      // crawlers don't keep rediscovering a redirect from every docs page.
-      { "@type": "ListItem", "position": 2, "name": "Documentation", "item": "https://quicx.dev/docs/installation" },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": meta.title,
-        "item": `https://quicx.dev/docs/${slug}`,
-      },
-    ],
+    "itemListElement": crumbs.map((c, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "name": c.name,
+      "item": c.item,
+    })),
   };
 
   const techArticleJsonLd = {

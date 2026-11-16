@@ -34,8 +34,11 @@ const nav: { title: string; items: { label: string; href: string; external?: boo
     items: [
       { label: "Documentation", href: "/docs/installation" },
       { label: "Quick start", href: "/docs/quick-start" },
+      { label: "Configuration", href: "/docs/configuration" },
       { label: "CLI reference", href: "/docs/cli-reference" },
       { label: "Java client", href: "/docs/java-client" },
+      { label: "QXP protocol", href: "/docs/binary-protocol" },
+      { label: "Allocator", href: "/docs/allocator" },
     ],
   },
   {
