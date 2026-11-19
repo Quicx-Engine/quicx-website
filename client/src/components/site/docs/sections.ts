@@ -30,7 +30,12 @@ export const nav: DocsNavGroup[] = [
       {
         id: "quick-start",
         label: "Quick Start",
-        toc: [],
+        toc: [
+          { id: "qs-daemon", label: "Start the daemon" },
+          { id: "qs-producer", label: "Submit tasks with levels" },
+          { id: "qs-budget-full", label: "When the budget is full" },
+          { id: "qs-errors", label: "Common errors" },
+        ],
       },
       {
         id: "configuration",
@@ -109,7 +114,8 @@ export const nav: DocsNavGroup[] = [
           { id: "java-build-setup", label: "Add it to your build" },
           { id: "QuicxClient", label: "QuicxClient for producers" },
           { id: "QuicxWorker", label: "QuicxWorker for consumers" },
-          { id: "QuicxException", label: "Errors and limits" },
+          { id: "java-threading", label: "Threading model" },
+          { id: "QuicxException", label: "Error handling" },
         ],
       },
       {

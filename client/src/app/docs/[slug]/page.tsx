@@ -23,7 +23,7 @@ export async function generateMetadata({
   const meta = sectionMeta[slug];
   if (!meta) return {};
   const url = `${SITE_URL}/docs/${slug}`;
-  const title = `${meta.title} - Quicx Docs`;
+  const title = meta.seoTitle ?? `${meta.title} - Quicx Docs`;
   const description = meta.description ?? meta.lede;
   return {
     // absolute: the root template would otherwise append a second "| Quicx"
@@ -81,7 +81,7 @@ export default async function DocsSectionPage({
   const techArticleJsonLd = {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    "headline": `${meta.title} - Quicx Documentation`,
+    "headline": meta.seoTitle ?? `${meta.title} - Quicx Documentation`,
     "description": meta.description ?? meta.lede,
     "url": `https://quicx.dev/docs/${slug}`,
     "mainEntityOfPage": `https://quicx.dev/docs/${slug}`,
@@ -96,6 +96,7 @@ export default async function DocsSectionPage({
       "@id": "https://quicx.dev/#organization"
     },
     "datePublished": "2026-04-21",
+    // the same value as this page's lastmod in sitemap.xml
     "dateModified": meta.updated,
     "about": {
       "@id": "https://quicx.dev/#software"

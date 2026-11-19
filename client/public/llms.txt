@@ -26,14 +26,14 @@ Quicx is an in-memory broker, not a durable one. No persistence (a restart empti
 
 ## Docs
 - [Installation](https://quicx.dev/docs/installation): one-line install, checksums, pinning a version
-- [Quick start](https://quicx.dev/docs/quick-start): first daemon, producer and worker
+- [Quick start](https://quicx.dev/docs/quick-start): a daemon with a memory budget, a Java producer with value levels and a worker; what a full budget evicts; common errors
 - [Configuration](https://quicx.dev/docs/configuration): every setting, the admission rule, capacity planning
 - [Architecture](https://quicx.dev/docs/architecture): how a task moves through the daemon
 - [Allocator](https://quicx.dev/docs/allocator): apool, its ideas from the allocator literature, and their measured effect
 - [QXP Protocol](https://quicx.dev/docs/binary-protocol): frame header, message types, SUBMIT_VALUED
 - [Benchmarks](https://quicx.dev/docs/benchmarks): measured results on two machines, value-aware admission, several daemons
 - [CLI reference](https://quicx.dev/docs/cli-reference): start, stop, status, version, several daemons per machine
-- [Java client](https://quicx.dev/docs/java-client): dev.quicx:quicx-client
+- [Java client](https://quicx.dev/docs/java-client): dev.quicx:quicx-client for Maven and Gradle; QuicxClient and QuicxWorker API, threading, errors, compatibility
 - [Limitations](https://quicx.dev/docs/limitations): what Quicx does not do
 - [Changelog](https://quicx.dev/docs/changelog): what changed in each release
 

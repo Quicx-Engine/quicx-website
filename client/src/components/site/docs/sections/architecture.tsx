@@ -29,6 +29,12 @@ export function ArchitectureSection() {
           clients that speak the same protocol, QXP, and the first frame they send tells the
           daemon which role they&rsquo;re playing.
         </p>
+        <p>
+          The <Link href="/docs/java-client">Quicx Java client</Link> plays both roles:{" "}
+          <InlineCode>QuicxClient</InlineCode> is a producer and <InlineCode>QuicxWorker</InlineCode>{" "}
+          a worker. The <Link href="/docs/quick-start">Java quick start</Link> runs one of each
+          against a local daemon, so every path below can be watched in a terminal.
+        </p>
         <p>There are four message paths, one in each direction across the two hops in the diagram:</p>
       </Prose>
 

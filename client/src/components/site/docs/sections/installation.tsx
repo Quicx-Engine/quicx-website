@@ -21,8 +21,8 @@ export function InstallationSection() {
           <strong>Linux (x86_64 / arm64)</strong> and{" "}
           <strong>macOS (Intel / Apple Silicon)</strong> without any additional tooling. No
           runtime dependencies, no package manager, no JDK. The Java client is distributed
-          separately through Maven Central (see{" "}
-          <Link href="/docs/quick-start">Quick Start</Link>).
+          separately through Maven Central; its coordinates are in{" "}
+          <Link href="/docs/java-client#java-build-setup">the Java client&rsquo;s Maven and Gradle setup</Link>.
         </p>
       </Prose>
 
@@ -134,6 +134,13 @@ curl -fsSL https://quicx.dev/install.sh | QUICX_INSTALL_DIR=~/.local/bin sh`}
         language="sh"
         code={`user@host ~ % quicx version\nquicx v${CURRENT_VERSION}\n`}
       />
+
+      <Prose>
+        <p>
+          Next, <Link href="/docs/quick-start">run a first task queue in Java</Link>: a daemon
+          with a memory budget, a worker and a producer, in about a minute.
+        </p>
+      </Prose>
 
       <Callout variant="tip" title="Offline / airgapped installs">
         Download the release binary directly from{" "}

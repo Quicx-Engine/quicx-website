@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import {
   SectionHeaderFor,
   Prose,
@@ -153,8 +154,11 @@ export function BinaryProtocolSection() {
         <p>
           <strong>QXP</strong> (the Quicx Protocol) is Quicx&rsquo;s own protocol, designed by
           Dimitar Anastasov for Quicx. Producers, workers and the <InlineCode>quicx</InlineCode>{" "}
-          CLI all speak it; the Java client is one implementation of it, and this page is enough
-          to write another in any language.
+          CLI all speak it; the{" "}
+          <Link href="/docs/java-client">Java client, dev.quicx:quicx-client</Link>, is one
+          implementation of it, and this page is enough to write another in any language. To see
+          the frames below at work, run the{" "}
+          <Link href="/docs/quick-start">quick start with a Java producer and worker</Link>.
         </p>
       </Prose>
 

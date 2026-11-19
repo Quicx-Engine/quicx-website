@@ -7,7 +7,14 @@ export type SectionMeta = {
   lede: string;
   /** Meta description override, for ledes too long for a search snippet (~160 chars). */
   description?: string;
-  /** Date of the last meaningful content change (YYYY-MM-DD) — feeds sitemap lastmod and TechArticle dateModified. */
+  /** The whole <title>, for pages that target a search query of their own. Default: "<title> - Quicx Docs". */
+  seoTitle?: string;
+  /**
+   * Date of the last meaningful change to the page (YYYY-MM-DD): its main content, its links or
+   * its structured data. Feeds the sitemap lastmod, TechArticle dateModified and og:modified_time,
+   * so bump it in the same commit as the change. Not the commit time: one copy-editing commit
+   * touches every page without changing what any of them says.
+   */
   updated: string;
   toc: TocEntry[];
 };
@@ -18,7 +25,7 @@ export const sectionMeta: Record<string, SectionMeta> = {
     kicker: "Getting Started",
     title: "Installation",
     lede: "Quicx ships as a single static binary. One curl command detects your OS and architecture, downloads the matching release from GitHub, and drops the daemon into your PATH.",
-    updated: "2026-11-11",
+    updated: "2026-11-20",
     toc: [
       { id: "what-installer-does", label: "What the installer does" },
       { id: "verify-installation", label: "Verify it worked" },
@@ -27,10 +34,20 @@ export const sectionMeta: Record<string, SectionMeta> = {
   "quick-start": {
     num: "§ 01.02",
     kicker: "Getting Started",
-    title: "Quick Start",
-    lede: "Start the daemon with quicx start, pull the Java client from Maven Central, and submit your first task. End-to-end in under a minute.",
-    updated: "2026-11-11",
-    toc: [],
+    title: "Quick Start in Java",
+    lede: "Start the daemon with a 256 KiB memory budget, run a Java worker and a producer that gives its tasks value levels, then fill the budget and watch Quicx keep the valuable task. About a minute, with no build tool: Java 11 runs each file straight from source.",
+    description: "Run Quicx in a minute: start the daemon with a memory budget, submit Java tasks with value levels, run a worker, then watch a full budget evict.",
+    seoTitle: "Quicx Quick Start: First Task Queue in Java in 60 Seconds",
+    updated: "2026-11-20",
+    toc: [
+      { id: "qs-daemon", label: "Start the daemon" },
+      { id: "qs-client", label: "Get the Java client" },
+      { id: "qs-worker", label: "Run a worker" },
+      { id: "qs-producer", label: "Submit tasks with levels" },
+      { id: "qs-budget-full", label: "When the budget is full" },
+      { id: "qs-errors", label: "Common errors" },
+      { id: "qs-next", label: "Next steps" },
+    ],
   },
   "configuration": {
     num: "§ 01.03",
@@ -52,7 +69,7 @@ export const sectionMeta: Record<string, SectionMeta> = {
     kicker: "Core Concepts",
     title: "Architecture",
     lede: "One daemon, three role-based endpoints, one allocator. Every piece is in one diagram, and none of them is optional.",
-    updated: "2026-11-09",
+    updated: "2026-11-20",
     toc: [{ id: "single-daemon-design", label: "Why a single daemon?" }],
   },
   "allocator": {
@@ -75,7 +92,7 @@ export const sectionMeta: Record<string, SectionMeta> = {
     title: "QXP Protocol",
     lede: "QXP, the Quicx Protocol, is the wire format designed for Quicx. Every frame is a 6-byte header followed by a variable-length payload. The daemon reads the length first, so parsing a frame is a couple of pointer reads.",
     description: "QXP, the Quicx Protocol: every frame is a 6-byte header plus a variable-length payload. No framing ambiguity, no text encoding, just pointer reads.",
-    updated: "2026-11-09",
+    updated: "2026-11-20",
     toc: [
       { id: "protocol-participants", label: "Participants & transport" },
       { id: "protocol-frame-header", label: "Frame header" },
@@ -90,7 +107,7 @@ export const sectionMeta: Record<string, SectionMeta> = {
     title: "Benchmarks",
     lede: "81,900 tasks/sec end to end at 49 µs median, and 46,593 tasks of 100 B in 8 MiB where 1.0.4 held 655. Measured on an Apple M4 Pro and a 2011 Intel i3 on Linux with the same scripts; anything not measured here is labelled with its provenance.",
     description: "Quicx 2.0 benchmarks on macOS and Linux: 81,900 tasks/sec at 49 µs median, 71× the capacity of 1.0.4 in 8 MiB, memory returned after bursts.",
-    updated: "2026-11-09",
+    updated: "2026-11-20",
     toc: [
       { id: "reference-run", label: "Reference run" },
       { id: "bench-throughput", label: "Throughput" },
@@ -131,13 +148,17 @@ export const sectionMeta: Record<string, SectionMeta> = {
     kicker: "Reference",
     title: "Java Client",
     lede: "dev.quicx:quicx-client 2.1.0 is a small, dependency-free Java 11+ library. QuicxClient submits tasks, with value levels if you want, and can wait for their result; QuicxWorker runs them, reconnecting and reporting on its own.",
-    description: "dev.quicx:quicx-client 2.1.0, a dependency-free Java 11+ library: QuicxClient submits tasks with value levels and waits for results, QuicxWorker runs them.",
-    updated: "2026-11-11",
+    description: "dev.quicx:quicx-client 2.1.0 for Maven and Gradle, Java 11+: QuicxClient and QuicxWorker API, error handling, threading and compatibility.",
+    seoTitle: "Quicx Java Client (Maven/Gradle): Setup and API Reference",
+    updated: "2026-11-20",
     toc: [
       { id: "java-build-setup", label: "Add it to your build" },
+      { id: "java-compatibility", label: "Compatibility" },
       { id: "QuicxClient", label: "QuicxClient for producers" },
       { id: "QuicxWorker", label: "QuicxWorker for consumers" },
-      { id: "QuicxException", label: "Errors and limits" },
+      { id: "java-threading", label: "Threading model" },
+      { id: "QuicxException", label: "Error handling" },
+      { id: "java-limits", label: "Limits and delivery" },
     ],
   },
   "changelog": {

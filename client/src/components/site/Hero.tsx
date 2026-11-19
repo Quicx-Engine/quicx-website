@@ -39,9 +39,9 @@ export function Hero() {
               className="enter mt-8 flex flex-wrap items-center gap-x-8 gap-y-3"
               style={{ "--d": "580ms" } as React.CSSProperties}
             >
-              <TextLink href="/docs/quick-start">Start with Quicx</TextLink>
-              <TextLink href="/docs/installation" className="text-quicx-body">
-                Read the docs
+              <TextLink href="/docs/quick-start">Quick start: a first task in Java</TextLink>
+              <TextLink href="/docs/java-client" className="text-quicx-body">
+                Java client for Maven and Gradle
               </TextLink>
             </div>
           </div>

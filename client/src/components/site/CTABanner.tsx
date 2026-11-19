@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Container, ButtonLink, ArrowGlyph } from "./primitives";
 import { InstallCommand } from "./InstallCommand";
 import { Reveal } from "./motion";
@@ -16,9 +17,11 @@ export function CTABanner() {
         </Reveal>
 
         <div className="mt-12 grid grid-cols-1 gap-x-10 gap-y-8 border-t border-quicx-on-orange/25 pt-10 lg:grid-cols-12">
-          <p className="max-w-[44ch] text-[17px] leading-[1.6] text-quicx-on-orange/85 lg:col-span-5">
-            Install the daemon, pull the Java client from Maven Central, and submit your first
-            task. There is nothing to sign up for.
+          <p className="max-w-[44ch] text-[17px] leading-[1.6] text-quicx-on-orange/85 lg:col-span-5 [&_a]:font-medium [&_a]:text-quicx-on-orange [&_a]:underline [&_a]:decoration-quicx-on-orange/40 [&_a]:underline-offset-4 [&_a:hover]:decoration-quicx-on-orange">
+            Install the daemon, pull the{" "}
+            <Link href="/docs/java-client">Java client from Maven Central</Link>, and{" "}
+            <Link href="/docs/quick-start">submit your first task in Java</Link>. There is
+            nothing to sign up for.
           </p>
           <div className="flex flex-col gap-4 lg:col-span-7">
             <InstallCommand tone="onOrange" />

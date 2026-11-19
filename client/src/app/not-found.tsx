@@ -3,11 +3,12 @@ import { Footer } from "@/components/site/Footer";
 import { Interactive404 } from "@/components/site/Interactive404";
 import type { Metadata } from "next";
 
-// Overrides the root layout's "index, follow" so the 404 page doesn't ship
-// two contradictory robots tags alongside Next's automatic noindex.
+// Next adds <meta name="robots" content="noindex"> to every 404 by itself.
+// null drops the root layout's "index, follow" (and its googlebot tag), so
+// that automatic tag is the only robots tag on the page.
 export const metadata: Metadata = {
   title: "Page not found",
-  robots: { index: false, follow: true },
+  robots: null,
 };
 
 export default function NotFound() {

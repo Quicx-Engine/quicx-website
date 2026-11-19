@@ -248,6 +248,12 @@ export function BenchmarksSection() {
           waiting. Only value-aware admission keeps all of them in both. Throughput is the same in
           every configuration.
         </p>
+        <p>
+          Producers set the level per task with{" "}
+          <Link href="/docs/java-client#QuicxClient">the Java client&rsquo;s submit(type, payload, level)</Link>.
+          To watch a full budget evict a less valuable task on your own machine, follow{" "}
+          <Link href="/docs/quick-start#qs-budget-full">the quick start&rsquo;s budget-full step</Link>.
+        </p>
       </Prose>
 
       <SubHeading id="bench-methodology">Methodology</SubHeading>
